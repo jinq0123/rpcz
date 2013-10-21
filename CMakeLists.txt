@@ -36,5 +36,7 @@ if(rpcz_build_examples)
   add_subdirectory(examples/cpp)
 endif(rpcz_build_examples)
 
-file(GLOB RPCZ_PUBLIC_HEADERS include/rpcz/*.h)
+
+file(GLOB RPCZ_PUBLIC_HEADERS include/rpcz/*.hpp)
+message(STATUS ${RPCZ_PUBLIC_HEADERS})
 install(FILES ${RPCZ_PUBLIC_HEADERS} DESTINATION include/rpcz)
