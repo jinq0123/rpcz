@@ -38,7 +38,7 @@ static const status_code DEADLINE_EXCEEDED = rpc_response_header::DEADLINE_EXCEE
 static const status_code TERMINATED = rpc_response_header::TERMINATED;
 }  // namespace status
 namespace application_error {
-static const application_error_code NO_ERROR = rpc_response_header::NO_ERROR;
+static const application_error_code APPLICATION_NO_ERROR = rpc_response_header::APPLICATION_NO_ERROR;
 static const application_error_code INVALID_HEADER = rpc_response_header::INVALID_HEADER;
 static const application_error_code NO_SUCH_SERVICE = rpc_response_header::NO_SUCH_SERVICE;
 static const application_error_code NO_SUCH_METHOD = rpc_response_header::NO_SUCH_METHOD;
