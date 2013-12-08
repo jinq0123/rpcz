@@ -22,7 +22,6 @@
 #include <boost/thread/tss.hpp>
 #include <map>
 #include <ostream>
-#include <pthread.h>
 #include <sstream>
 #include <stddef.h>
 #include <string>
