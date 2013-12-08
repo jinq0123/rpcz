@@ -13,16 +13,16 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing ( http://blog.csdn.net/jq0123 )
 
 #include "rpcz/clock.hpp"
-#include <sys/time.h>
+#include <boost/chrono.hpp>
 
 namespace rpcz {
 
-uint64 zclock_time(void) {
-    struct timeval tv;
-    gettimeofday (&tv, NULL);
-    return (int64_t) (tv.tv_sec * 1000 + tv.tv_usec / 1000);
+uint64 zclock_ms(void) {
+    return boost::chrono::high_resolution_clock::now()
+        .time_since_epoch().count() / 1000000;  
 }
 
 }  // namespace rpcz

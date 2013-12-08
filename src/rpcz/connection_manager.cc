@@ -98,7 +98,7 @@ void connection::send_request(
     int64 deadline_ms,
     connection_manager::client_request_callback callback) {
   remote_response_wrapper wrapper;
-  wrapper.start_time = zclock_time();
+  wrapper.start_time = zclock_ms();
   wrapper.deadline_ms = deadline_ms;
   wrapper.callback = callback;
 

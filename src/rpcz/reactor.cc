@@ -96,7 +96,7 @@ int reactor::loop() {
 }
 
 long reactor::process_closure_run_map() {
-  uint64 now = zclock_time();
+  uint64 now = zclock_ms();
   closure_run_map::iterator ub(closure_run_map_.upper_bound(now));
   for (closure_run_map::const_iterator it = closure_run_map_.begin();
        it != ub;
