@@ -221,7 +221,7 @@ class connection_manager_thread {
     switch (command) {
       case kQuit:
         // Ask the workers to quit. They'll in turn send kWorkerDone.
-        for (int i = 0; i < workers_.size(); ++i) {
+        for (size_t i = 0; i < workers_.size(); ++i) {
           send_string(frontend_socket_, workers_[i], ZMQ_SNDMORE);
           send_empty_message(frontend_socket_, ZMQ_SNDMORE);
           send_char(frontend_socket_, kWorkerQuit, 0);
