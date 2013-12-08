@@ -10,7 +10,7 @@ option(rpcz_build_static "Build static library." OFF)
 option(rpcz_build_examples "Build rpcz's examples." OFF)
 
 find_package(ProtobufPlugin REQUIRED)
-find_package(Boost REQUIRED COMPONENTS thread program_options)
+find_package(Boost REQUIRED COMPONENTS thread program_options chrono date_time system)
 find_package(ZeroMQ REQUIRED)
 
 find_path(CPPZMQ_DIR

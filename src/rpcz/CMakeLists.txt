@@ -17,6 +17,9 @@ set(RPCZ_SOURCES
     ${PROTO_SOURCES})
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${PROTOBUF_LIBRARY}
+                  ${Boost_CHRONO_LIBRARIES}
+                  ${Boost_DATE_TIME_LIBRARIES}
+                  ${Boost_SYSTEM_LIBRARIES}
                   ${Boost_THREAD_LIBRARIES})
 
 add_library(rpcz SHARED ${RPCZ_SOURCES})
