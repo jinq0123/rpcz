@@ -132,7 +132,7 @@ bool forward_message(zmq::socket_t &socket_in,
 void log_message_vector(message_vector& vector) {
   LOG(INFO) << "---- " << vector.size() << "----";
   boost::hash<std::string> hash;
-  for (int i = 0; i < vector.size(); ++i) {
+  for (size_t i = 0; i < vector.size(); ++i) {
     std::string message(message_to_string(vector[i]));
     std::stringstream ss;
     ss << std::hex << hash(message);

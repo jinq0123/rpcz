@@ -44,7 +44,7 @@ class message_iterator {
     while (has_more()) next();
   }
 
-  inline bool has_more() { return has_more_; }
+  inline bool has_more() { return 0 != has_more_; }
 
   inline zmq::message_t& next() {
     socket_.recv(&message_, 0);
@@ -55,7 +55,7 @@ class message_iterator {
  private:
   zmq::socket_t& socket_;
   zmq::message_t message_;
-  int64_t has_more_;
+  int has_more_;
   size_t more_size_;
 
   message_iterator& operator=(const message_iterator&);
