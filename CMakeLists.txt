@@ -13,7 +13,13 @@ find_package(ProtobufPlugin REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread program_options)
 find_package(ZeroMQ REQUIRED)
 
+find_path(CPPZMQ_DIR
+  NAMES zmq.hpp
+  PATHS ${ZeroMQ_INCLUDE_DIRS} ${CMAKE_INCLUDE_PATH}
+)
+
 include_directories(${ZeroMQ_INCLUDE_DIRS})
+include_directories(${CPPZMQ_DIR})
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR}/include)
