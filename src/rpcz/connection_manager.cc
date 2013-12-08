@@ -25,9 +25,15 @@
 #include <sstream>
 #include <stddef.h>
 #include <string>
-#include <unistd.h>
 #include <utility>
 #include <vector>
+
+#ifdef WIN32
+#include <process.h>  // for getpid()
+#else
+#include <unistd.h>  // for getpid()
+#endif
+
 #include "zmq.h"
 #include "zmq.hpp"
 

@@ -21,7 +21,7 @@
 
 namespace rpcz {
 
-uint64 zclock_time();
+uint64 zclock_ms();
 
 }  // namespace
 #endif
