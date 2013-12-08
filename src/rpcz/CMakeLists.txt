@@ -36,6 +36,10 @@ endif(rpcz_build_static)
 add_executable(zsendrpc zsendrpc.cc)
 target_link_libraries(zsendrpc rpcz ${Boost_PROGRAM_OPTIONS_LIBRARIES})
 
+if(rpcz_build_static)
+    add_dependencies(zsendrpc rpcz_static)  # zsendrpc need rpcz.lib
+endif(rpcz_build_static)
+
 install(TARGETS ${RPCZ_TARGET_LIBS} zsendrpc
   RUNTIME DESTINATION bin
   LIBRARY DESTINATION lib
