@@ -18,7 +18,7 @@ message rpc_response_header {
     TERMINATED = 6;
   }
   enum application_error_code {
-    NO_ERROR = 0;
+    APPLICATION_NO_ERROR = 0;
     INVALID_HEADER = -1;
     NO_SUCH_SERVICE = -2;
     NO_SUCH_METHOD = -3;
