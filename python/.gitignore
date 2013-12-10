@@ -4,3 +4,4 @@ rpcz/pywraprpcz.*
 *.pyc
 *_pb2.py
 *_rpcz.py
+/__pycache__
