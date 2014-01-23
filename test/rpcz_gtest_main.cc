@@ -20,7 +20,9 @@
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);
+#ifndef WIN32
   ::google::InstallFailureSignalHandler();
+#endif
   ::google::InitGoogleLogging(argv[0]);
   int retval = RUN_ALL_TESTS();
   ::google::protobuf::ShutdownProtobufLibrary();
