@@ -22,6 +22,3 @@ VC build need to check on rpcz_build_static,
 because rpcz.dll will not produce lib file,
 which zsendrpc need.
 
-Only support msvc Release version. 
-(Using release version of libprotobuf.lib,
- and need plugin/cpp/Release/protoc-gen-cpp_rpcz.exe.)
