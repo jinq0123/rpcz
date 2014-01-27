@@ -16,7 +16,6 @@ set(RPCZ_SOURCES
     sync_event.cc zmq_utils.cc
     ${PROTO_SOURCES})
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
-                  ${PROTOBUF_LIBRARY}
                   ${Boost_CHRONO_LIBRARIES}
                   ${Boost_DATE_TIME_LIBRARIES}
                   ${Boost_SYSTEM_LIBRARIES}
@@ -24,6 +23,9 @@ set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
 
 add_library(rpcz SHARED ${RPCZ_SOURCES})
 target_link_libraries(rpcz ${RPCZ_LIB_DEPS})
+target_link_libraries(rpcz optimized ${PROTOBUF_LIBRARY})
+target_link_libraries(rpcz debug ${PROTOBUF_LIBRARY_DEBUG})
+
 set(RPCZ_TARGET_LIBS rpcz)
 
 if(rpcz_build_static)

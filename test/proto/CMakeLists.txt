@@ -9,7 +9,8 @@ PROTOBUF_GENERATE_RPCZ(SEARCH_RPCZ_SRCS SEARCH_RPCZ_HDRS search.proto)
 
 add_library(search_pb ${SEARCH_PB_SRCS} ${SEARCH_PB_HDRS} ${SEARCH_RPCZ_SRCS}
                       ${SEARCH_RPCZ_HDRS})
-target_link_libraries(search_pb ${PROTOBUF_LIBRARY})
+target_link_libraries(search_pb optimized ${PROTOBUF_LIBRARY})
+target_link_libraries(search_pb debug ${PROTOBUF_LIBRARY_DEBUG})
 
 add_custom_target(_force_python_protos ALL DEPENDS ${SEARCH_PB_PY_SRCS}
     ${SEARCH_PB_PYRPCZ_SRCS})
