@@ -98,17 +98,9 @@ class message_vector {
 bool read_message_to_vector(zmq::socket_t* socket,
                          message_vector* data);
 
-bool read_message_to_vector(zmq::socket_t* socket,
-                         message_vector* routes,
-                         message_vector* data);
-
 void write_vector_to_socket(zmq::socket_t* socket,
                          message_vector& data,
                          int flags=0);
-
-void write_vectors_to_socket(zmq::socket_t* socket,
-                          message_vector& routes,
-                          message_vector& data);
 
 std::string message_to_string(zmq::message_t& msg);
 
@@ -124,9 +116,6 @@ bool send_string(zmq::socket_t* socket,
 bool send_uint64(zmq::socket_t* socket,
                 uint64 value,
                 int flags=0);
-
-bool forward_message(zmq::socket_t &socket_in,
-                    zmq::socket_t &socket_out);
 
 template<typename T, typename Message>
 inline T& interpret_message(Message& msg) {
@@ -161,8 +150,6 @@ inline bool send_char(zmq::socket_t* socket, char ch, int flags=0) {
   *(char*)msg.data() = ch;
   return socket->send(msg, flags);
 }
-
-void log_message_vector(message_vector& vector);
 
 inline void forward_messages(message_iterator& iter, zmq::socket_t& socket) {
   while (iter.has_more()) {
