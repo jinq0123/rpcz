@@ -45,7 +45,7 @@ bool read_message_to_vector(zmq::socket_t* socket,
   while (1) {
     zmq::message_t *msg = new zmq::message_t;
     socket->recv(msg, 0);
-    int64_t more;           //  Multipart detection
+    int more;           //  Multipart detection
     size_t more_size = sizeof (more);
     socket->getsockopt(ZMQ_RCVMORE, &more, &more_size);
     data->push_back(msg);
@@ -63,7 +63,7 @@ bool read_message_to_vector(zmq::socket_t* socket,
   while (1) {
     zmq::message_t *msg = new zmq::message_t;
     socket->recv(msg, 0);
-    int64_t more;           //  Multipart detection
+    int more;           //  Multipart detection
     size_t more_size = sizeof(more);
     socket->getsockopt(ZMQ_RCVMORE, &more, &more_size);
     if (first_part) {
