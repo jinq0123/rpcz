@@ -177,9 +177,7 @@ class connection_manager_thread {
       zmq::context_t* context,
       int nthreads,
       sync_event* ready_event,
-      connection_manager* connection_manager,
       zmq::socket_t* frontend_socket) : 
-    connection_manager_(connection_manager),
     context_(context),
     frontend_socket_(frontend_socket),
     current_worker_(0) {
@@ -205,11 +203,10 @@ class connection_manager_thread {
   static void run(zmq::context_t* context,
                   int nthreads,
                   sync_event* ready_event,
-                  zmq::socket_t* frontend_socket,
-                  connection_manager* connection_manager) {
+                  zmq::socket_t* frontend_socket) {
     connection_manager_thread cmt(context, nthreads,
                                 ready_event,
-                                connection_manager, frontend_socket);
+                                frontend_socket);
     cmt.reactor_.loop();
   }
 
@@ -381,7 +378,6 @@ class connection_manager_thread {
   typedef std::map<event_id, connection_manager::client_request_callback>
       remote_response_map;
   typedef std::map<uint64, event_id> deadline_map;
-  connection_manager* connection_manager_;
   remote_response_map remote_response_map_;
   deadline_map deadline_map_;
   event_id_generator event_id_generator_;
@@ -409,7 +405,7 @@ connection_manager::connection_manager(zmq::context_t* context, int nthreads)
   sync_event event;
   broker_thread_ = boost::thread(&connection_manager_thread::run,
                                  context, nthreads, &event,
-                                 frontend_socket, this);
+                                 frontend_socket);
   event.wait();
 }
 
