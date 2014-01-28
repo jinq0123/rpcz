@@ -139,7 +139,7 @@ void SendManyMessages(connection connection, int thread_id) {
         thread_id * request_count * 17 + i);
     requests.push_back(request);
     connection.send_request(*request, -1,
-                            bind(&barrier_closure::run, &barrier, _1, _2));
+                            boost::bind(&barrier_closure::run, &barrier, _1, _2));
   }
   barrier.wait(request_count);
 }
