@@ -39,11 +39,11 @@
 
 #include "google/protobuf/stubs/common.h"
 #include "rpcz/callback.hpp"
-#include "rpcz/clock.hpp"
-#include "rpcz/logging.hpp"
+#include "clock.hpp"
+#include "logging.hpp"
 #include "rpcz/macros.hpp"
-#include "rpcz/reactor.hpp"
-#include "rpcz/zmq_utils.hpp"
+#include "reactor.hpp"
+#include "zmq_utils.hpp"
 
 namespace rpcz {
 namespace {

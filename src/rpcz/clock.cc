@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing ( http://blog.csdn.net/jq0123 )
 
-#include "rpcz/clock.hpp"
+#include "clock.hpp"
 #include <boost/chrono.hpp>
 
 namespace rpcz {

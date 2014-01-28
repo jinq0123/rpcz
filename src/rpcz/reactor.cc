@@ -14,12 +14,12 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "rpcz/reactor.hpp"
+#include "reactor.hpp"
 #include <signal.h>
 #include <vector>
 #include "rpcz/callback.hpp"
-#include "rpcz/clock.hpp"
-#include "rpcz/logging.hpp"
+#include "clock.hpp"
+#include "logging.hpp"
 #include "rpcz/macros.hpp"
 #include "zmq.hpp"
 
