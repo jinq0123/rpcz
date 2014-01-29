@@ -30,12 +30,12 @@
 #include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/connection_manager.hpp"
-#include "rpcz/logging.hpp"
+#include "logging.hpp"
 #include "rpcz/macros.hpp"
 #include "rpcz/rpc.hpp"
-#include "rpcz/reactor.hpp"
+#include "reactor.hpp"
 #include "rpcz/service.hpp"
-#include "rpcz/zmq_utils.hpp"
+#include "zmq_utils.hpp"
 #include "rpcz/rpcz.pb.h"
 
 namespace rpcz {

@@ -14,7 +14,7 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "rpcz/zmq_utils.hpp"
+#include "zmq_utils.hpp"
 #include <boost/functional/hash.hpp>
 #include <sstream>
 #include <stddef.h>
@@ -26,7 +26,7 @@
 
 #include "google/protobuf/stubs/common.h"
 #include "zmq.hpp"
-#include "rpcz/logging.hpp"
+#include "logging.hpp"
 #include "rpcz/macros.hpp"
 
 namespace rpcz {

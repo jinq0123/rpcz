@@ -14,15 +14,16 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
+#include "rpc_channel_impl.hpp"
+
 #include <google/protobuf/descriptor.h>
 #include <zmq.hpp>
 #include "rpcz/callback.hpp"
 #include "rpcz/connection_manager.hpp"
-#include "rpcz/logging.hpp"
+#include "logging.hpp"
 #include "rpcz/rpc.hpp"
-#include "rpcz/rpc_channel_impl.hpp"
 #include "rpcz/sync_event.hpp"
-#include "rpcz/zmq_utils.hpp"
+#include "zmq_utils.hpp"
 
 namespace rpcz {
 

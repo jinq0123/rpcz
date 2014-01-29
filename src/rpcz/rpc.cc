@@ -15,8 +15,8 @@
 // Author: nadavs@google.com <Nadav Samet>
 
 #include "boost/lexical_cast.hpp"
-#include "rpcz/logging.hpp"
-#include "rpcz/reactor.hpp"
+#include "logging.hpp"
+#include "reactor.hpp"
 #include "rpcz/rpc.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/rpcz.pb.h"
