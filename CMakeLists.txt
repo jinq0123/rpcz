@@ -35,6 +35,8 @@ endif(NOT MSVC)
 
 set(CMAKE_OSX_ARCHITECTURES x86_64)
 
+file(GLOB RPCZ_PUBLIC_HEADERS include/rpcz/*.hpp)
+
 add_subdirectory(src)
 
 if(rpcz_build_tests)
@@ -46,8 +48,6 @@ if(rpcz_build_examples)
   add_subdirectory(examples/cpp)
 endif(rpcz_build_examples)
 
-
-file(GLOB RPCZ_PUBLIC_HEADERS include/rpcz/*.hpp)
 message(STATUS ${RPCZ_PUBLIC_HEADERS})
 install(FILES ${RPCZ_PUBLIC_HEADERS} DESTINATION include/rpcz)
 install(FILES ${PROJECT_BINARY_DIR}/src/rpcz/rpcz.pb.h DESTINATION include/rpcz)

@@ -15,13 +15,14 @@ set(RPCZ_SOURCES
     reactor.cc rpc.cc rpc_channel_impl.cc server.cc
     sync_event.cc zmq_utils.cc
     ${PROTO_SOURCES})
+file(GLOB RPCZ_HEADERS *.hpp)
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${Boost_CHRONO_LIBRARIES}
                   ${Boost_DATE_TIME_LIBRARIES}
                   ${Boost_SYSTEM_LIBRARIES}
                   ${Boost_THREAD_LIBRARIES})
 
-add_library(rpcz SHARED ${RPCZ_SOURCES})
+add_library(rpcz SHARED ${RPCZ_SOURCES} ${RPCZ_HEADERS} ${RPCZ_PUBLIC_HEADERS})
 target_link_libraries(rpcz ${RPCZ_LIB_DEPS})
 target_link_libraries(rpcz optimized ${PROTOBUF_LIBRARY})
 target_link_libraries(rpcz debug ${PROTOBUF_LIBRARY_DEBUG})
