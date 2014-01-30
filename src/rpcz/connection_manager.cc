@@ -18,6 +18,7 @@
 
 #include <algorithm>
 #include <boost/lexical_cast.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
 #include <map>
@@ -41,7 +42,6 @@
 #include "rpcz/callback.hpp"
 #include "clock.hpp"
 #include "logging.hpp"
-#include "rpcz/macros.hpp"
 #include "reactor.hpp"
 #include "zmq_utils.hpp"
 
@@ -52,7 +52,7 @@ const uint64 kGenerator = 2;
 
 typedef uint64 event_id;
 
-class event_id_generator {
+class event_id_generator : boost::noncopyable {
  public:
   event_id_generator() {
     state_ = (reinterpret_cast<uint64>(this) << 32) + getpid();
@@ -65,7 +65,6 @@ class event_id_generator {
 
  private:
   uint64 state_;
-  DISALLOW_COPY_AND_ASSIGN(event_id_generator);
 };
 
 // Command codes for internal process communication.

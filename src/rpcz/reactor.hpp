@@ -19,14 +19,15 @@
 
 #include <map>
 #include <vector>
+#include <boost/noncopyable.hpp>
 #include "zmq.hpp"
-#include "rpcz/macros.hpp"
+#include "rpcz/common.hpp"
 
 namespace rpcz {
 
 class closure;
 
-class reactor {
+class reactor : boost::noncopyable {
  public:
   reactor();
   ~reactor();
@@ -48,7 +49,6 @@ class reactor {
   std::vector<zmq::pollitem_t> pollitems_;
   typedef std::map<uint64, std::vector<closure*> > closure_run_map;
   closure_run_map closure_run_map_;
-  DISALLOW_COPY_AND_ASSIGN(reactor);
 };
 }  // namespace
 #endif

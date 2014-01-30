@@ -19,8 +19,9 @@
 
 #include <stdexcept>
 #include <string>
+#include <boost/noncopyable.hpp>
 
-#include "rpcz/macros.hpp"
+#include "rpcz/common.hpp"
 #include "rpcz/rpcz.pb.h"
 
 namespace rpcz {
@@ -48,7 +49,7 @@ static const application_error_code METHOD_NOT_IMPLEMENTED = rpc_response_header
 
 class sync_event;
 
-class rpc {
+class rpc : boost::noncopyable {
  public:
   rpc();
 
@@ -95,7 +96,6 @@ class rpc {
 
   friend class rpc_channel_impl;
   friend class server_channel_impl;
-  DISALLOW_COPY_AND_ASSIGN(rpc);
 };
 
 class rpc_error : public std::runtime_error {

@@ -27,7 +27,6 @@
 #include "google/protobuf/stubs/common.h"
 #include "zmq.hpp"
 #include "logging.hpp"
-#include "rpcz/macros.hpp"
 
 namespace rpcz {
 std::string message_to_string(zmq::message_t& msg) {

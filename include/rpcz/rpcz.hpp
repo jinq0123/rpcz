@@ -21,15 +21,10 @@
 #include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/connection_manager.hpp"
-#include "rpcz/macros.hpp"
 #include "rpcz/rpc.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
 #include "rpcz/service.hpp"
 #include "rpcz/sync_event.hpp"
 
-// Two include files were intentionally left out since they rely on ZeroMQ
-// headers being around and probably most people will not need this low-level
-// functionality. These files are:
-//    zmq_utils.h
 #endif

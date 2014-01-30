@@ -17,7 +17,7 @@
 #ifndef RPCZ_CLOCK_H
 #define RPCZ_CLOCK_H
 
-#include "rpcz/macros.hpp"
+#include "rpcz/common.hpp"
 
 namespace rpcz {
 

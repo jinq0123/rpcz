@@ -18,9 +18,9 @@
 #define RPCZ_ZMQ_UTILS_H
 
 #include <string>
-#include "boost/ptr_container/ptr_vector.hpp"
+#include <boost/ptr_container/ptr_vector.hpp>
 #include "zmq.hpp"
-#include "rpcz/macros.hpp"
+#include "rpcz/common.hpp"
 
 namespace zmq {
 class socket_t;

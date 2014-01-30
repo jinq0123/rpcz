@@ -17,7 +17,7 @@
 #ifndef RPCZ_SERVER_H
 #define RPCZ_SERVER_H
 
-#include "rpcz/macros.hpp"
+#include <boost/noncopyable.hpp>
 #include "rpcz/rpcz.pb.h"
 
 namespace zmq {
@@ -35,7 +35,7 @@ class service;
 
 // A server object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside a worker thread.
-class server {
+class server : boost::noncopyable {
  public:
   // Constructs a server that uses the provided application. The
   // application must outlive the server.
@@ -67,7 +67,6 @@ class server {
   connection_manager& connection_manager_;
   typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
   rpc_service_map service_map_;
-  DISALLOW_COPY_AND_ASSIGN(server);
 };
 
 // rpc_service is a low-level request handler: requests and replies are void*.

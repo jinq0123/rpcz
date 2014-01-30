@@ -21,19 +21,15 @@
 #ifndef RPCZ_CALLBACK_H
 #define RPCZ_CALLBACK_H
 
-#include "rpcz/macros.hpp"
+#include <boost/noncopyable.hpp>
 
 namespace rpcz {
 
-class closure {
+class closure : boost::noncopyable {
  public:
   closure() {}
   virtual ~closure() {}
-
   virtual void run() = 0;
-
- private:
-  DISALLOW_COPY_AND_ASSIGN(closure);
 };
 
 // For args = 0

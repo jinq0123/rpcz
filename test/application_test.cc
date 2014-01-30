@@ -16,7 +16,6 @@
 
 #include "zmq.hpp"
 #include "rpcz/application.hpp"
-#include "rpcz/macros.hpp"
 #include "gtest/gtest.h"
 
 namespace rpcz {

@@ -20,7 +20,6 @@
 #include "rpcz/callback.hpp"
 #include "clock.hpp"
 #include "logging.hpp"
-#include "rpcz/macros.hpp"
 #include "zmq.hpp"
 
 namespace rpcz {
@@ -29,6 +28,26 @@ static bool g_interrupted = false;
 void signal_handler(int signal_value) {
   g_interrupted = true;
 }
+
+// Deletes each pointer in the range [begin, end)
+template<typename IteratorType>
+void delete_container_pointers(const IteratorType& begin,
+                             const IteratorType& end) {
+  for (IteratorType i = begin; i != end; ++i) {
+    delete *i;
+  }
+}
+
+// For each item in the range [begin, end), delete item->first and item->second.
+template<typename IteratorType>
+void delete_container_pair_pointers(const IteratorType& begin,
+                                 const IteratorType& end) {
+  for (IteratorType i = begin; i != end; ++i) {
+    delete i->first;
+    delete i->second;
+  }
+}
+
 }  // unnamed namespace
 
 reactor::reactor() : should_quit_(false) {

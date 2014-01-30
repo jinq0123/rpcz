@@ -19,8 +19,9 @@
 
 #include <string>
 #include <boost/function.hpp>
+#include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
-#include "rpcz/macros.hpp"
+#include "rpcz/common.hpp"
 #include "rpcz/sync_event.hpp"
 
 namespace zmq {
@@ -59,7 +60,7 @@ class message_vector;
 //          c.add(closure)
 //
 // connection_manager and connection are thread-safe.
-class connection_manager {
+class connection_manager : boost::noncopyable {
  public:
   enum status {
     INACTIVE = 0,
@@ -111,7 +112,6 @@ class connection_manager {
   std::string frontend_endpoint_;
   sync_event is_termating_;
 
-  DISALLOW_COPY_AND_ASSIGN(connection_manager);
   friend class connection;
   friend class client_connection;
   friend class connection_managerThread;
