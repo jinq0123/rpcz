@@ -14,8 +14,8 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "rpcz/plugin/python/rpcz_python_generator.h"
 #include <google/protobuf/compiler/plugin.h>
+#include "rpcz_python_generator.h"
 
 int main(int argc, char* argv[]) {
   rpcz::plugin::python::Generator generator;

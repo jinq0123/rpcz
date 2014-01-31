@@ -24,7 +24,7 @@
 #include "rpcz/application.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/service.hpp"
-#include "rpcz/rpc.hpp"
+#include "rpcz/rpc_controller.hpp"
 
 using google::protobuf::DynamicMessageFactory;
 using google::protobuf::FileDescriptor;
@@ -110,18 +110,18 @@ int run_call(const std::string& endpoint,
 
   application app;
   scoped_ptr<rpc_channel> channel(app.create_rpc_channel(endpoint));
-  rpc rpc;
+  rpc_controller rpc_controller;
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   channel->call_method(
       FLAGS_service_name.empty() ? service_name : FLAGS_service_name,
-      method_desc, *request, reply, &rpc, NULL);
-  rpc.wait();
+      method_desc, *request, reply, &rpc_controller, NULL);
+  rpc_controller.wait();
 
-  if (rpc.get_status() != status::OK) {
-    cerr << "status: " << rpc.get_status() << endl;
-    cerr << "Error " << rpc.get_application_error_code() << ": "
-        << rpc.get_error_message() << endl;
+  if (rpc_controller.get_status() != status::OK) {
+    cerr << "status: " << rpc_controller.get_status() << endl;
+    cerr << "Error " << rpc_controller.get_application_error_code() << ": "
+        << rpc_controller.get_error_message() << endl;
   } else {
     std::string out;
     ::TextFormat::PrintToString(*reply, &out);

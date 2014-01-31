@@ -17,7 +17,7 @@
 #ifndef RPCZ_RPC_CHANNEL_IMPL_H
 #define RPCZ_RPC_CHANNEL_IMPL_H
 
-#include "rpcz/connection_manager.hpp"
+#include "rpcz/connection_manager.hpp"  // TODO: DEL
 #include "rpcz/rpc_channel.hpp"
 
 namespace rpcz {
@@ -36,18 +36,22 @@ class rpc_channel_impl: public rpc_channel {
   virtual void call_method(const std::string& service_name,
                           const google::protobuf::MethodDescriptor* method,
                           const google::protobuf::Message& request,
-                          google::protobuf::Message* response, rpc* rpc,
+                          google::protobuf::Message* response,
+                          rpc_controller* rpc_controller,
                           closure* done);
 
   virtual void call_method0(
       const std::string& service_name,
       const std::string& method_name,
       const std::string& request,
-      std::string* response, rpc* rpc, closure* done);
+      std::string* response,
+      rpc_controller* rpc_controller,
+      closure* done);
 
  private:
   virtual void handle_client_response(
-      rpc_response_context response_context, connection_manager::status status,
+      rpc_response_context response_context,
+      connection_manager::status status,
       message_iterator& iter);
 
   void call_method_full(
@@ -57,7 +61,7 @@ class rpc_channel_impl: public rpc_channel {
     const std::string& request,
     ::google::protobuf::Message* response_msg,
     std::string* response_str,
-    rpc* rpc,
+    rpc_controller* rpc_controller,
     closure* done);
 
   connection connection_;

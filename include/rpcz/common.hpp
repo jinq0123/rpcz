@@ -17,7 +17,7 @@
 #ifndef RPCZ_COMMON_H
 #define RPCZ_COMMON_H
 
-#include "google/protobuf/stubs/common.h"
+#include <google/protobuf/stubs/common.h>
 
 namespace rpcz {
 using google::protobuf::scoped_ptr; 

@@ -38,7 +38,7 @@
 #include "zmq.h"
 #include "zmq.hpp"
 
-#include "google/protobuf/stubs/common.h"
+#include <google/protobuf/stubs/common.h>
 #include "rpcz/callback.hpp"
 #include "clock.hpp"
 #include "logging.hpp"

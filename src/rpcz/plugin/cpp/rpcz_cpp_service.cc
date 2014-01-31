@@ -14,13 +14,13 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "rpcz/plugin/cpp/rpcz_cpp_service.h"
+#include "rpcz_cpp_service.h"
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/printer.h>
 
-#include "rpcz/plugin/common/strutil.h"
-#include "rpcz/plugin/cpp/cpp_helpers.h"
+#include "strutil.h"
+#include "cpp_helpers.h"
 
 namespace rpcz {
 namespace plugin {
@@ -140,7 +140,7 @@ void ServiceGenerator::GenerateMethodSignatures(
       printer->Print(sub_vars,
                      "$virtual$void $name$(const $input_type$& request,\n"
                      "                     $output_type$* response,\n"
-                     "                     ::rpcz::rpc* rpc,"
+                     "                     ::rpcz::rpc_controller* rpc_controller,"
                      "                     ::rpcz::closure* done);\n");
       printer->Print(sub_vars,
                      "$virtual$void $name$(const $input_type$& request,\n"
@@ -315,24 +315,24 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
     printer->Print(sub_vars,
       "void $classname$_Stub::$name$(const $input_type$& request,\n"
       "                              $output_type$* response,\n"
-      "                              ::rpcz::rpc* rpc,\n"
+      "                              ::rpcz::rpc_controller* rpc_controller,\n"
       "                              ::rpcz::closure* done) {\n"
       "  channel_->call_method(service_name_,\n"
       "                        $classname$::descriptor()->method($index$),\n"
-      "                        request, response, rpc, done);\n"
+      "                        request, response, rpc_controller, done);\n"
       "}\n");
     printer->Print(sub_vars,
       "void $classname$_Stub::$name$(const $input_type$& request,\n"
       "                              $output_type$* response,\n"
       "                              long deadline_ms) {\n"
-      "  ::rpcz::rpc rpc;\n"
-      "  rpc.set_deadline_ms(deadline_ms);\n"
+      "  ::rpcz::rpc_controller rpc_controller;\n"
+      "  rpc_controller.set_deadline_ms(deadline_ms);\n"
       "  channel_->call_method(service_name_,\n"
       "                        $classname$::descriptor()->method($index$),\n"
-      "                        request, response, &rpc, NULL);\n"
-      "  rpc.wait();\n"
-      "  if (!rpc.ok()) {\n"
-      "    throw ::rpcz::rpc_error(rpc);\n"
+      "                        request, response, &rpc_controller, NULL);\n"
+      "  rpc_controller.wait();\n"
+      "  if (!rpc_controller.ok()) {\n"
+      "    throw ::rpcz::rpc_error(rpc_controller);\n"
       "  }\n"
       "}\n");
   }

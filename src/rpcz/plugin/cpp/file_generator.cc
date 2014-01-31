@@ -14,14 +14,15 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
+#include "file_generator.h"
+
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
 #include <google/protobuf/io/printer.h>
 
-#include "rpcz/plugin/common/strutil.h"
-#include "rpcz/plugin/cpp/cpp_helpers.h"
-#include "rpcz/plugin/cpp/file_generator.h"
-#include "rpcz/plugin/cpp/rpcz_cpp_service.h"
+#include "strutil.h"
+#include "cpp_helpers.h"
+#include "rpcz_cpp_service.h"
 
 namespace rpcz {
 namespace plugin {
@@ -67,7 +68,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "}  // namespace protobuf\n"
     "}  // namespace google\n"
     "namespace rpcz {\n"
-    "class rpc;\n"
+    "class rpc_controller;\n"
     "class closure;\n"
     "class rpc_channel;\n"
     "}  //namesacpe rpcz\n"

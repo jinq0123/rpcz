@@ -31,7 +31,7 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "logging.hpp"
-#include "rpcz/rpc.hpp"
+#include "rpcz/rpc_controller.hpp"
 #include "reactor.hpp"
 #include "rpcz/service.hpp"
 #include "zmq_utils.hpp"

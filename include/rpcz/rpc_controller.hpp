@@ -49,11 +49,11 @@ static const application_error_code METHOD_NOT_IMPLEMENTED = rpc_response_header
 
 class sync_event;
 
-class rpc : boost::noncopyable {
+class rpc_controller : boost::noncopyable {
  public:
-  rpc();
+  rpc_controller();
 
-  ~rpc();
+  ~rpc_controller();
 
   inline bool ok() const {
     return get_status() == status::OK;
@@ -100,11 +100,11 @@ class rpc : boost::noncopyable {
 
 class rpc_error : public std::runtime_error {
  public:
-  explicit rpc_error(const rpc& rpc_) 
-      : std::runtime_error(rpc_.to_string()),
-        status_(rpc_.get_status()),
-        error_message_(rpc_.get_error_message()),
-        application_error_code_(rpc_.get_application_error_code()) {}
+  explicit rpc_error(const rpc_controller& rpc_controller) 
+      : std::runtime_error(rpc_controller.to_string()),
+        status_(rpc_controller.get_status()),
+        error_message_(rpc_controller.get_error_message()),
+        application_error_code_(rpc_controller.get_application_error_code()) {}
 
   virtual ~rpc_error() throw() {}
 

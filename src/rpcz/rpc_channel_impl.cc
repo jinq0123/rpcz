@@ -21,7 +21,7 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "logging.hpp"
-#include "rpcz/rpc.hpp"
+#include "rpcz/rpc_controller.hpp"
 #include "rpcz/sync_event.hpp"
 #include "zmq_utils.hpp"
 
@@ -39,7 +39,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 }
 
 struct rpc_response_context {
-  rpc* rpc_;
+  rpc_controller* rpc_controller;
   ::google::protobuf::Message* response_msg;
   std::string* response_str;
   closure* user_closure;
@@ -52,9 +52,9 @@ void rpc_channel_impl::call_method_full(
     const std::string& request,
     ::google::protobuf::Message* response_msg,
     std::string* response_str,
-    rpc* rpc_,
+    rpc_controller* rpc_controller,
     closure* done) {
-  CHECK_EQ(rpc_->get_status(), status::INACTIVE);
+  CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
   rpc_request_header generic_request;
   generic_request.set_service(service_name);
   generic_request.set_method(method_name);
@@ -67,8 +67,7 @@ void rpc_channel_impl::call_method_full(
   if (request_msg != NULL) {
     size_t bytes = request_msg->ByteSize();
     payload_out.reset(new zmq::message_t(bytes));
-    if (!request_msg->SerializeToArray(payload_out->data(),
-                                       bytes)) {
+    if (!request_msg->SerializeToArray(payload_out->data(), bytes)) {
       throw invalid_message_error("Request serialization failed.");
     }
   } else {
@@ -80,15 +79,15 @@ void rpc_channel_impl::call_method_full(
   msg_vector.push_back(payload_out.release());
 
   rpc_response_context response_context;
-  response_context.rpc_ = rpc_;
+  response_context.rpc_controller = rpc_controller;
   response_context.user_closure = done;
   response_context.response_str = response_str;
   response_context.response_msg = response_msg;
-  rpc_->set_status(status::ACTIVE);
+  rpc_controller->set_status(status::ACTIVE);
 
   connection_.send_request(
       msg_vector,
-      rpc_->get_deadline_ms(),
+      rpc_controller->get_deadline_ms(),
       bind(&rpc_channel_impl::handle_client_response, this,
            response_context, _1, _2));
 }
@@ -97,7 +96,7 @@ void rpc_channel_impl::call_method0(const std::string& service_name,
                                 const std::string& method_name,
                                 const std::string& request,
                                 std::string* response,
-                                rpc* rpc,
+                                rpc_controller* rpc_controller,
                                 closure* done) {
   call_method_full(service_name,
                  method_name,
@@ -105,7 +104,7 @@ void rpc_channel_impl::call_method0(const std::string& service_name,
                  request,
                  NULL,
                  response,
-                 rpc,
+                 rpc_controller,
                  done);
 }
 
@@ -114,7 +113,7 @@ void rpc_channel_impl::call_method(
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
     google::protobuf::Message* response,
-    rpc* rpc,
+    rpc_controller* rpc_controller,
     closure* done) {
   call_method_full(service_name,
                  method->name(),
@@ -122,7 +121,7 @@ void rpc_channel_impl::call_method(
                  "",
                  response,
                  NULL,
-                 rpc,
+                 rpc_controller,
                  done);
 }
 
@@ -131,34 +130,34 @@ void rpc_channel_impl::handle_client_response(
     message_iterator& iter) {
   switch (status) {
     case connection_manager::DEADLINE_EXCEEDED:
-      response_context.rpc_->set_status(
+      response_context.rpc_controller->set_status(
           status::DEADLINE_EXCEEDED);
       break;
     case connection_manager::DONE: {
         if (!iter.has_more()) {
-          response_context.rpc_->set_failed(application_error::INVALID_MESSAGE,
-                                           "");
+          response_context.rpc_controller->set_failed(
+              application_error::INVALID_MESSAGE, "");
           break;
         }
         rpc_response_header generic_response;
         zmq::message_t& msg_in = iter.next();
         if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
-          response_context.rpc_->set_failed(application_error::INVALID_MESSAGE,
-                                           "");
+          response_context.rpc_controller->set_failed(
+              application_error::INVALID_MESSAGE, "");
           break;
         }
         if (generic_response.status() != status::OK) {
-          response_context.rpc_->set_failed(generic_response.application_error(),
-                                           generic_response.error());
+          response_context.rpc_controller->set_failed(
+              generic_response.application_error(),
+              generic_response.error());
         } else {
-          response_context.rpc_->set_status(status::OK);
+          response_context.rpc_controller->set_status(status::OK);
           zmq::message_t& payload = iter.next();
           if (response_context.response_msg) {
             if (!response_context.response_msg->ParseFromArray(
-                    payload.data(),
-                    payload.size())) {
-              response_context.rpc_->set_failed(application_error::INVALID_MESSAGE,
-                                              "");
+                    payload.data(), payload.size())) {
+              response_context.rpc_controller->set_failed(
+                  application_error::INVALID_MESSAGE, "");
               break;
             }
           } else if (response_context.response_str) {
@@ -177,8 +176,8 @@ void rpc_channel_impl::handle_client_response(
                    << status;
   }
   // We call signal() before we execute closure since the closure may delete
-  // the rpc object (which contains the sync_event).
-  response_context.rpc_->sync_event_->signal();
+  // the rpc_controller object (which contains the sync_event).
+  response_context.rpc_controller->sync_event_->signal();
   if (response_context.user_closure) {
     response_context.user_closure->run();
   }

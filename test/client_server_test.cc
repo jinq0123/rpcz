@@ -23,7 +23,7 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/rpc_channel.hpp"
-#include "rpcz/rpc.hpp"
+#include "rpcz/rpc_controller.hpp"
 #include "rpcz/server.hpp"
 #include "rpcz/sync_event.hpp"
 
@@ -35,7 +35,7 @@ using namespace std;
 namespace rpcz {
 
 void super_done(SearchResponse *response,
-               rpc* newrpc, reply<SearchResponse> reply) {
+               rpc_controller* newrpc, reply<SearchResponse> reply) {
   delete newrpc;
   reply.send(*response);
   delete response;
@@ -57,7 +57,7 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "bar") {
       reply.Error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      rpc* newrpc = new rpc;
+      rpc_controller* newrpc = new rpc_controller;
       SearchResponse* response = new SearchResponse;
       backend_->Search(request, response, newrpc, new_callback(super_done,
                                                                response,
@@ -143,10 +143,10 @@ class server_test : public ::testing::Test {
     SearchRequest request;
     SearchResponse response;
     request.set_query(query);
-    rpc rpc;
-    stub.Search(request, &response, &rpc, NULL);
-    rpc.wait();
-    EXPECT_TRUE(rpc.ok());
+    rpc_controller rpc_controller;
+    stub.Search(request, &response, &rpc_controller, NULL);
+    rpc_controller.wait();
+    EXPECT_TRUE(rpc_controller.ok());
     return response;
   }
 
@@ -171,13 +171,13 @@ TEST_F(server_test, SimpleRequestAsync) {
   SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
-  rpc rpc;
+  rpc_controller rpc_controller;
   request.set_query("happiness");
   sync_event sync;
-  stub.Search(request, &response, &rpc, new_callback(
+  stub.Search(request, &response, &rpc_controller, new_callback(
           &sync, &sync_event::signal));
   sync.wait();
-  ASSERT_TRUE(rpc.ok());
+  ASSERT_TRUE(rpc_controller.ok());
   ASSERT_EQ(2, response.results_size());
   ASSERT_EQ("The search for happiness", response.results(0));
 }
@@ -187,23 +187,23 @@ TEST_F(server_test, SimpleRequestWithError) {
   SearchRequest request;
   request.set_query("foo");
   SearchResponse response;
-  rpc rpc;
-  stub.Search(request, &response, &rpc, NULL);
-  rpc.wait();
-  ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, rpc.get_status());
-  ASSERT_EQ("I don't like foo.", rpc.get_error_message());
+  rpc_controller rpc_controller;
+  stub.Search(request, &response, &rpc_controller, NULL);
+  rpc_controller.wait();
+  ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, rpc_controller.get_status());
+  ASSERT_EQ("I don't like foo.", rpc_controller.get_error_message());
 }
 
 TEST_F(server_test, SimpleRequestWithTimeout) {
   SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
-  rpc rpc;
+  rpc_controller rpc_controller;
   request.set_query("timeout");
-  rpc.set_deadline_ms(1);
-  stub.Search(request, &response, &rpc, NULL);
-  rpc.wait();
-  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc.get_status());
+  rpc_controller.set_deadline_ms(1);
+  stub.Search(request, &response, &rpc_controller, NULL);
+  rpc_controller.wait();
+  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
 }
 
 TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
@@ -211,14 +211,14 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   SearchRequest request;
   SearchResponse response;
   {
-    rpc rpc;
+    rpc_controller rpc_controller;
     request.set_query("timeout");
-    rpc.set_deadline_ms(1);
+    rpc_controller.set_deadline_ms(1);
     sync_event event;
-    stub.Search(request, &response, &rpc,
+    stub.Search(request, &response, &rpc_controller,
                 new_callback(&event, &sync_event::signal));
     event.wait();
-    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc.get_status());
+    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
   }
 }
 
@@ -226,11 +226,11 @@ TEST_F(server_test, DelegatedRequest) {
   SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
-  rpc rpc;
+  rpc_controller rpc_controller;
   request.set_query("delegate");
-  stub.Search(request, &response, &rpc, NULL);
-  rpc.wait();
-  ASSERT_EQ(rpc_response_header::OK, rpc.get_status());
+  stub.Search(request, &response, &rpc_controller, NULL);
+  rpc_controller.wait();
+  ASSERT_EQ(rpc_response_header::OK, rpc_controller.get_status());
   ASSERT_EQ("42!", response.results(0));
 }
 

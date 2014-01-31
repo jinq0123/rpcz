@@ -2,8 +2,7 @@ set(RPCZ_PLUGIN_ROOT ${CMAKE_BINARY_DIR}/src/rpcz/plugin)
 
 function(PROTOBUF_GENERATE_RPCZ SRCS HDRS)
   if(MSVC)
-    # Only support msvc Release version.
-    set(PLUGIN_BIN ${RPCZ_PLUGIN_ROOT}/cpp/Release/protoc-gen-cpp_rpcz.exe)
+    set(PLUGIN_BIN ${RPCZ_PLUGIN_ROOT}/cpp/${CMAKE_CFG_INTDIR}/protoc-gen-cpp_rpcz.exe)
   else(MSVC)
     set(PLUGIN_BIN ${RPCZ_PLUGIN_ROOT}/cpp/protoc-gen-cpp_rpcz)
   endif(MSVC)
@@ -18,8 +17,7 @@ endfunction()
 
 function(PROTOBUF_GENERATE_PYTHON_RPCZ SRCS)
   if(MSVC)
-    # Only support msvc Release version.
-    set(PLUGIN_BIN ${RPCZ_PLUGIN_ROOT}/python/Release/protoc-gen-python_rpcz.exe)
+    set(PLUGIN_BIN ${RPCZ_PLUGIN_ROOT}/python/${CMAKE_CFG_INTDIR}/protoc-gen-python_rpcz.exe)
   else(MSVC)
     set(PLUGIN_BIN ${RPCZ_PLUGIN_ROOT}/python/protoc-gen-python_rpcz)
   endif(MSVC)

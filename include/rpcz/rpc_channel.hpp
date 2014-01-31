@@ -20,7 +20,7 @@
 #include <string>
 #include <set>
 
-#include "google/protobuf/stubs/common.h"
+#include <google/protobuf/stubs/common.h>
 
 namespace google {
 namespace protobuf {
@@ -32,7 +32,7 @@ class MethodDescriptor;
 namespace rpcz {
 class closure;
 class connection;
-class rpc;
+class rpc_controller;
 
 class rpc_channel {
  public:
@@ -40,7 +40,7 @@ class rpc_channel {
                           const google::protobuf::MethodDescriptor* method,
                           const google::protobuf::Message& request,
                           google::protobuf::Message* response,
-                          rpc* rpc,
+                          rpc_controller* rpc_controller,
                           closure* done) = 0;
 
   // DO NOT USE: this method exists only for language bindings and may be
@@ -49,7 +49,7 @@ class rpc_channel {
                            const std::string& method_name,
                            const std::string& request,
                            std::string* response,
-                           rpc* rpc,
+                           rpc_controller* rpc_controller,
                            closure* done) = 0;
 
   static rpc_channel* create(connection connection);

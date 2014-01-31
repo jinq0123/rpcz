@@ -14,6 +14,8 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
+#include "rpcz_cpp_generator.h"
+
 #include <google/protobuf/compiler/code_generator.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/io/printer.h>
@@ -22,8 +24,7 @@
 #include <utility>
 #include <vector>
 
-#include "rpcz/plugin/cpp/file_generator.h"
-#include "rpcz/plugin/cpp/rpcz_cpp_generator.h"
+#include "file_generator.h"
 
 namespace rpcz {
 namespace plugin {

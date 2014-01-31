@@ -19,7 +19,7 @@
 
 // Internal logging and checks. We piggyback on the facilities that come
 // from the protobuf library.
-#include "google/protobuf/stubs/common.h"
+#include <google/protobuf/stubs/common.h>
 
 // CHECK_* functions cause the program to terminate. They should be used only
 // for internal consistency checks.

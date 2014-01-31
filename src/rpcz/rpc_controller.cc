@@ -14,35 +14,36 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
+#include "rpcz/rpc_controller.hpp"
+
 #include <boost/lexical_cast.hpp>
 #include "logging.hpp"
 #include "reactor.hpp"
-#include "rpcz/rpc.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/rpcz.pb.h"
 
 namespace rpcz {
 
-rpc::rpc()
+rpc_controller::rpc_controller()
     : status_(status::INACTIVE),
       application_error_code_(0),
       deadline_ms_(-1),
       sync_event_(new sync_event()) {
 };
 
-rpc::~rpc() {}
+rpc_controller::~rpc_controller() {}
 
-void rpc::set_failed(int application_error, const std::string& error_message) {
+void rpc_controller::set_failed(int application_error, const std::string& error_message) {
   set_status(status::APPLICATION_ERROR);
   error_message_ = error_message;
   application_error_code_ = application_error;
 }
 
-void rpc::set_status(status_code status) {
+void rpc_controller::set_status(status_code status) {
   status_ = status;
 }
 
-int rpc::wait() {
+int rpc_controller::wait() {
   status_code status = get_status();
   CHECK_NE(status, status::INACTIVE)
       << "Request must be sent before calling wait()";
@@ -53,7 +54,7 @@ int rpc::wait() {
   return 0;
 }
 
-std::string rpc::to_string() const {
+std::string rpc_controller::to_string() const {
   std::string result =
       "status: " + rpc_response_header_status_code_Name(get_status());
   if (get_status() == status::APPLICATION_ERROR) {

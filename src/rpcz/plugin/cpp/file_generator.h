@@ -20,7 +20,7 @@
 #include <string>
 #include <vector>
 
-#include "rpcz/plugin/cpp/rpcz_cpp_service.h"
+#include "rpcz_cpp_service.h"
 
 namespace rpcz {
 namespace plugin {

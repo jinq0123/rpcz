@@ -28,7 +28,7 @@
 // performance-minded Python code leverage the fast C++ implementation
 // directly.
 
-#include "rpcz/plugin/python/rpcz_python_generator.h"
+#include "rpcz_python_generator.h"
 
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/descriptor.pb.h>
@@ -38,7 +38,7 @@
 #include <stddef.h>
 #include <map>
 
-#include "rpcz/plugin/common/strutil.h"
+#include "strutil.h"
 
 namespace rpcz {
 namespace plugin {
