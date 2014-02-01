@@ -19,7 +19,7 @@
 #include <google/protobuf/descriptor.h>
 #include <zmq.hpp>
 #include "rpcz/callback.hpp"
-#include "rpcz/connection_manager.hpp"
+#include "connection_manager.hpp"
 #include "logging.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/sync_event.hpp"

@@ -117,10 +117,6 @@ class connection_manager : boost::noncopyable {
   friend class connection_managerThread;
 };
 
-// Installs a SIGINT and SIGTERM handlers that causes all RPCZ's event loops
-// to cleanly quit.
-void install_signal_handler();
-
 // Represents a connection to a server. Thread-safe.
 class connection {
  public:

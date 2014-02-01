@@ -61,9 +61,17 @@ setup(
     },
     ext_modules=[
         Extension("rpcz.pywraprpcz", ["cython/pywraprpcz.cpp"],
-                  libraries=["rpcz"],
-                  include_dirs=['../include', '../build/src'],
-                  library_dirs=['../build/deps/lib', '../build/src/rpcz'],
+                  libraries=["rpcz", "libprotobuf", "libzmq"],
+                  include_dirs=['../include', '../build/src',
+                      'C:/Boost/include/boost-1_52',
+                      'E:/JinQing/Workspace/rpcz_jinq/src',
+                      'E:/JinQing/LibSrc/protobuf-2.5.0/vsprojects/include'],
+                  library_dirs=['../build/deps/lib', '../build/src/rpcz',
+                      'c:/Boost/lib',
+                      'E:/JinQing/Workspace/rpcz_jinq/src/rpcz/Release',
+                      'E:/JinQing/LibSrc/zeromq-3.2.3/lib/Win32',
+                      'E:/JinQing/LibSrc/protobuf-2.5.0/vsprojects/Release'],
                   language='c++')
     ],
+
 )

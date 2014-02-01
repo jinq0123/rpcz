@@ -17,7 +17,7 @@
 #ifndef RPCZ_RPC_CHANNEL_IMPL_H
 #define RPCZ_RPC_CHANNEL_IMPL_H
 
-#include "rpcz/connection_manager.hpp"  // TODO: DEL
+#include "connection_manager.hpp"  // TODO: DEL
 #include "rpcz/rpc_channel.hpp"
 
 namespace rpcz {

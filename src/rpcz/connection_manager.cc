@@ -14,7 +14,7 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "rpcz/connection_manager.hpp"
+#include "connection_manager.hpp"
 
 #include <algorithm>
 #include <boost/lexical_cast.hpp>

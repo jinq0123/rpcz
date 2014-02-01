@@ -7,13 +7,8 @@ cdef extern from "Python.h":
     void PyEval_InitThreads()
 
 
-cdef extern from "rpcz/connection_manager.hpp" namespace "rpcz":
-    cdef void install_signal_handler()
-
-
 def init():
     import sys
-    # InstallSignalHandler()
     PyEval_InitThreads()
 
 

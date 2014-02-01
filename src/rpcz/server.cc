@@ -29,7 +29,7 @@
 
 #include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
-#include "rpcz/connection_manager.hpp"
+#include "connection_manager.hpp"
 #include "logging.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "reactor.hpp"

@@ -15,7 +15,6 @@
 // Author: nadavs@google.com <Nadav Samet>
 
 #include "reactor.hpp"
-#include <signal.h>
 #include <vector>
 #include "rpcz/callback.hpp"
 #include "clock.hpp"
@@ -24,10 +23,6 @@
 
 namespace rpcz {
 namespace {
-static bool g_interrupted = false;
-void signal_handler(int signal_value) {
-  g_interrupted = true;
-}
 
 // Deletes each pointer in the range [begin, end)
 template<typename IteratorType>
@@ -107,11 +102,7 @@ int reactor::loop() {
       sockets_[i].second->run();
     }
   }
-  if (g_interrupted) {
-    return -1;
-  } else {
-    return 0;
-  }
+  return 0;
 }
 
 long reactor::process_closure_run_map() {
@@ -137,17 +128,4 @@ void reactor::set_should_quit() {
   should_quit_ = true;
 }
 
-void install_signal_handler() {
-#ifdef WIN32
-  signal(SIGINT, signal_handler);
-  signal(SIGTERM, signal_handler);
-#else
-  struct sigaction action;
-  action.sa_handler = signal_handler;
-  action.sa_flags = 0;
-  sigemptyset(&action.sa_mask);
-  sigaction(SIGINT, &action, NULL);
-  sigaction(SIGTERM, &action, NULL);
-#endif  // WIN32
-}
 }  // namespace rpcz
