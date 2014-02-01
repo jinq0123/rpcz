@@ -11,10 +11,6 @@ cdef extern from "rpcz/connection_manager.hpp" namespace "rpcz":
     cdef void install_signal_handler()
 
 
-cdef extern from "rpcz/callback.hpp" namespace "rpcz":
-  pass
-
-
 def init():
     import sys
     # InstallSignalHandler()
@@ -54,8 +50,8 @@ cdef extern from "rpcz/sync_event.hpp" namespace "rpcz":
         void signal() nogil
         void wait() nogil
 
-cdef extern from "rpcz/rpc.hpp" namespace "rpcz":
-    cdef cppclass _rpc "rpcz::rpc":
+cdef extern from "rpcz/rpc_controller.hpp" namespace "rpcz":
+    cdef cppclass _rpc_controller "rpcz::rpc_controller":
         bint ok()
         int get_status()
         string get_error_message()
@@ -65,12 +61,12 @@ cdef extern from "rpcz/rpc.hpp" namespace "rpcz":
         int wait() nogil
 
 
-cdef class WrappedRPC:
-    cdef _rpc *thisptr
+cdef class RpcController:
+    cdef _rpc_controller *thisptr
     cdef _sync_event *sync_event
 
     def __cinit__(self):
-        self.thisptr = new _rpc()
+        self.thisptr = new _rpc_controller()
         self.sync_event = new _sync_event()
     def __dealloc__(self):
         del self.sync_event
@@ -101,10 +97,10 @@ cdef struct ClosureWrapper:
     string* response_str
     void* response_obj
     void* callback
-    void* rpc
+    void* rpc_controller
 
 
-cdef extern from "rpcz/macros.hpp" namespace "rpcz":
+cdef extern from "rpcz/callback.hpp" namespace "rpcz":
     cdef cppclass closure:
         pass
 
@@ -118,13 +114,13 @@ cdef void python_callback_bridge(ClosureWrapper *closure_wrapper) with gil:
             string_ptr_to_pystring(closure_wrapper.response_str))
     response = <object>closure_wrapper.response_obj;
     callback = <object>closure_wrapper.callback
-    rpc = <WrappedRPC>closure_wrapper.rpc
-    rpc.sync_event.signal()
+    rpc_controller = <RpcController>closure_wrapper.rpc_controller
+    rpc_controller.sync_event.signal()
     if callback is not None:
-        callback(response, rpc)
+        callback(response, rpc_controller)
     Py_DECREF(<object>closure_wrapper.response_obj)
     Py_DECREF(<object>closure_wrapper.callback)
-    Py_DECREF(<object>closure_wrapper.rpc)
+    Py_DECREF(<object>closure_wrapper.rpc_controller)
     del closure_wrapper.response_str
     free(closure_wrapper)
 
@@ -132,7 +128,8 @@ cdef void python_callback_bridge(ClosureWrapper *closure_wrapper) with gil:
 cdef extern from "rpcz/rpc_channel.hpp" namespace "rpcz":
     cdef cppclass _rpc_channel "rpcz::rpc_channel":
         void call_method0(string service_name, string method_name,
-                          string request, string* response, _rpc* rpc, 
+                          string request, string* response,
+                          _rpc_controller* rpc_controller, 
                           closure* callback) except +
 
 
@@ -144,22 +141,22 @@ cdef class RpcChannel:
         raise TypeError("Use Application.create_rpc_channel to create a "
                         "RpcChannel.")
     def call_method(self, service_name, method_name,
-                   request, response, WrappedRPC rpc, callback):
+                   request, response, RpcController rpc_controller, callback):
         cdef ClosureWrapper* closure_wrapper = <ClosureWrapper*>malloc(
                 sizeof(ClosureWrapper))
         closure_wrapper.response_str = new string()
         closure_wrapper.response_obj = <void*>response
         closure_wrapper.callback = <void*>callback
-        closure_wrapper.rpc = <void*>rpc
+        closure_wrapper.rpc_controller = <void*>rpc_controller
         Py_INCREF(response)
         Py_INCREF(callback)
-        Py_INCREF(rpc)
+        Py_INCREF(rpc_controller)
         self.thisptr.call_method0(
                 make_string(service_name),
                 make_string(method_name),
                 make_string(request.SerializeToString()),
                 closure_wrapper.response_str,
-                rpc.thisptr,
+                rpc_controller.thisptr,
                 new_callback(
                     python_callback_bridge, closure_wrapper))
 
