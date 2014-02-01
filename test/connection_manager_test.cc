@@ -24,10 +24,10 @@
 #include <zmq.hpp>
 #include "gtest/gtest.h"
 #include "rpcz/callback.hpp"
+#include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
-
 
 namespace rpcz {
 
@@ -85,9 +85,9 @@ message_vector* create_quit_request() {
   return request;
 }
 
-void expect_timeout(connection_manager::status status, message_iterator& iter,
-                   sync_event* sync) {
-  ASSERT_EQ(connection_manager::DEADLINE_EXCEEDED, status);
+void expect_timeout(connection_manager_status status,
+    message_iterator& iter, sync_event* sync) {
+  ASSERT_EQ(CMSTATUS_DEADLINE_EXCEEDED, status);
   ASSERT_FALSE(iter.has_more());
   sync->signal();
 }
@@ -106,11 +106,11 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
   event.wait();
 }
 
-class barrier_closure : public connection_manager::client_request_callback {
+class barrier_closure : public client_request_callback {
  public:
   barrier_closure() : count_(0) {}
 
-  void run(connection_manager::status status, message_iterator& iter) {
+  void run(connection_manager_status status, message_iterator& iter) {
     boost::unique_lock<boost::mutex> lock(mutex_);
     ++count_;
     cond_.notify_all();
@@ -171,9 +171,9 @@ void handle_request(client_connection connection,
 }
 
 void handle_server_response(sync_event* sync,
-                            connection_manager::status status,
+                            connection_manager_status status,
                             message_iterator& iter) {
-  CHECK_EQ(connection_manager::DONE, status);
+  CHECK_EQ(CMSTATUS_DONE, status);
   CHECK_EQ("318", message_to_string(iter.next()));
   sync->signal();
 }

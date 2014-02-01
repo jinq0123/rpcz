@@ -19,7 +19,6 @@
 #include <google/protobuf/descriptor.h>
 #include <zmq.hpp>
 #include "rpcz/callback.hpp"
-#include "connection_manager.hpp"
 #include "logging.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/sync_event.hpp"
@@ -126,14 +125,15 @@ void rpc_channel_impl::call_method(
 }
 
 void rpc_channel_impl::handle_client_response(
-    rpc_response_context response_context, connection_manager::status status,
+    rpc_response_context response_context,
+    connection_manager_status status,
     message_iterator& iter) {
   switch (status) {
-    case connection_manager::DEADLINE_EXCEEDED:
+    case CMSTATUS_DEADLINE_EXCEEDED:
       response_context.rpc_controller->set_status(
           status::DEADLINE_EXCEEDED);
       break;
-    case connection_manager::DONE: {
+    case CMSTATUS_DONE: {
         if (!iter.has_more()) {
           response_context.rpc_controller->set_failed(
               application_error::INVALID_MESSAGE, "");
@@ -169,8 +169,8 @@ void rpc_channel_impl::handle_client_response(
         }
       }
       break;
-    case connection_manager::ACTIVE:
-    case connection_manager::INACTIVE:
+    case CMSTATUS_ACTIVE:
+    case CMSTATUS_INACTIVE:
     default:
       CHECK(false) << "Unexpected status: "
                    << status;

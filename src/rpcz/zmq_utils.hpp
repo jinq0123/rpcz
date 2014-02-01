@@ -19,7 +19,7 @@
 
 #include <string>
 #include <boost/ptr_container/ptr_vector.hpp>
-#include "zmq.hpp"
+#include <zmq.hpp>
 #include "rpcz/common.hpp"
 
 namespace zmq {

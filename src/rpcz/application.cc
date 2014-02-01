@@ -16,8 +16,9 @@
 
 #include <string>
 #include <zmq.hpp>
-#include "rpcz/application.hpp"
+#include "connection.hpp"
 #include "connection_manager.hpp"
+#include "rpcz/application.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
 

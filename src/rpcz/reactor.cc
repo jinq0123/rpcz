@@ -19,7 +19,7 @@
 #include "rpcz/callback.hpp"
 #include "clock.hpp"
 #include "logging.hpp"
-#include "zmq.hpp"
+#include <zmq.hpp>
 
 namespace rpcz {
 namespace {

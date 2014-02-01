@@ -15,17 +15,19 @@
 // Author: nadavs@google.com <Nadav Samet>
 
 #include "zmq_utils.hpp"
-#include <boost/functional/hash.hpp>
-#include <sstream>
+
 #include <stddef.h>
 #include <string.h>
-#include <zmq.h>
+
 #include <ostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
+#include <boost/functional/hash.hpp>
 #include <google/protobuf/stubs/common.h>
-#include "zmq.hpp"
+#include <zmq.hpp>
+
 #include "logging.hpp"
 
 namespace rpcz {

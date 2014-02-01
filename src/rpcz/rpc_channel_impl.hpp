@@ -17,14 +17,14 @@
 #ifndef RPCZ_RPC_CHANNEL_IMPL_H
 #define RPCZ_RPC_CHANNEL_IMPL_H
 
-#include "connection_manager.hpp"  // TODO: DEL
+#include "connection.hpp"
+#include "connection_manager_status.hpp"
 #include "rpcz/rpc_channel.hpp"
 
 namespace rpcz {
 
-class connection;
 class closure;
-class message_vector;
+class message_iterator;
 struct rpc_response_context;
 
 class rpc_channel_impl: public rpc_channel {
@@ -51,7 +51,7 @@ class rpc_channel_impl: public rpc_channel {
  private:
   virtual void handle_client_response(
       rpc_response_context response_context,
-      connection_manager::status status,
+      connection_manager_status status,
       message_iterator& iter);
 
   void call_method_full(
@@ -64,7 +64,10 @@ class rpc_channel_impl: public rpc_channel {
     rpc_controller* rpc_controller,
     closure* done);
 
+ private:
   connection connection_;
-};
+};  // class rpc_channel_impl
+
 } // namespace rpcz
+
 #endif /* RPCZ_SIMPLE_RPC_CHANNEL_IMPL_H_ */

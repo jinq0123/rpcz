@@ -14,32 +14,14 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include <zmq.hpp>
-#include "rpcz/application.hpp"
-#include "gtest/gtest.h"
+#ifndef RPCZ_CONNECTION_MANAGER_STATUS_H
+#define RPCZ_CONNECTION_MANAGER_STATUS_H
 
-namespace rpcz {
-
-class application_test : public ::testing::Test {
- protected:
-  void InitDefaultApp() {
-    application_.reset(new application);
-  }
-
-  scoped_ptr<application> application_;
+enum connection_manager_status {
+    CMSTATUS_INACTIVE = 0,
+    CMSTATUS_ACTIVE = 1,
+    CMSTATUS_DONE = 2,
+    CMSTATUS_DEADLINE_EXCEEDED = 3,
 };
 
-TEST_F(application_test, Initializes) {
-  InitDefaultApp();
-}
-
-TEST_F(application_test, InitializesWithProvidedZeroMQContext) {
-  zmq::context_t* context = new zmq::context_t(1);
-  application::options options;
-  options.zeromq_context = context;
-  application_.reset(new application(options));
-  application_.reset();
-  delete context;
-}
-
-}  // namespace rpcz
+#endif  // RPCZ_CONNECTION_MANAGER_STATUS_H

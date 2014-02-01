@@ -21,6 +21,7 @@
 #include <zmq.hpp>
 
 #include "rpcz/callback.hpp"
+#include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/rpc_controller.hpp"

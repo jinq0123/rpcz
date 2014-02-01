@@ -20,7 +20,7 @@
 #include <map>
 #include <vector>
 #include <boost/noncopyable.hpp>
-#include "zmq.hpp"
+#include <zmq.hpp>
 #include "rpcz/common.hpp"
 
 namespace rpcz {

@@ -35,14 +35,16 @@
 #include <unistd.h>  // for getpid()
 #endif
 
-#include "zmq.h"
-#include "zmq.hpp"
-
+#include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>
-#include "rpcz/callback.hpp"
-#include "clock.hpp"
+
+#include "client_request_callback.hpp"
+#include "connection.hpp"
+#include "internal_commands.hpp"
 #include "logging.hpp"
 #include "reactor.hpp"
+#include "remote_response_wrapper.hpp"
+#include "rpcz/callback.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {
@@ -65,54 +67,8 @@ class event_id_generator : boost::noncopyable {
 
  private:
   uint64 state_;
-};
-
-// Command codes for internal process communication.
-//
-// Message sent from outside to the broker thread:
-const char kRequest = 0x01;      // send request to a connected socket.
-const char kConnect = 0x02;      // connect to a given endpoint.
-const char kBind    = 0x03;      // bind to an endpoint.
-const char kReply   = 0x04;      // reply to a request
-const char kQuit    = 0x0f;      // Starts the quit second.
-
-// Messages sent from the broker to a worker thread:
-const char krunclosure        = 0x11;   // run a closure
-const char krunserver_function = 0x12;   // Handle a request (a reply path
-                                        // is given)
-const char kInvokeclient_request_callback = 0x13;  // run a user supplied
-                                                 // function that processes
-                                                 // a reply from a remote
-                                                 // server.
-const char kWorkerQuit = 0x1f;          // Asks the worker to quit.
-
-// Messages sent from a worker thread to the broker:
-const char kReady = 0x21;        // Always the first message sent.
-const char kWorkerDone = 0x22;   // Sent just before the worker quits.
-}  // unnamed namespace
-
-struct remote_response_wrapper {
-  int64 deadline_ms;
-  uint64 start_time;
-  connection_manager::client_request_callback callback;
-};
-
-void connection::send_request(
-    message_vector& request,
-    int64 deadline_ms,
-    connection_manager::client_request_callback callback) {
-  remote_response_wrapper wrapper;
-  wrapper.start_time = zclock_ms();
-  wrapper.deadline_ms = deadline_ms;
-  wrapper.callback = callback;
-
-  zmq::socket_t& socket = manager_->get_frontend_socket();
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kRequest, ZMQ_SNDMORE);
-  send_uint64(&socket, connection_id_, ZMQ_SNDMORE);
-  send_object(&socket, wrapper, ZMQ_SNDMORE);
-  write_vector_to_socket(&socket, request);
-}
+};  // class event_id_generator
+}  // namespace
 
 void client_connection::reply(message_vector* v) {
   zmq::socket_t& socket = manager_->get_frontend_socket();
@@ -157,10 +113,10 @@ void worker_thread(connection_manager* connection_manager,
         }
         break;
       case kInvokeclient_request_callback: {
-        connection_manager::client_request_callback cb =
-            interpret_message<connection_manager::client_request_callback>(
+        client_request_callback cb =
+            interpret_message<client_request_callback>(
                 iter.next());
-        connection_manager::status status = connection_manager::status(
+        connection_manager_status status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
         cb(status, iter);
       }
@@ -347,10 +303,10 @@ class connection_manager_thread {
     if (response_iter == remote_response_map_.end()) {
       return;
     }
-    connection_manager::client_request_callback& callback = response_iter->second;
+    client_request_callback& callback = response_iter->second;
     begin_worker_command(kInvokeclient_request_callback);
     send_object(frontend_socket_, callback, ZMQ_SNDMORE);
-    send_uint64(frontend_socket_, connection_manager::DONE, ZMQ_SNDMORE);
+    send_uint64(frontend_socket_, CMSTATUS_DONE, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
     remote_response_map_.erase(response_iter);
   }
@@ -360,10 +316,10 @@ class connection_manager_thread {
     if (response_iter == remote_response_map_.end()) {
       return;
     }
-    connection_manager::client_request_callback& callback = response_iter->second;
+    client_request_callback& callback = response_iter->second;
     begin_worker_command(kInvokeclient_request_callback);
     send_object(frontend_socket_, callback, ZMQ_SNDMORE);
-    send_uint64(frontend_socket_, connection_manager::DEADLINE_EXCEEDED, 0);
+    send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
     remote_response_map_.erase(response_iter);
   }
 
@@ -374,7 +330,7 @@ class connection_manager_thread {
   }
 
  private:
-  typedef std::map<event_id, connection_manager::client_request_callback>
+  typedef std::map<event_id, client_request_callback>
       remote_response_map;
   typedef std::map<uint64, event_id> deadline_map;
   remote_response_map remote_response_map_;

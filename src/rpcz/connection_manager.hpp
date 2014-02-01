@@ -23,6 +23,7 @@
 #include <boost/thread.hpp>
 #include "rpcz/common.hpp"
 #include "rpcz/sync_event.hpp"
+#include "connection_manager_status.hpp"
 
 namespace zmq {
 class context_t;
@@ -62,17 +63,8 @@ class message_vector;
 // connection_manager and connection are thread-safe.
 class connection_manager : boost::noncopyable {
  public:
-  enum status {
-    INACTIVE = 0,
-    ACTIVE = 1,
-    DONE = 2,
-    DEADLINE_EXCEEDED = 3,
-  };
-
   typedef boost::function<void(const client_connection&, message_iterator&)>
       server_function;
-  typedef boost::function<void(status status, message_iterator&)>
-      client_request_callback;
 
   // Constructs a connection_manager that has nthreads worker threads. The
   // connection_manager does not take ownership of the given ZeroMQ context.
@@ -115,33 +107,6 @@ class connection_manager : boost::noncopyable {
   friend class connection;
   friend class client_connection;
   friend class connection_managerThread;
-};
-
-// Represents a connection to a server. Thread-safe.
-class connection {
- public:
-  connection() : manager_((connection_manager*)0xbadecafe), connection_id_(0) {}
-
-  // Asynchronously sends a request over the connection.
-  // request: a vector of messages to be sent. Does not take ownership of the
-  //          request. The vector has to live valid at least until the request
-  //          completes. It can be safely de-allocated inside the provided
-  //          closure or after remote_response->wait() returns.
-  // deadline_ms - milliseconds before giving up on this request. -1 means
-  //               forever.
-  // callback - a closure that will be ran on one of the worker threads when a
-  //           response arrives or it timeouts.
-  void send_request(
-      message_vector& request,
-      int64 deadline_ms,
-      connection_manager::client_request_callback callback);
-
- private:
-  connection(connection_manager *manager, uint64 connection_id) :
-      manager_(manager), connection_id_(connection_id) {}
-  connection_manager* manager_;
-  uint64 connection_id_;
-  friend class connection_manager;
 };
 
 class client_connection {

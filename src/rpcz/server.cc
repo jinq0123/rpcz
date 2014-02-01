@@ -27,15 +27,15 @@
 #include <google/protobuf/stubs/common.h>
 #include <zmq.hpp>
 
-#include "rpcz/application.hpp"
-#include "rpcz/callback.hpp"
 #include "connection_manager.hpp"
 #include "logging.hpp"
-#include "rpcz/rpc_controller.hpp"
 #include "reactor.hpp"
+#include "rpcz/application.hpp"
+#include "rpcz/callback.hpp"
+#include "rpcz/rpc_controller.hpp"
+#include "rpcz/rpcz.pb.h"
 #include "rpcz/service.hpp"
 #include "zmq_utils.hpp"
-#include "rpcz/rpcz.pb.h"
 
 namespace rpcz {
 
