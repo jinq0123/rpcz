@@ -122,6 +122,7 @@ class connection_manager : boost::noncopyable {
   boost::thread_specific_ptr<zmq::socket_t> socket_;
   std::string frontend_endpoint_;
   sync_event is_termating_;
+  bool already_quit_;  // to ensure quit_and_join() only once
 
   friend class connection;
   friend class client_connection;

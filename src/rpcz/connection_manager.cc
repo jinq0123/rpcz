@@ -342,10 +342,11 @@ class connection_manager_thread {
 };
 
 connection_manager::connection_manager()
-  : context_(NULL)
-  , frontend_endpoint_(
-        "inproc://" + boost::lexical_cast<std::string>(this)
-        + ".rpcz.connection_manager.frontend") {
+  : context_(NULL),
+    frontend_endpoint_("inproc://" + boost::lexical_cast<std::string>(this)
+        + ".rpcz.connection_manager.frontend"),
+    already_quit_(false)
+{
   DLOG(INFO) << "connection_manager() ";
   application_options options;
   context_ = options.get_zmq_context();
@@ -447,6 +448,8 @@ connection_manager::~connection_manager() {
 
 void connection_manager::quit_and_join()
 {
+  if (already_quit_) return;
+  already_quit_ = true;  // not thread-safe
   DLOG(INFO) << "quit_and_join()...";
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
