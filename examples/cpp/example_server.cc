@@ -39,11 +39,10 @@ class SearchServiceImpl : public SearchService {
 }  // namespace examples
 
 int main() {
-  rpcz::application application;
-  rpcz::server server(application);
+  rpcz::server server;
   examples::SearchServiceImpl search_service;
   server.register_service(&search_service);
   cout << "Serving requests on port 5555." << endl;
   server.bind("tcp://*:5555");
-  application.run();
+  rpcz::application::run();
 }

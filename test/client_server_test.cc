@@ -23,6 +23,7 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
+#include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/server.hpp"
@@ -44,8 +45,9 @@ void super_done(SearchResponse *response,
 
 class SearchServiceImpl : public SearchService {
  public:
-  SearchServiceImpl(SearchService_Stub* backend, connection_manager* cm)
-      : backend_(backend), delayed_reply_(NULL), cm_(cm) {};
+  SearchServiceImpl(SearchService_Stub* backend)
+      : backend_(backend), delayed_reply_(NULL)
+      , cm_(connection_manager::get()) {};
 
   ~SearchServiceImpl() {
   }
@@ -93,7 +95,7 @@ class SearchServiceImpl : public SearchService {
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
   reply<SearchResponse> delayed_reply_;
-  connection_manager* cm_;
+  connection_manager_ptr cm_;
 };
 
 // For handling complex delegated queries.
@@ -112,15 +114,13 @@ class server_test : public ::testing::Test {
  public:
   server_test() :
       context_(new zmq::context_t(1)),
-      cm_(new connection_manager(context_.get(), 10)),
-      frontend_server_(*cm_.get()),
-      backend_server_(*cm_.get()) {
+      frontend_server_(),
+      backend_server_() {
     start_server();
   }
 
   ~server_test() {
     // terminate the context, which will cause the thread to quit.
-    cm_.reset(NULL);
     context_.reset(NULL);
   }
 
@@ -128,14 +128,15 @@ class server_test : public ::testing::Test {
     backend_server_.register_service(
         new BackendSearchServiceImpl);
     backend_server_.bind("inproc://myserver.backend");
-    backend_connection_ = cm_->connect("inproc://myserver.backend");
+    rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
+    backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_server_.register_service(
         frontend_service = new SearchServiceImpl(
             new SearchService_Stub(
-                rpc_channel::create(backend_connection_), true), cm_.get()));
+                rpc_channel::create(backend_connection_), true)));
     frontend_server_.bind("inproc://myserver.frontend");
-    frontend_connection_ = cm_->connect("inproc://myserver.frontend");
+    frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
 
   SearchResponse send_blocking_request(connection connection,
@@ -153,7 +154,6 @@ class server_test : public ::testing::Test {
 
  protected:
   scoped_ptr<zmq::context_t> context_;
-  scoped_ptr<connection_manager> cm_;
   connection frontend_connection_;
   connection backend_connection_;
   server frontend_server_;
@@ -287,7 +287,7 @@ TEST_F(server_test, ConnectionManagerTermination) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
   }
   LOG(INFO)<<"I'm here";
-  cm_->run();
+  connection_manager::get()->run();
   LOG(INFO)<<"I'm there";
 }
 }  // namespace

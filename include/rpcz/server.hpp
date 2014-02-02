@@ -18,6 +18,7 @@
 #define RPCZ_SERVER_H
 
 #include <boost/noncopyable.hpp>
+#include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/rpcz.pb.h"
 
 namespace zmq {
@@ -25,9 +26,7 @@ class socket_t;
 };
 
 namespace rpcz {
-class application;
 class client_connection;
-class connection_manager;
 class message_iterator;
 class rpc_service;
 class server_channel;
@@ -37,14 +36,7 @@ class service;
 // The service interface methods are executed inside a worker thread.
 class server : boost::noncopyable {
  public:
-  // Constructs a server that uses the provided application. The
-  // application must outlive the server.
-  explicit server(application& application);
-
-  // Constructs a server that uses the provided connection_manager. The
-  // connection_manager must outlive the server.
-  explicit server(connection_manager& connection_manager);
-
+  server();
   ~server();
 
   // Registers an rpc service with this server. All registrations must occur
@@ -64,7 +56,7 @@ class server : boost::noncopyable {
   void handle_request(const client_connection& connection,
                       message_iterator& iter);
 
-  connection_manager& connection_manager_;
+  connection_manager_ptr connection_manager_ptr_;
   typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
   rpc_service_map service_map_;
 };

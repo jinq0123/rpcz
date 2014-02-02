@@ -42,7 +42,7 @@ class client_connection {
   uint64 socket_id_;
   const std::string sender_;
   const std::string event_id_;
-  friend void worker_thread(connection_manager*, zmq::context_t*, std::string);
+  friend void worker_thread(connection_manager*, zmq::context_t &, std::string);
 };
 
 }  // namespace rpcz

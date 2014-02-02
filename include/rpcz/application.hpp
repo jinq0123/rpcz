@@ -13,71 +13,50 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_APPLICATION_H
 #define RPCZ_APPLICATION_H
 
 #include <string>
-#include "rpcz/common.hpp"
 
 namespace zmq {
 class context_t; 
 }  // namespace zmq
 
 namespace rpcz {
-class connection_manager;
 class rpc_channel;
-class server;
 
 // rpcz::application is a simple interface that helps setting up a common
 // RPCZ client or server application.
-class application {
- public:
-  class options {
-   public:
-    options() : connection_manager_threads(10),
-                zeromq_context(NULL),
-                zeromq_io_threads(1) {}
-
-    // Number of connection manager threads. Those threads are used for
-    // running user code: handling server requests or running callbacks.
-    int connection_manager_threads;
-
-    // ZeroMQ context to use for our application. If NULL, then application will
-    // construct its own ZeroMQ context and own it. If you provide your own
-    // ZeroMQ context, application will not take ownership of it. The ZeroMQ
-    // context must outlive the application.
-    zmq::context_t* zeromq_context;
-
-    // Number of ZeroMQ I/O threads, to be passed to zmq_init(). This value is
-    // ignored when you provide your own ZeroMQ context.
-    int zeromq_io_threads;
-  };
-
-  application();
-
-  explicit application(const options& options);
-
-  virtual ~application();
+namespace application {
 
   // Creates an rpc_channel to the given endpoint. Attach it to a Stub and you
   // can start making calls through this channel from any thread. No locking
   // needed. It is your responsibility to delete this object.
-  virtual rpc_channel* create_rpc_channel(const std::string& endpoint);
+  rpc_channel* create_rpc_channel(const std::string& endpoint);  // TODO: move to rpc_channel
 
   // Blocks the current thread until another thread calls terminate.
-  virtual void run();
+  void run();
 
   // Releases all the threads that are blocked inside run()
-  virtual void terminate();
+  void terminate();
 
- private:
-  void init(const options& options);
+  // You can change the default options BEFORE any client or server.
+  // These options are:
+  // * Number of connection manager threads. Those threads are used for
+  //   running user code: handling server requests or running callbacks.
+  //   Default 1.
+  // * ZeroMQ context to use for our application. If NULL, then application will
+  //   construct its own ZeroMQ context and own it. If you provide your own
+  //   ZeroMQ context, application will not take ownership of it. The ZeroMQ
+  //   context must outlive the rpcz application. Default NULL.
+  // * Number of ZeroMQ I/O threads, to be passed to zmq_init(). This value is
+  //   ignored when you provide your own ZeroMQ context. Default 1.
+  void set_connection_manager_threads(int n);  // default 1
+  void set_zmq_context(zmq::context_t* context);  // default NULL
+  void set_zmq_io_threads(int n);  // default 1
+}  // namespace application
 
-  bool owns_context_;
-  zmq::context_t* context_;
-  scoped_ptr<connection_manager> connection_manager_;
-  friend class server;
-};
 }  // namespace rpcz
 #endif

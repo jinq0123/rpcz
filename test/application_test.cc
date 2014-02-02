@@ -16,30 +16,23 @@
 
 #include <zmq.hpp>
 #include "rpcz/application.hpp"
+#include "rpcz/connection_manager.hpp"
 #include "gtest/gtest.h"
 
 namespace rpcz {
 
 class application_test : public ::testing::Test {
- protected:
-  void InitDefaultApp() {
-    application_.reset(new application);
-  }
-
-  scoped_ptr<application> application_;
 };
-
-TEST_F(application_test, Initializes) {
-  InitDefaultApp();
-}
 
 TEST_F(application_test, InitializesWithProvidedZeroMQContext) {
   zmq::context_t* context = new zmq::context_t(1);
-  application::options options;
-  options.zeromq_context = context;
-  application_.reset(new application(options));
-  application_.reset();
+  {
+    application::set_zmq_context(context);
+    connection_manager_ptr cm = connection_manager::get();
+  }
   delete context;
 }
 
 }  // namespace rpcz
+
+

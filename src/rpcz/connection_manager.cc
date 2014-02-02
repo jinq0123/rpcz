@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include "connection_manager.hpp"
 
@@ -38,6 +39,7 @@
 #include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>
 
+#include "application_options.hpp"
 #include "client_connection.hpp"
 #include "client_request_callback.hpp"
 #include "connection.hpp"
@@ -49,6 +51,10 @@
 #include "zmq_utils.hpp"
 
 namespace rpcz {
+
+connection_manager::weak_ptr connection_manager::this_weak_ptr_;
+boost::mutex connection_manager::this_weak_ptr_mutex_;
+
 namespace {
 const uint64 kLargePrime = (1ULL << 63) - 165;
 const uint64 kGenerator = 2;
@@ -72,8 +78,8 @@ class event_id_generator : boost::noncopyable {
 }  // namespace
 
 void worker_thread(connection_manager* connection_manager,
-                  zmq::context_t* context, std::string endpoint) {
-  zmq::socket_t socket(*context, ZMQ_DEALER);
+                  zmq::context_t & context, std::string endpoint) {
+  zmq::socket_t socket(context, ZMQ_DEALER);
   socket.connect(endpoint.c_str());
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kReady);
@@ -119,7 +125,7 @@ void worker_thread(connection_manager* connection_manager,
 class connection_manager_thread {
  public:
   connection_manager_thread(
-      zmq::context_t* context,
+      zmq::context_t & context,
       int nthreads,
       sync_event* ready_event,
       zmq::socket_t* frontend_socket) : 
@@ -145,7 +151,7 @@ class connection_manager_thread {
     }
   }
 
-  static void run(zmq::context_t* context,
+  static void run(zmq::context_t & context,
                   int nthreads,
                   sync_event* ready_event,
                   zmq::socket_t* frontend_socket) {
@@ -220,7 +226,7 @@ class connection_manager_thread {
 
   inline void handle_connect_command(const std::string& sender,
                                    const std::string& endpoint) {
-    zmq::socket_t* socket = new zmq::socket_t(*context_, ZMQ_DEALER);
+    zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
     connections_.push_back(socket);
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -238,7 +244,7 @@ class connection_manager_thread {
       const std::string& sender,
       const std::string& endpoint,
       connection_manager::server_function server_function) {
-    zmq::socket_t* socket = new zmq::socket_t(*context_, ZMQ_ROUTER);
+    zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     socket->bind(endpoint.c_str());
@@ -329,29 +335,54 @@ class connection_manager_thread {
   reactor reactor_;
   std::vector<zmq::socket_t*> connections_;
   std::vector<zmq::socket_t*> server_sockets_;
-  zmq::context_t* context_;
+  zmq::context_t & context_;
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;
   int current_worker_;
 };
 
-connection_manager::connection_manager(zmq::context_t* context, int nthreads)
-  : context_(context),
-    frontend_endpoint_(
-        "inproc://" + boost::lexical_cast<std::string>(this) + ".cm.frontend") {
-  zmq::socket_t* frontend_socket = new zmq::socket_t(*context, ZMQ_ROUTER);
+connection_manager::connection_manager()
+  : context_(NULL)
+  , frontend_endpoint_(
+        "inproc://" + boost::lexical_cast<std::string>(this)
+        + ".rpcz.connection_manager.frontend") {
+  application_options options;
+  context_ = options.get_zmq_context();
+  if (NULL == context_)
+  {
+      int zmq_io_threads = options.get_zmq_io_threads();
+      assert(zmq_io_threads > 0);
+      own_context_.reset(new zmq::context_t(zmq_io_threads));
+      context_ = own_context_.get();
+  }
+  assert(context_);
+  zmq::socket_t* frontend_socket = new zmq::socket_t(*context_, ZMQ_ROUTER);
   int linger_ms = 0;
   frontend_socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   frontend_socket->bind(frontend_endpoint_.c_str());
+  int nthreads = options.get_connection_manager_threads();
+  assert(nthreads > 0);
   for (int i = 0; i < nthreads; ++i) {
     worker_threads_.add_thread(
-        new boost::thread(&worker_thread, this, context, frontend_endpoint_));
+        new boost::thread(&worker_thread, this, boost::ref(*context_), frontend_endpoint_));
   }
   sync_event event;
   broker_thread_ = boost::thread(&connection_manager_thread::run,
-                                 context, nthreads, &event,
+                                 boost::ref(*context_), nthreads, &event,
                                  frontend_socket);
   event.wait();
+}
+
+connection_manager_ptr connection_manager::get()
+{
+  connection_manager_ptr p = this_weak_ptr_.lock();
+  if (p) return p;
+  lock_guard lock(this_weak_ptr_mutex_);
+  p = this_weak_ptr_.lock();
+  if (p) return p;
+  p.reset(new connection_manager);
+  this_weak_ptr_ = p;
+  return p;
 }
 
 zmq::socket_t& connection_manager::get_frontend_socket() {
@@ -415,4 +446,5 @@ connection_manager::~connection_manager() {
   worker_threads_.join_all();
   socket_.reset(NULL);
 }
+
 }  // namespace rpcz

@@ -13,55 +13,49 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
+
+#include "rpcz/application.hpp"
 
 #include <string>
 #include <zmq.hpp>
+
+#include "application_options.hpp"
 #include "connection.hpp"
 #include "connection_manager.hpp"
-#include "rpcz/application.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
 
 namespace rpcz {
+namespace application {
 
-application::application() {
-  init(options());
-};
-
-application::application(const application::options& options) {
-  init(options);
-};
-
-application::~application() {
-  connection_manager_.reset();
-  if (owns_context_) {
-    delete context_;
-  }
-}
-
-void application::init(const application::options& options) {
-  if (options.zeromq_context) {
-    context_ = options.zeromq_context;
-    owns_context_ = false;
-  } else {
-    context_ = new zmq::context_t(options.zeromq_io_threads);
-    owns_context_ = true;
-  }
-  connection_manager_.reset(new connection_manager(
-          context_,
-          options.connection_manager_threads));
-}
-
-rpc_channel* application::create_rpc_channel(const std::string& endpoint) {
+rpc_channel* create_rpc_channel(const std::string& endpoint) {
   return rpc_channel::create(
-      connection_manager_->connect(endpoint));
+      connection_manager::get()->connect(endpoint));
 }
 
-void application::run() {
-  connection_manager_->run();
+void run() {
+  connection_manager::get()->run();
 }
 
-void application::terminate() {
-  connection_manager_->terminate();
+void terminate() {
+  connection_manager::get()->terminate();
 }
+
+void set_zmq_context(zmq::context_t* context)
+{
+  application_options::set_zmq_context(context);
+}
+
+void set_zmq_io_threads(int n)
+{
+  application_options::set_zmq_io_threads(n);
+}
+
+void set_connection_manager_threads(int n)
+{
+  application_options::set_connection_manager_threads(n);
+}
+
+}  // namespace application
 }  // namespace rpcz

@@ -11,7 +11,7 @@ set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
 
 include_directories(${PROJECT_BINARY_DIR})
 set(RPCZ_SOURCES
-    application.cc client_connection.cc clock.cc
+    application.cc application_options.cc client_connection.cc clock.cc
     connection.cc connection_manager.cc
     reactor.cc rpc_controller.cc rpc_channel_impl.cc server.cc
     sync_event.cc zmq_utils.cc

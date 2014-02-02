@@ -137,24 +137,19 @@ class proto_rpc_service : public rpc_service {
   scoped_ptr<service> service_;
 };
 
-server::server(application& application)
-  : connection_manager_(*application.connection_manager_.get()) {
-}
-
-server::server(connection_manager& connection_manager)
-  : connection_manager_(connection_manager) {
+server::server()
+  : connection_manager_ptr_(connection_manager::get()) {
+  assert(connection_manager_ptr_);
 }
 
 server::~server() { }
 
 void server::register_service(rpcz::service *service) {
-  register_service(service,
-                  service->GetDescriptor()->name());
+  register_service(service, service->GetDescriptor()->name());
 }
 
 void server::register_service(rpcz::service *service, const std::string& name) {
-  register_service(new proto_rpc_service(service),
-                  name);
+  register_service(new proto_rpc_service(service), name);
 }
 
 void server::register_service(rpcz::rpc_service *rpc_service,
@@ -165,7 +160,7 @@ void server::register_service(rpcz::rpc_service *rpc_service,
 void server::bind(const std::string& endpoint) {
   connection_manager::server_function f = boost::bind(
       &server::handle_request, this, _1, _2);
-  connection_manager_.bind(endpoint, f);
+  connection_manager_ptr_->bind(endpoint, f);
 }
 
 void server::handle_request(const client_connection& connection,

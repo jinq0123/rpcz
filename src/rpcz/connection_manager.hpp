@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_CONNECTION_MANAGER_H
 #define RPCZ_CONNECTION_MANAGER_H
@@ -21,9 +22,11 @@
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
-#include "rpcz/common.hpp"
-#include "rpcz/sync_event.hpp"
+#include <boost/weak_ptr.hpp>
 #include "connection_manager_status.hpp"
+#include "rpcz/common.hpp"
+#include "rpcz/connection_manager_ptr.hpp"
+#include "rpcz/sync_event.hpp"
 
 namespace zmq {
 class context_t;
@@ -38,6 +41,7 @@ class connection;
 class connection_thread_context;
 class message_iterator;
 
+// TODO: Update it.
 // A connection_manager is a multi-threaded asynchronous system for communication
 // over ZeroMQ sockets. A connection_manager can:
 //   1. connect to a remote server and allow all threads the program to share
@@ -60,40 +64,52 @@ class message_iterator;
 //          c.add(closure)
 //
 // connection_manager and connection are thread-safe.
+// connection_manager is singleton.
 class connection_manager : boost::noncopyable {
+
+ private:
+  connection_manager();
+
+ public:
+  // Dynamic singleton. Auto destruct.
+  static connection_manager_ptr get();
+
  public:
   typedef boost::function<void(const client_connection&, message_iterator&)>
       server_function;
 
-  // Constructs a connection_manager that has nthreads worker threads. The
-  // connection_manager does not take ownership of the given ZeroMQ context.
-  connection_manager(zmq::context_t* context, int nthreads);
-
   // Blocks the current thread until all connection managers have completed.
-  virtual ~connection_manager();
+  ~connection_manager();
 
   // connects all connection_manager threads to the given endpoint. On success
   // this method returns a connection object that can be used from any thread
   // to communicate with this endpoint.
-  virtual connection connect(const std::string& endpoint);
+  connection connect(const std::string& endpoint);
 
   // binds a socket to the given endpoint and registers server_function as a
   // handler for requests to this socket. The function gets executed on one of
   // the worker threads. When the function returns, the endpoint is already
   // bound.
-  virtual void bind(const std::string& endpoint, server_function function);
+  void bind(const std::string& endpoint, server_function function);
 
   // Executes the closure on one of the worker threads.
-  virtual void add(closure* closure);
+  void add(closure* closure);
 
   // Blocks this thread until terminate() is called from another thread.
-  virtual void run();
+  void run();
 
   // Releases all the threads that are blocked inside run()
-  virtual void terminate();
+  void terminate();
 
  private:
-  zmq::context_t* context_;
+  typedef boost::weak_ptr<connection_manager> weak_ptr;
+  typedef boost::lock_guard<boost::mutex> lock_guard;
+  static weak_ptr this_weak_ptr_;
+  static boost::mutex this_weak_ptr_mutex_;
+
+ private:
+  scoped_ptr<zmq::context_t> own_context_;
+  zmq::context_t* context_;  // Use own_context_ or external context
 
   inline zmq::socket_t& get_frontend_socket();
 
