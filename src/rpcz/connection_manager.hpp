@@ -102,6 +102,10 @@ class connection_manager : boost::noncopyable {
   void terminate();
 
  private:
+  // Quit and join all threads;
+  void quit_and_join();
+
+ private:
   typedef boost::weak_ptr<connection_manager> weak_ptr;
   typedef boost::lock_guard<boost::mutex> lock_guard;
   static weak_ptr this_weak_ptr_;
