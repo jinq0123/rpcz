@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include <zmq.hpp>
 
+#include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
@@ -45,6 +46,7 @@ void super_done(SearchResponse *response,
 
 class SearchServiceImpl : public SearchService {
  public:
+  // Will take ownership of backend.
   SearchServiceImpl(SearchService_Stub* backend)
       : backend_(backend), delayed_reply_(NULL)
       , cm_(connection_manager::get()) {};
@@ -116,25 +118,28 @@ class server_test : public ::testing::Test {
       context_(new zmq::context_t(1)),
       frontend_server_(),
       backend_server_() {
+    application::set_zmq_context(context_.get());
+    application::set_connection_manager_threads(10);
+    cm_ = connection_manager::get();
     start_server();
   }
 
   ~server_test() {
     // terminate the context, which will cause the thread to quit.
+    cm_->terminate();
     context_.reset(NULL);
   }
 
   void start_server() {
-    backend_server_.register_service(
-        new BackendSearchServiceImpl);
+    backend_service.reset(new BackendSearchServiceImpl);
+    backend_server_.register_service(backend_service.get());
     backend_server_.bind("inproc://myserver.backend");
     rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
     backend_connection_ = cm->connect("inproc://myserver.backend");
 
-    frontend_server_.register_service(
-        frontend_service = new SearchServiceImpl(
-            new SearchService_Stub(
-                rpc_channel::create(backend_connection_), true)));
+    frontend_service.reset(new SearchServiceImpl(
+        new SearchService_Stub(rpc_channel::create(backend_connection_), true)));
+    frontend_server_.register_service(frontend_service.get());
     frontend_server_.bind("inproc://myserver.frontend");
     frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
@@ -154,11 +159,13 @@ class server_test : public ::testing::Test {
 
  protected:
   scoped_ptr<zmq::context_t> context_;
+  connection_manager_ptr cm_;
   connection frontend_connection_;
   connection backend_connection_;
   server frontend_server_;
   server backend_server_;
-  SearchServiceImpl* frontend_service;
+  scoped_ptr<SearchServiceImpl> frontend_service;
+  scoped_ptr<BackendSearchServiceImpl> backend_service;
 };
 
 TEST_F(server_test, SimpleRequest) {
