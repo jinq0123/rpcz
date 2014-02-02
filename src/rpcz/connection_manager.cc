@@ -38,6 +38,7 @@
 #include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>
 
+#include "client_connection.hpp"
 #include "client_request_callback.hpp"
 #include "connection.hpp"
 #include "internal_commands.hpp"
@@ -69,17 +70,6 @@ class event_id_generator : boost::noncopyable {
   uint64 state_;
 };  // class event_id_generator
 }  // namespace
-
-void client_connection::reply(message_vector* v) {
-  zmq::socket_t& socket = manager_->get_frontend_socket();
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kReply, ZMQ_SNDMORE);
-  send_uint64(&socket, socket_id_, ZMQ_SNDMORE);
-  send_string(&socket, sender_, ZMQ_SNDMORE);
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_string(&socket, event_id_, ZMQ_SNDMORE);
-  write_vector_to_socket(&socket, *v);
-}
 
 void worker_thread(connection_manager* connection_manager,
                   zmq::context_t* context, std::string endpoint) {

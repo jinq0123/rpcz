@@ -27,6 +27,7 @@
 #include <google/protobuf/stubs/common.h>
 #include <zmq.hpp>
 
+#include "client_connection.hpp"
 #include "connection_manager.hpp"
 #include "logging.hpp"
 #include "reactor.hpp"

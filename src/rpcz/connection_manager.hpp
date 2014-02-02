@@ -37,7 +37,6 @@ class closure;
 class connection;
 class connection_thread_context;
 class message_iterator;
-class message_vector;
 
 // A connection_manager is a multi-threaded asynchronous system for communication
 // over ZeroMQ sockets. A connection_manager can:
@@ -107,23 +106,8 @@ class connection_manager : boost::noncopyable {
   friend class connection;
   friend class client_connection;
   friend class connection_managerThread;
-};
+};  // class connection_manager
 
-class client_connection {
- public:
-  void reply(message_vector* v);
-
- private:
-  client_connection(connection_manager* manager, uint64 socket_id,
-                   std::string& sender, std::string& event_id)
-      : manager_(manager), socket_id_(socket_id), sender_(sender),
-      event_id_(event_id) {}
-
-  connection_manager* manager_;
-  uint64 socket_id_;
-  const std::string sender_;
-  const std::string event_id_;
-  friend void worker_thread(connection_manager*, zmq::context_t*, std::string);
-};
 }  // namespace rpcz
+
 #endif

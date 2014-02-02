@@ -24,6 +24,7 @@
 #include <zmq.hpp>
 #include "gtest/gtest.h"
 #include "rpcz/callback.hpp"
+#include "rpcz/client_connection.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/sync_event.hpp"
