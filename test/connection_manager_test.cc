@@ -42,6 +42,7 @@ class connection_manager_test : public ::testing::Test {
 };
 
 TEST_F(connection_manager_test, TestStartsAndFinishes) {
+  ASSERT_EQ(0, connection_manager::use_count());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
@@ -97,6 +98,7 @@ void expect_timeout(connection_manager_status status,
 }
 
 TEST_F(connection_manager_test, TestTimeoutAsync) {
+  ASSERT_EQ(0, connection_manager::use_count());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
 
@@ -151,6 +153,7 @@ void SendManyMessages(connection connection, int thread_id) {
 }
 
 TEST_F(connection_manager_test, ManyClientsTest) {
+  ASSERT_EQ(0, connection_manager::use_count());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
 
@@ -189,6 +192,7 @@ void handle_server_response(sync_event* sync,
 }
 
 TEST_F(connection_manager_test, TestBindServer) {
+  ASSERT_EQ(0, connection_manager::use_count());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
@@ -216,6 +220,7 @@ void DoThis(zmq::context_t * context) {
 }
 
 TEST_F(connection_manager_test, ProcessesSingleCallback) {
+  ASSERT_EQ(0, connection_manager::use_count());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
@@ -253,6 +258,7 @@ void add_many_closures() {
 }
 
 TEST_F(connection_manager_test, ProcessesManyCallbacksFromManyThreads) {
+  ASSERT_EQ(0, connection_manager::use_count());
   const int thread_count = 10;
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(thread_count);

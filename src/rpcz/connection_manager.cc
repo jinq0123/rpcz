@@ -387,6 +387,11 @@ connection_manager_ptr connection_manager::get()
   return p;
 }
 
+long connection_manager::use_count()
+{
+    return this_weak_ptr_.use_count();
+}
+
 zmq::socket_t& connection_manager::get_frontend_socket() {
   zmq::socket_t* socket = socket_.get();
   if (socket == NULL) {

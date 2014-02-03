@@ -115,32 +115,32 @@ class BackendSearchServiceImpl : public SearchService {
 class server_test : public ::testing::Test {
  public:
   server_test() :
-      context_(new zmq::context_t(1)),
-      frontend_server_(),
-      backend_server_() {
+      context_(new zmq::context_t(1)) {
+    EXPECT_EQ(0, connection_manager::use_count());
     application::set_zmq_context(context_.get());
     application::set_connection_manager_threads(10);
-    cm_ = connection_manager::get();
+    frontend_server_.reset(new server);
+    backend_server_.reset(new server);
     start_server();
   }
 
   ~server_test() {
     // terminate the context, which will cause the thread to quit.
-    cm_->terminate();
+    application::terminate();
     context_.reset(NULL);
   }
 
   void start_server() {
     backend_service.reset(new BackendSearchServiceImpl);
-    backend_server_.register_service(backend_service.get());
-    backend_server_.bind("inproc://myserver.backend");
+    backend_server_->register_service(backend_service.get());
+    backend_server_->bind("inproc://myserver.backend");
     rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
     backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_service.reset(new SearchServiceImpl(
         new SearchService_Stub(rpc_channel::create(backend_connection_), true)));
-    frontend_server_.register_service(frontend_service.get());
-    frontend_server_.bind("inproc://myserver.frontend");
+    frontend_server_->register_service(frontend_service.get());
+    frontend_server_->bind("inproc://myserver.frontend");
     frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
 
@@ -162,8 +162,8 @@ class server_test : public ::testing::Test {
   connection_manager_ptr cm_;
   connection frontend_connection_;
   connection backend_connection_;
-  server frontend_server_;
-  server backend_server_;
+  scoped_ptr<server> frontend_server_;
+  scoped_ptr<server> backend_server_;
   scoped_ptr<SearchServiceImpl> frontend_service;
   scoped_ptr<BackendSearchServiceImpl> backend_service;
 };

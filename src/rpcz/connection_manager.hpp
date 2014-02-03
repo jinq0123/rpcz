@@ -73,6 +73,7 @@ class connection_manager : boost::noncopyable {
  public:
   // Dynamic singleton. Auto destruct.
   static connection_manager_ptr get();
+  static long use_count();
 
  public:
   typedef boost::function<void(const client_connection&, message_iterator&)>
