@@ -115,7 +115,7 @@ class BackendSearchServiceImpl : public SearchService {
 class server_test : public ::testing::Test {
  public:
   server_test() :
-      context_(new zmq::context_t(1)) {
+      context_(new zmq::context_t(1)) /* scoped_ptr */ {
     EXPECT_EQ(0, connection_manager::use_count());
     application::set_zmq_context(context_.get());
     application::set_connection_manager_threads(10);
@@ -127,19 +127,24 @@ class server_test : public ::testing::Test {
   ~server_test() {
     // terminate the context, which will cause the thread to quit.
     application::terminate();
-    context_.reset(NULL);
+    frontend_server_.reset();
+    backend_server_.reset();
+    frontend_service_.reset();
+    backend_service_.reset();
+    EXPECT_EQ(0, connection_manager::use_count());
+    context_.reset();
   }
 
   void start_server() {
-    backend_service.reset(new BackendSearchServiceImpl);
-    backend_server_->register_service(backend_service.get());
+    backend_service_.reset(new BackendSearchServiceImpl);
+    backend_server_->register_service(backend_service_.get());
     backend_server_->bind("inproc://myserver.backend");
     rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
     backend_connection_ = cm->connect("inproc://myserver.backend");
 
-    frontend_service.reset(new SearchServiceImpl(
+    frontend_service_.reset(new SearchServiceImpl(
         new SearchService_Stub(rpc_channel::create(backend_connection_), true)));
-    frontend_server_->register_service(frontend_service.get());
+    frontend_server_->register_service(frontend_service_.get());
     frontend_server_->bind("inproc://myserver.frontend");
     frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
@@ -159,13 +164,12 @@ class server_test : public ::testing::Test {
 
  protected:
   scoped_ptr<zmq::context_t> context_;
-  connection_manager_ptr cm_;
   connection frontend_connection_;
   connection backend_connection_;
   scoped_ptr<server> frontend_server_;
   scoped_ptr<server> backend_server_;
-  scoped_ptr<SearchServiceImpl> frontend_service;
-  scoped_ptr<BackendSearchServiceImpl> backend_service;
+  scoped_ptr<SearchServiceImpl> frontend_service_;
+  scoped_ptr<BackendSearchServiceImpl> backend_service_;
 };
 
 TEST_F(server_test, SimpleRequest) {
@@ -278,7 +282,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
   }
   // We may get here before the timing out request was processed, and if we
   // just send delay right away, the server may be unable to reply.
-  frontend_service->timeout_request_received.wait();
+  frontend_service_->timeout_request_received.wait();
   request.set_query("delayed");
   stub.Search(request, &response);
 }

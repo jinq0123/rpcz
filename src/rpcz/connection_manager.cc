@@ -144,6 +144,7 @@ class connection_manager_thread {
     for (int i = 0; i < nthreads; ++i) {
       message_iterator iter(*frontend_socket_);
       std::string sender = message_to_string(iter.next());
+      assert(!sender.empty());  // zmq id
       CHECK_EQ(0, iter.next().size());
       char command(interpret_message<char>(iter.next()));
       CHECK_EQ(kReady, command) << "Got unexpected command " << (int)command;

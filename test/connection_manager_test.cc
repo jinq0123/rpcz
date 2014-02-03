@@ -48,12 +48,15 @@ TEST_F(connection_manager_test, TestStartsAndFinishes) {
   connection_manager_ptr cm = connection_manager::get();
 }
 
-void echo_server(zmq::socket_t *socket) {
+void echo_server(zmq::context_t & context) {
+  scoped_ptr<zmq::socket_t> socket(new zmq::socket_t(context, ZMQ_DEALER));
+  socket->bind("inproc://server.test");
+
   bool should_quit = false;
   int messages = 0;
   while (!should_quit) {
     message_vector v;
-    GOOGLE_CHECK(read_message_to_vector(socket, &v));
+    GOOGLE_CHECK(read_message_to_vector(socket.get(), &v));
     ++messages;
     ASSERT_EQ(4, v.size());
     if (message_to_string(v[2]) == "hello") {
@@ -63,15 +66,12 @@ void echo_server(zmq::socket_t *socket) {
     } else {
       GOOGLE_CHECK(false) << "Unknown command: " << message_to_string(v[2]);
     }
-    write_vector_to_socket(socket, v);
+    write_vector_to_socket(socket.get(), v);
   }
-  delete socket;
 }
 
 boost::thread start_server(zmq::context_t & context) {
-  zmq::socket_t* server = new zmq::socket_t(context, ZMQ_DEALER);
-  server->bind("inproc://server.test");
-  return boost::thread(boost::bind(echo_server, server));
+  return boost::thread(boost::bind(echo_server, boost::ref(context)));
 }
 
 message_vector* create_simple_request(int number=0) {

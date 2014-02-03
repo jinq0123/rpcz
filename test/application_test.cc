@@ -25,13 +25,13 @@ class application_test : public ::testing::Test {
 };
 
 TEST_F(application_test, InitializesWithProvidedZeroMQContext) {
-  zmq::context_t* context = new zmq::context_t(1);
+  scoped_ptr<zmq::context_t> context(new zmq::context_t(1));
   {
     ASSERT_EQ(0, connection_manager::use_count());
-    application::set_zmq_context(context);
+    application::set_zmq_context(context.get());
     connection_manager_ptr cm = connection_manager::get();
   }
-  delete context;
+  context.reset();
 }
 
 }  // namespace rpcz
