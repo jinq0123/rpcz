@@ -147,6 +147,8 @@ server_impl::server_impl()
 }
 
 server_impl::~server_impl() {
+  // TODO: unbind() first
+
   // Delete proto_rpc_service pointers.
   BOOST_FOREACH(rpc_service_map::value_type & r, service_map_)
   {
@@ -160,19 +162,18 @@ void server_impl::register_service(rpcz::service & service) {
 }
 
 void server_impl::register_service(rpcz::service & service, const std::string& name) {
-  register_rpc_service(new proto_rpc_service(service), name);
-  // TODO: delete proto_rpc_service
-}
+  // TODO: unregister existing service
 
-void server_impl::register_rpc_service(rpcz::rpc_service *rpc_service,
-                              const std::string& name) {
-  service_map_[name] = rpc_service;  // Owns it. Delete in destructor.
+  // Registers a low-level rpc_service.
+  // Owns the new proto_rpc_service. Delete in destructor.
+  service_map_[name] = new proto_rpc_service(service);
 }
 
 void server_impl::bind(const std::string& endpoint) {
   connection_manager::server_function f = boost::bind(
       &server_impl::handle_request, this, _1, _2);
   connection_manager_ptr_->bind(endpoint, f);
+  // TODO: record endpoints for unbind later. ( Server can multi bind. )
 }
 
 void server_impl::handle_request(const client_connection& connection,

@@ -25,7 +25,8 @@ server::server()
   : impl_(new server_impl) /* scoped_ptr */ {
 }
 
-server::~server() { }
+server::~server() {
+}
 
 void server::register_service(rpcz::service & service) {
   impl_->register_service(service);
