@@ -13,21 +13,22 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_CONNECTION_H
 #define RPCZ_CONNECTION_H
 
 #include "rpcz/common.hpp"
+#include "rpcz/connection_manager_ptr.hpp"
 #include "client_request_callback.hpp"
 
 namespace rpcz {
-class connection_manager;
 class message_vector;
 
 // Represents a connection to a server. Thread-safe.
 class connection {
  public:
-  connection() : manager_((connection_manager*)0xbadecafe), connection_id_(0) {}
+  connection();
 
   // Asynchronously sends a request over the connection.
   // request: a vector of messages to be sent. Does not take ownership of the
@@ -44,9 +45,10 @@ class connection {
       const client_request_callback & callback);
 
  private:
-  connection(connection_manager *manager, uint64 connection_id) :
-      manager_(manager), connection_id_(connection_id) {}
-  connection_manager* manager_;
+  explicit connection(uint64 connection_id);
+
+ private:
+  connection_manager_ptr manager_;
   uint64 connection_id_;
   friend class connection_manager;
 };

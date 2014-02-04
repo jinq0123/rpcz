@@ -119,6 +119,8 @@ class server_test : public ::testing::Test {
     EXPECT_EQ(0, connection_manager::use_count());
     application::set_zmq_context(context_.get());
     application::set_connection_manager_threads(10);
+    frontend_connection_.reset(new connection);
+    backend_connection_.reset(new connection);
     frontend_server_.reset(new server);
     backend_server_.reset(new server);
     start_server();
@@ -131,6 +133,9 @@ class server_test : public ::testing::Test {
     backend_server_.reset();
     frontend_service_.reset();
     backend_service_.reset();
+    frontend_connection_.reset();
+    backend_connection_.reset();
+
     EXPECT_EQ(0, connection_manager::use_count());
     context_.reset();
   }
@@ -140,13 +145,13 @@ class server_test : public ::testing::Test {
     backend_server_->register_service(backend_service_.get());
     backend_server_->bind("inproc://myserver.backend");
     rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
-    backend_connection_ = cm->connect("inproc://myserver.backend");
+    *backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_service_.reset(new SearchServiceImpl(
-        new SearchService_Stub(rpc_channel::create(backend_connection_), true)));
+        new SearchService_Stub(rpc_channel::create(*backend_connection_), true)));
     frontend_server_->register_service(frontend_service_.get());
     frontend_server_->bind("inproc://myserver.frontend");
-    frontend_connection_ = cm->connect("inproc://myserver.frontend");
+    *frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
 
   SearchResponse send_blocking_request(connection connection,
@@ -162,25 +167,27 @@ class server_test : public ::testing::Test {
     return response;
   }
 
- protected:
-  scoped_ptr<zmq::context_t> context_;
-  connection frontend_connection_;
-  connection backend_connection_;
-  scoped_ptr<server> frontend_server_;
-  scoped_ptr<server> backend_server_;
+protected:
+  // destruct in reversed order
+  scoped_ptr<zmq::context_t> context_;  // destruct last
+  scoped_ptr<connection> frontend_connection_;
+  scoped_ptr<connection> backend_connection_;
   scoped_ptr<SearchServiceImpl> frontend_service_;
   scoped_ptr<BackendSearchServiceImpl> backend_service_;
+  // Server must destruct before service. (Or unregister services before destruct.)
+  scoped_ptr<server> frontend_server_;
+  scoped_ptr<server> backend_server_;
 };
 
 TEST_F(server_test, SimpleRequest) {
   SearchResponse response =
-      send_blocking_request(frontend_connection_, "happiness");
+      send_blocking_request(*frontend_connection_, "happiness");
   ASSERT_EQ(2, response.results_size());
   ASSERT_EQ("The search for happiness", response.results(0));
 }
 
 TEST_F(server_test, SimpleRequestAsync) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   rpc_controller rpc_controller;
@@ -195,7 +202,7 @@ TEST_F(server_test, SimpleRequestAsync) {
 }
 
 TEST_F(server_test, SimpleRequestWithError) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   request.set_query("foo");
   SearchResponse response;
@@ -207,7 +214,7 @@ TEST_F(server_test, SimpleRequestWithError) {
 }
 
 TEST_F(server_test, SimpleRequestWithTimeout) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   rpc_controller rpc_controller;
@@ -219,7 +226,7 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
 }
 
 TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   {
@@ -235,7 +242,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
 }
 
 TEST_F(server_test, DelegatedRequest) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   rpc_controller rpc_controller;
@@ -247,7 +254,7 @@ TEST_F(server_test, DelegatedRequest) {
 }
 
 TEST_F(server_test, EasyBlockingRequestUsingDelegate) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   request.set_query("delegate");
@@ -256,7 +263,7 @@ TEST_F(server_test, EasyBlockingRequestUsingDelegate) {
 }
 
 TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   request.set_query("foo");
@@ -270,7 +277,7 @@ TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
 }
 
 TEST_F(server_test, EasyBlockingRequestWithTimeout) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   SearchResponse response;
   request.set_query("timeout");
@@ -288,7 +295,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
 }
 
 TEST_F(server_test, ConnectionManagerTermination) {
-  SearchService_Stub stub(rpc_channel::create(frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   request.set_query("terminate");
   SearchResponse response;

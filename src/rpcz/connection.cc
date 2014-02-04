@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include "connection.hpp"
 
@@ -25,6 +26,16 @@
 #include "zmq_utils.hpp"
 
 namespace rpcz {
+
+connection::connection()
+    : manager_(connection_manager::get()),
+      connection_id_(0) {
+}
+
+connection::connection(uint64 connection_id)
+    : manager_(connection_manager::get()),
+      connection_id_(connection_id) {
+}
 
 void connection::send_request(
     message_vector& request,

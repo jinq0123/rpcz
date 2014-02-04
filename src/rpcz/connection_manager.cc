@@ -413,7 +413,7 @@ connection connection_manager::connect(const std::string& endpoint) {
   socket.recv(&msg);
   socket.recv(&msg);
   uint64 connection_id = interpret_message<uint64>(msg);
-  return connection(this, connection_id);
+  return connection(connection_id);
 }
 
 void connection_manager::bind(const std::string& endpoint,
