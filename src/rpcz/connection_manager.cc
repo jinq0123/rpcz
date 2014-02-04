@@ -345,8 +345,7 @@ class connection_manager_thread {
 connection_manager::connection_manager()
   : context_(NULL),
     frontend_endpoint_("inproc://" + boost::lexical_cast<std::string>(this)
-        + ".rpcz.connection_manager.frontend"),
-    already_quit_(false)
+        + ".rpcz.connection_manager.frontend")
 {
   DLOG(INFO) << "connection_manager() ";
   application_options options;
@@ -443,26 +442,17 @@ void connection_manager::run() {
 }
 
 void connection_manager::terminate() {
-  quit_and_join();
   is_termating_.signal();
 }
 
 connection_manager::~connection_manager() {
   DLOG(INFO) << "~connection_manager()";
-  terminate();
-}
-
-void connection_manager::quit_and_join()
-{
-  if (already_quit_) return;
-  already_quit_ = true;  // not thread-safe
-  DLOG(INFO) << "quit_and_join()...";
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kQuit, 0);
   broker_thread_.join();
   worker_threads_.join_all();
-  DLOG(INFO) << "quit_and_join() done.";
+  DLOG(INFO) << "All threads joined.";
 }
 
 }  // namespace rpcz
