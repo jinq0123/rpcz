@@ -24,6 +24,7 @@
 #include <utility>
 
 #include <boost/bind.hpp>
+#include <boost/foreach.hpp>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/message.h>
 #include <google/protobuf/stubs/common.h>
@@ -145,7 +146,14 @@ server_impl::server_impl()
   assert(connection_manager_ptr_);
 }
 
-server_impl::~server_impl() { }
+server_impl::~server_impl() {
+  // Delete proto_rpc_service pointers.
+  BOOST_FOREACH(rpc_service_map::value_type & r, service_map_)
+  {
+      delete r.second;
+  }
+  service_map_.clear();
+}
 
 void server_impl::register_service(rpcz::service & service) {
   register_service(service, service.GetDescriptor()->name());
@@ -158,7 +166,7 @@ void server_impl::register_service(rpcz::service & service, const std::string& n
 
 void server_impl::register_rpc_service(rpcz::rpc_service *rpc_service,
                               const std::string& name) {
-  service_map_[name] = rpc_service;
+  service_map_[name] = rpc_service;  // Owns it. Delete in destructor.
 }
 
 void server_impl::bind(const std::string& endpoint) {
