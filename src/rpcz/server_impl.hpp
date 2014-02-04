@@ -45,10 +45,13 @@ class server_impl : boost::noncopyable {
   // external clients. If you use the first form, the service name from the
   // protocol buffer definition will be used. Does not take ownership of the
   // provided service.
-  void register_service(service* service);
-  void register_service(service* service, const std::string& name);
+  void register_service(service & service);
+  void register_service(service & service, const std::string& name);
 
   void bind(const std::string& endpoint);
+
+  // TODO: unregister_service()
+  // TODO: register_service() after bind()
 
  private:
   // Registers a low-level rpc_service.

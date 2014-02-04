@@ -146,12 +146,13 @@ server_impl::server_impl()
 
 server_impl::~server_impl() { }
 
-void server_impl::register_service(rpcz::service *service) {
-  register_service(service, service->GetDescriptor()->name());
+void server_impl::register_service(rpcz::service & service) {
+  register_service(service, service.GetDescriptor()->name());
 }
 
-void server_impl::register_service(rpcz::service *service, const std::string& name) {
-  register_rpc_service(new proto_rpc_service(service), name);
+void server_impl::register_service(rpcz::service & service, const std::string& name) {
+  register_rpc_service(new proto_rpc_service(&service), name);
+  // TODO: delete proto_rpc_service
 }
 
 void server_impl::register_rpc_service(rpcz::rpc_service *rpc_service,

@@ -27,11 +27,11 @@ server::server()
 
 server::~server() { }
 
-void server::register_service(rpcz::service *service) {
+void server::register_service(rpcz::service & service) {
   impl_->register_service(service);
 }
 
-void server::register_service(rpcz::service *service, const std::string& name) {
+void server::register_service(rpcz::service & service, const std::string& name) {
   impl_->register_service(service, name);
 }
 

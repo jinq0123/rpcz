@@ -142,14 +142,14 @@ class server_test : public ::testing::Test {
 
   void start_server() {
     backend_service_.reset(new BackendSearchServiceImpl);
-    backend_server_->register_service(backend_service_.get());
+    backend_server_->register_service(*backend_service_);
     backend_server_->bind("inproc://myserver.backend");
     rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
     *backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_service_.reset(new SearchServiceImpl(
         new SearchService_Stub(rpc_channel::create(*backend_connection_), true)));
-    frontend_server_->register_service(frontend_service_.get());
+    frontend_server_->register_service(*frontend_service_);
     frontend_server_->bind("inproc://myserver.frontend");
     *frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
