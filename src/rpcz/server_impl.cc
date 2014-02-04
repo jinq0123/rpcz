@@ -13,8 +13,10 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpcz/server.hpp"
+#include "server_impl.hpp"
+
 #include <signal.h>
 #include <string.h>
 #include <functional>
@@ -80,7 +82,7 @@ class server_channel_impl : public server_channel {
   client_connection connection_;
   scoped_ptr<google::protobuf::Message> request_;
 
-  // Sends the response back to a function server through the reply function.
+  // Sends the response back to a function server_impl through the reply function.
   // Takes ownership of the provided payload message.
   void send_generic_response(const rpc_response_header& generic_rpc_response,
                            zmq::message_t* payload) {
@@ -137,33 +139,33 @@ class proto_rpc_service : public rpc_service {
   scoped_ptr<service> service_;
 };
 
-server::server()
+server_impl::server_impl()
   : connection_manager_ptr_(connection_manager::get()) {
   assert(connection_manager_ptr_);
 }
 
-server::~server() { }
+server_impl::~server_impl() { }
 
-void server::register_service(rpcz::service *service) {
+void server_impl::register_service(rpcz::service *service) {
   register_service(service, service->GetDescriptor()->name());
 }
 
-void server::register_service(rpcz::service *service, const std::string& name) {
+void server_impl::register_service(rpcz::service *service, const std::string& name) {
   register_service(new proto_rpc_service(service), name);
 }
 
-void server::register_service(rpcz::rpc_service *rpc_service,
+void server_impl::register_service(rpcz::rpc_service *rpc_service,
                               const std::string& name) {
   service_map_[name] = rpc_service;
 }
 
-void server::bind(const std::string& endpoint) {
+void server_impl::bind(const std::string& endpoint) {
   connection_manager::server_function f = boost::bind(
-      &server::handle_request, this, _1, _2);
+      &server_impl::handle_request, this, _1, _2);
   connection_manager_ptr_->bind(endpoint, f);
 }
 
-void server::handle_request(const client_connection& connection,
+void server_impl::handle_request(const client_connection& connection,
                             message_iterator& iter) {
   if (!iter.has_more()) {
     return;

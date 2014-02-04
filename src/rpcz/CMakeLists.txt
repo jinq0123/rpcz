@@ -13,7 +13,7 @@ include_directories(${PROJECT_BINARY_DIR})
 set(RPCZ_SOURCES
     application.cc application_options.cc client_connection.cc clock.cc
     connection.cc connection_manager.cc
-    reactor.cc rpc_controller.cc rpc_channel_impl.cc server.cc
+    reactor.cc rpc_controller.cc rpc_channel_impl.cc server.cc server_impl.cc
     sync_event.cc zmq_utils.cc
     ${PROTO_SOURCES})
 file(GLOB RPCZ_HEADERS *.hpp)

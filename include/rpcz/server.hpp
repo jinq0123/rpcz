@@ -13,24 +13,18 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_SERVER_H
 #define RPCZ_SERVER_H
 
+#include <string>
 #include <boost/noncopyable.hpp>
-#include "rpcz/connection_manager_ptr.hpp"
-#include "rpcz/rpcz.pb.h"
-
-namespace zmq {
-class socket_t;
-};
+#include "rpcz/common.hpp"  // for scoped_ptr
 
 namespace rpcz {
-class client_connection;
-class message_iterator;
-class rpc_service;
-class server_channel;
 class service;
+class server_impl;
 
 // A server object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside a worker thread.
@@ -49,27 +43,10 @@ class server : boost::noncopyable {
 
   void bind(const std::string& endpoint);
 
-  // Registers a low-level rpc_service.
-  void register_service(rpc_service* rpc_service, const std::string& name);
-
  private:
-  void handle_request(const client_connection& connection,
-                      message_iterator& iter);
+  scoped_ptr<server_impl> impl_;
+};  // class server
 
-  connection_manager_ptr connection_manager_ptr_;
-  typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
-  rpc_service_map service_map_;
-};
+}  // namespace rpcz
 
-// rpc_service is a low-level request handler: requests and replies are void*.
-// It is exposed here for language bindings. Do not use directly.
-class rpc_service {
- public:
-  virtual ~rpc_service() {}
-
-  virtual void dispatch_request(const std::string& method,
-                               const void* payload, size_t payload_len,
-                               server_channel* channel_) = 0;
-};
-}  // namespace
-#endif
+#endif  // RPCZ_SERVER_H
