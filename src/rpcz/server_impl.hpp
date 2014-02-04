@@ -50,8 +50,9 @@ class server_impl : boost::noncopyable {
 
   void bind(const std::string& endpoint);
 
+ private:
   // Registers a low-level rpc_service.
-  void register_service(rpc_service* rpc_service, const std::string& name);
+  void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  private:
   void handle_request(const client_connection& connection,

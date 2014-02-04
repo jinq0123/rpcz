@@ -151,10 +151,10 @@ void server_impl::register_service(rpcz::service *service) {
 }
 
 void server_impl::register_service(rpcz::service *service, const std::string& name) {
-  register_service(new proto_rpc_service(service), name);
+  register_rpc_service(new proto_rpc_service(service), name);
 }
 
-void server_impl::register_service(rpcz::rpc_service *rpc_service,
+void server_impl::register_rpc_service(rpcz::rpc_service *rpc_service,
                               const std::string& name) {
   service_map_[name] = rpc_service;
 }
