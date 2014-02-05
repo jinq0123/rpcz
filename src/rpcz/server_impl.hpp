@@ -18,9 +18,9 @@
 #ifndef RPCZ_SERVER_IMPL_H
 #define RPCZ_SERVER_IMPL_H
 
+#include <map>
 #include <boost/noncopyable.hpp>
 #include "rpcz/connection_manager_ptr.hpp"
-#include "rpcz/rpcz.pb.h"
 
 namespace rpcz {
 class client_connection;

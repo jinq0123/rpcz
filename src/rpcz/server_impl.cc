@@ -161,8 +161,7 @@ void server_impl::register_service(rpcz::service & service) {
 }
 
 void server_impl::register_service(rpcz::service & service, const std::string& name) {
-  // TODO: unregister existing service
-
+  unregister_service(name);
   // Registers a low-level rpc_service. Owns the new proto_rpc_service.
   service_map_[name] = new proto_rpc_service(service);  // Delete in unregister_service().
 }
