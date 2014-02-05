@@ -15,11 +15,10 @@
 // Author: nadavs@google.com <Nadav Samet>
 
 #include "reactor.hpp"
-#include <vector>
-#include "rpcz/callback.hpp"
+
 #include "clock.hpp"
 #include "logging.hpp"
-#include <zmq.hpp>
+#include "rpcz/callback.hpp"
 
 namespace rpcz {
 namespace {
@@ -74,6 +73,7 @@ void rebuild_poll_items(
 }
 }  // namespace
 
+// TODO: make run_closure_at() threak-safe
 void reactor::run_closure_at(uint64 timestamp, closure* closure) {
   closure_run_map_[timestamp].push_back(closure);
 }

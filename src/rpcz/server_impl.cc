@@ -33,7 +33,6 @@
 #include "client_connection.hpp"
 #include "connection_manager.hpp"
 #include "logging.hpp"
-#include "reactor.hpp"
 #include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/rpc_controller.hpp"

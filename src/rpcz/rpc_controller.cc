@@ -17,8 +17,8 @@
 #include "rpcz/rpc_controller.hpp"
 
 #include <boost/lexical_cast.hpp>
+
 #include "logging.hpp"
-#include "reactor.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/rpcz.pb.h"
 
