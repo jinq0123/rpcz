@@ -95,13 +95,12 @@ int reactor::loop() {
       }
     }
     for (size_t i = 0; i < pollitems_.size(); ++i) {
-      if (!pollitems_[i].revents & ZMQ_POLLIN) {
-        continue;
-      }
-      pollitems_[i].revents = 0;
-      sockets_[i].second->run();
-    }
-  }
+      if (pollitems_[i].revents & ZMQ_POLLIN) {
+        // TODO: process all events after each zmq_poll() call.
+        sockets_[i].second->run();
+      }  // if
+    }  // for
+  }  // while (!should_quit_)
   return 0;
 }
 
