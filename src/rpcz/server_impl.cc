@@ -150,11 +150,10 @@ server_impl::~server_impl() {
   // TODO: unbind() first
 
   // Delete proto_rpc_service pointers.
-  BOOST_FOREACH(rpc_service_map::value_type & r, service_map_)
-  {
-      delete r.second;
-  }
-  service_map_.clear();
+  rpc_service_map map_copy = service_map_;
+  BOOST_FOREACH(rpc_service_map::value_type & r, map_copy)
+      unregister_service(r.first);
+  assert(service_map_.empty());
 }
 
 void server_impl::register_service(rpcz::service & service) {
@@ -164,9 +163,17 @@ void server_impl::register_service(rpcz::service & service) {
 void server_impl::register_service(rpcz::service & service, const std::string& name) {
   // TODO: unregister existing service
 
-  // Registers a low-level rpc_service.
-  // Owns the new proto_rpc_service. Delete in destructor.
-  service_map_[name] = new proto_rpc_service(service);
+  // Registers a low-level rpc_service. Owns the new proto_rpc_service.
+  service_map_[name] = new proto_rpc_service(service);  // Delete in unregister_service().
+}
+
+void server_impl::unregister_service(const std::string & name)
+{
+  rpc_service_map::const_iterator service_it = service_map_.find(name);
+  if (service_it == service_map_.end())
+    return;
+  delete (*service_it).second;  // new in register_service()
+  service_map_.erase(service_it);
 }
 
 void server_impl::bind(const std::string& endpoint) {

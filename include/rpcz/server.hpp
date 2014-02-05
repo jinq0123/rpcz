@@ -28,6 +28,7 @@ class server_impl;
 
 // A server object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside a worker thread.
+// Non-thread-safe.
 class server : boost::noncopyable {
  public:
   server();

@@ -22,10 +22,6 @@
 #include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/rpcz.pb.h"
 
-namespace zmq {
-class socket_t;
-};
-
 namespace rpcz {
 class client_connection;
 class message_iterator;
@@ -35,6 +31,7 @@ class service;
 
 // A server_impl object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside a worker thread.
+// Non-thread-safe.
 class server_impl : boost::noncopyable {
  public:
   server_impl();
@@ -50,8 +47,10 @@ class server_impl : boost::noncopyable {
 
   void bind(const std::string& endpoint);
 
-  // TODO: unregister_service()
   // TODO: register_service() after bind()
+
+ private:
+  void unregister_service(const std::string & name);
 
  private:
   void handle_request(const client_connection& connection,
