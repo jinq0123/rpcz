@@ -35,12 +35,14 @@ class connection_manager_thread {
       sync_event* ready_event,
       zmq::socket_t* frontend_socket);
 
-  void wait_for_workers_ready_reply(int nthreads);
-
+ public:
   static void run(zmq::context_t & context,
                   int nthreads,
                   sync_event* ready_event,
                   zmq::socket_t* frontend_socket);
+
+ private:
+  void wait_for_workers_ready_reply(int nthreads);
 
   void handle_frontend_socket(zmq::socket_t* frontend_socket);
 
