@@ -92,6 +92,8 @@ class connection_manager : boost::noncopyable {
   // the worker threads. When the function returns, the endpoint is already
   // bound.
   void bind(const std::string& endpoint, server_function function);
+  // Unbind socket and unregister server_function.
+  void unbind(const std::string& endpoint);
 
   // Executes the closure on one of the worker threads.
   void add(closure* closure);

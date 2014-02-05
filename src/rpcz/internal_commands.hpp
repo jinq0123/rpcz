@@ -26,7 +26,8 @@ namespace {
 const char kRequest = 0x01;      // send request to a connected socket.
 const char kConnect = 0x02;      // connect to a given endpoint.
 const char kBind    = 0x03;      // bind to an endpoint.
-const char kReply   = 0x04;      // reply to a request
+const char kUnbind  = 0x04;      // unbind an endpoint.
+const char kReply   = 0x05;      // reply to a request
 const char kQuit    = 0x0f;      // Starts the quit second.
 
 // Messages sent from the broker to a worker thread:

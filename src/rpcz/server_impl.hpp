@@ -19,6 +19,7 @@
 #define RPCZ_SERVER_IMPL_H
 
 #include <map>
+#include <set>
 #include <boost/noncopyable.hpp>
 #include "rpcz/connection_manager_ptr.hpp"
 
@@ -59,6 +60,8 @@ class server_impl : boost::noncopyable {
   connection_manager_ptr connection_manager_ptr_;
   typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
   rpc_service_map service_map_;  // Owns rpc_service. Delete in destructor.
+  typedef std::set<std::string> bind_endpoint_set;
+  bind_endpoint_set endpoints_;
 };
 
 // rpc_service is a low-level request handler: requests and replies are void*.

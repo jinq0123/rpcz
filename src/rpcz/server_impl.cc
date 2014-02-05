@@ -147,12 +147,15 @@ server_impl::server_impl()
 }
 
 server_impl::~server_impl() {
-  // TODO: unbind() first
+  // unbind first
+  BOOST_FOREACH(const bind_endpoint_set::value_type & v, endpoints_)
+    connection_manager_ptr_->unbind(v);
+  endpoints_.clear();
 
   // Delete proto_rpc_service pointers.
   rpc_service_map map_copy = service_map_;
-  BOOST_FOREACH(rpc_service_map::value_type & r, map_copy)
-      unregister_service(r.first);
+  BOOST_FOREACH(const rpc_service_map::value_type & v, map_copy)
+      unregister_service(v.first);
   assert(service_map_.empty());
 }
 
@@ -176,10 +179,12 @@ void server_impl::unregister_service(const std::string & name)
 }
 
 void server_impl::bind(const std::string& endpoint) {
+  // Record endpoints for unbind later. (Server can multi bind.)
+  if (!endpoints_.insert(endpoint).second)
+    return;  // already bound
   connection_manager::server_function f = boost::bind(
       &server_impl::handle_request, this, _1, _2);
   connection_manager_ptr_->bind(endpoint, f);
-  // TODO: record endpoints for unbind later. ( Server can multi bind. )
 }
 
 void server_impl::handle_request(const client_connection& connection,

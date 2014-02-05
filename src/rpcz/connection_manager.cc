@@ -187,6 +187,11 @@ class connection_manager_thread {
         handle_bind_command(sender, endpoint, sf);
         break;
       }
+      case kUnbind: {
+        std::string endpoint(message_to_string(iter.next()));
+        handle_unbind_command(sender, endpoint);
+        break;
+      }
       case kRequest:
         send_request(iter);
         break;
@@ -255,6 +260,16 @@ class connection_manager_thread {
             this, &connection_manager_thread::handle_server_socket,
             socket_id, server_function));
 
+    send_string(frontend_socket_, sender, ZMQ_SNDMORE);
+    send_empty_message(frontend_socket_, ZMQ_SNDMORE);
+    send_empty_message(frontend_socket_, 0);
+  }
+
+  inline void handle_unbind_command(
+      const std::string& sender,
+      const std::string& endpoint) {
+    // TODO: reactor_ delete socket
+    // XXX
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, 0);
@@ -426,7 +441,18 @@ void connection_manager::bind(const std::string& endpoint,
   zmq::message_t msg;
   socket.recv(&msg);
   socket.recv(&msg);
-  return;
+}
+
+// Unbind socket and unregister server_function.
+void connection_manager::unbind(const std::string& endpoint)
+{
+  zmq::socket_t& socket = get_frontend_socket();
+  send_empty_message(&socket, ZMQ_SNDMORE);
+  send_char(&socket, kUnbind, ZMQ_SNDMORE);
+  send_string(&socket, endpoint, ZMQ_SNDMORE);
+  zmq::message_t msg;
+  socket.recv(&msg);
+  socket.recv(&msg);
 }
 
 void connection_manager::add(closure* closure) {
