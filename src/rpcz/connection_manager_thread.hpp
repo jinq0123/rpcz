@@ -83,6 +83,8 @@ class connection_manager_thread {
   reactor reactor_;
   std::vector<zmq::socket_t*> connections_;
   std::vector<zmq::socket_t*> server_sockets_;
+  typedef std::map<std::string, zmq::socket_t*> endpoint_to_socket;
+  endpoint_to_socket bind_map_;  // for unbind
   zmq::context_t & context_;
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;

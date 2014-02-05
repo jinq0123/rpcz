@@ -145,12 +145,14 @@ void connection_manager_thread::handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
       server_function server_function) {
-    zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);
+    zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     socket->bind(endpoint.c_str());
     uint64 socket_id = server_sockets_.size();
     server_sockets_.push_back(socket);
+    bind_map_[endpoint] = socket;  // for unbind
+    // reactor will own socket and callback.
     reactor_.add_socket(socket, new_permanent_callback(
         this, &connection_manager_thread::handle_server_socket,
         socket_id, server_function));
@@ -163,8 +165,12 @@ void connection_manager_thread::handle_bind_command(
 void connection_manager_thread::handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint) {
+    endpoint_to_socket::const_iterator it = bind_map_.find(endpoint);
+    if (it == bind_map_.end()) return;
+    assert((*it).second);
+    (*it).second->close();  // close binding socket
     // TODO: reactor_ delete socket
-    // XXX
+
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, 0);
