@@ -22,12 +22,13 @@
 #include "rpcz/common.hpp"
 
 namespace rpcz {
-namespace {
+
+typedef uint64 event_id;
+
+namespace detail {
 
 const uint64 kLargePrime = (1ULL << 63) - 165;
 const uint64 kGenerator = 2;
-
-typedef uint64 event_id;
 
 class event_id_generator : boost::noncopyable {
  public:
@@ -42,7 +43,7 @@ class event_id_generator : boost::noncopyable {
   uint64 state_;
 };  // class event_id_generator
 
-}  // namespace
+}  // namespace detail
 }  // namespace rpcz
 
 #endif  // RPCZ_EVENT_ID_GENERATOR_H

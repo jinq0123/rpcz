@@ -24,11 +24,11 @@
 #endif
 
 namespace rpcz {
-namespace {
+namespace detail {
 
 event_id_generator::event_id_generator() {
     state_ = (reinterpret_cast<uint64>(this) << 32) + getpid();
 }
 
-}  // namespace
+}  // namespace detail
 }  // namespace rpcz

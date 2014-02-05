@@ -77,7 +77,7 @@ class connection_manager_thread {
   typedef std::map<uint64, event_id> deadline_map;
   remote_response_map remote_response_map_;
   deadline_map deadline_map_;
-  event_id_generator event_id_generator_;
+  detail::event_id_generator event_id_generator_;
   reactor reactor_;
   std::vector<zmq::socket_t*> connections_;
   std::vector<zmq::socket_t*> server_sockets_;
