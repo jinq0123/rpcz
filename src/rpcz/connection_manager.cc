@@ -186,7 +186,7 @@ void connection_manager::unbind(const std::string& endpoint)
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kUnbind, ZMQ_SNDMORE);
-  send_string(&socket, endpoint, ZMQ_SNDMORE);
+  send_string(&socket, endpoint, 0);
   zmq::message_t msg;
   socket.recv(&msg);
   socket.recv(&msg);

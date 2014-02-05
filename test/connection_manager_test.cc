@@ -206,6 +206,14 @@ TEST_F(connection_manager_test, TestBindServer) {
   event.wait();
 }
 
+TEST_F(connection_manager_test, TestUnbind) {
+  ASSERT_EQ(0, connection_manager::use_count());
+  connection_manager_ptr cm = connection_manager::get();
+  const char kEndpoint[] = "inproc://server.point";
+  cm->bind(kEndpoint, &handle_request);
+  cm->unbind(kEndpoint);
+}
+
 const static char* kEndpoint = "inproc://test";
 const static char* kReply = "gotit";
 
