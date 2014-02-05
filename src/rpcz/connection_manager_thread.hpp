@@ -18,7 +18,14 @@
 #ifndef RPCZ_CONNECTION_MANAGER_THREAD_H
 #define RPCZ_CONNECTION_MANAGER_THREAD_H
 
+#include "client_request_callback.hpp"
+#include "event_id_generator.hpp"
+#include "reactor.hpp"
+#include "server_function.hpp"
+
 namespace rpcz {
+
+class sync_event;
 
 class connection_manager_thread {
  public:
@@ -47,14 +54,14 @@ class connection_manager_thread {
   inline void handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
-      connection_manager::server_function server_function);
+      server_function server_function);
 
   inline void handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint);
 
   void handle_server_socket(uint64 socket_id,
-      connection_manager::server_function server_function);
+      server_function server_function);
 
   inline void send_request(message_iterator& iter);
 

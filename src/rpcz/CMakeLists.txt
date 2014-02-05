@@ -13,6 +13,7 @@ include_directories(${PROJECT_BINARY_DIR})
 set(RPCZ_SOURCES
     application.cc application_options.cc client_connection.cc clock.cc
     connection.cc connection_manager.cc connection_manager_thread.cc
+    event_id_generator.cc
     reactor.cc rpc_controller.cc rpc_channel_impl.cc server.cc server_impl.cc
     sync_event.cc zmq_utils.cc
     ${PROTO_SOURCES})

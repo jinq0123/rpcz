@@ -30,53 +30,23 @@
 #include <utility>
 #include <vector>
 
-#ifdef WIN32
-#include <process.h>  // for getpid()
-#else
-#include <unistd.h>  // for getpid()
-#endif
-
 #include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>
 
 #include "application_options.hpp"
 #include "client_connection.hpp"
-#include "client_request_callback.hpp"
 #include "connection.hpp"
 #include "connection_manager_thread.hpp"
 #include "internal_commands.hpp"
 #include "logging.hpp"
-#include "reactor.hpp"
-#include "remote_response_wrapper.hpp"
 #include "rpcz/callback.hpp"
+#include "rpcz/sync_event.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {
 
 connection_manager::weak_ptr connection_manager::this_weak_ptr_;
 boost::mutex connection_manager::this_weak_ptr_mutex_;
-
-namespace {
-const uint64 kLargePrime = (1ULL << 63) - 165;
-const uint64 kGenerator = 2;
-
-typedef uint64 event_id;
-
-class event_id_generator : boost::noncopyable {
- public:
-  event_id_generator() {
-    state_ = (reinterpret_cast<uint64>(this) << 32) + getpid();
-  }
-
-  event_id get_next() {
-    state_ = (state_ * kGenerator) % kLargePrime;
-    return state_;
-  }
-
- private:
-  uint64 state_;
-};  // class event_id_generator
-}  // namespace
 
 void worker_thread(connection_manager* connection_manager,
                   zmq::context_t & context, std::string endpoint) {
@@ -97,8 +67,8 @@ void worker_thread(connection_manager* connection_manager,
         interpret_message<closure*>(iter.next())->run();
         break;
       case krunserver_function: {
-        connection_manager::server_function sf =
-            interpret_message<connection_manager::server_function>(iter.next());
+        server_function sf =
+            interpret_message<server_function>(iter.next());
         uint64 socket_id = interpret_message<uint64>(iter.next());
         std::string sender(message_to_string(iter.next()));
         if (iter.next().size() != 0) {
@@ -126,7 +96,8 @@ void worker_thread(connection_manager* connection_manager,
 connection_manager::connection_manager()
   : context_(NULL),
     frontend_endpoint_("inproc://" + boost::lexical_cast<std::string>(this)
-        + ".rpcz.connection_manager.frontend")
+        + ".rpcz.connection_manager.frontend"),
+    is_terminating_(new sync_event)  // scoped_ptr
 {
   DLOG(INFO) << "connection_manager() ";
   application_options options;
@@ -230,11 +201,11 @@ void connection_manager::add(closure* closure) {
 }
  
 void connection_manager::run() {
-  is_termating_.wait();
+  is_terminating_->wait();
 }
 
 void connection_manager::terminate() {
-  is_termating_.signal();
+  is_terminating_->signal();
 }
 
 connection_manager::~connection_manager() {

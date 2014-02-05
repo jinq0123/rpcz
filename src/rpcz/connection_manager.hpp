@@ -26,7 +26,7 @@
 #include "connection_manager_status.hpp"
 #include "rpcz/common.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
-#include "rpcz/sync_event.hpp"
+#include "server_function.hpp"
 
 namespace zmq {
 class context_t;
@@ -40,6 +40,7 @@ class closure;
 class connection;
 class connection_thread_context;
 class message_iterator;
+class sync_event;
 
 // TODO: Update it.
 // A connection_manager is a multi-threaded asynchronous system for communication
@@ -76,9 +77,6 @@ class connection_manager : boost::noncopyable {
   static long use_count();
 
  public:
-  typedef boost::function<void(const client_connection&, message_iterator&)>
-      server_function;
-
   // Blocks the current thread until all connection managers have completed.
   ~connection_manager();
 
@@ -120,7 +118,7 @@ class connection_manager : boost::noncopyable {
   boost::thread_group worker_threads_;
   boost::thread_specific_ptr<zmq::socket_t> socket_;
   std::string frontend_endpoint_;
-  sync_event is_termating_;
+  scoped_ptr<sync_event> is_terminating_;
 
   friend class connection;
   friend class client_connection;

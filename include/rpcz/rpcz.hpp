@@ -24,6 +24,5 @@
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
 #include "rpcz/service.hpp"
-#include "rpcz/sync_event.hpp"
 
 #endif

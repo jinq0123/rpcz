@@ -17,6 +17,13 @@
 
 #include "connection_manager_thread.hpp"
 
+#include "internal_commands.hpp"
+#include "logging.hpp"
+#include "remote_response_wrapper.hpp"
+#include "rpcz/callback.hpp"
+#include "rpcz/sync_event.hpp"  // TODO: hide it
+#include "zmq_utils.hpp"
+
 namespace rpcz {
 
 connection_manager_thread::connection_manager_thread(
@@ -71,9 +78,7 @@ void connection_manager_thread::handle_frontend_socket(zmq::socket_t* frontend_s
         break;
       case kBind: {
         std::string endpoint(message_to_string(iter.next()));
-        connection_manager::server_function sf(
-            interpret_message<connection_manager::server_function>(
-                iter.next()));
+        server_function sf(interpret_message<server_function>(iter.next()));
         handle_bind_command(sender, endpoint, sf);
         break;
       }
@@ -139,7 +144,7 @@ void connection_manager_thread::handle_connect_command(
 void connection_manager_thread::handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
-      connection_manager::server_function server_function) {
+      server_function server_function) {
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -166,7 +171,7 @@ void connection_manager_thread::handle_unbind_command(
 }
 
 void connection_manager_thread::handle_server_socket(uint64 socket_id,
-        connection_manager::server_function server_function) {
+        server_function server_function) {
     message_iterator iter(*server_sockets_[socket_id]);
     begin_worker_command(krunserver_function);
     send_object(frontend_socket_, server_function, ZMQ_SNDMORE);
