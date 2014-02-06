@@ -50,15 +50,15 @@ class connection_manager_thread {
 
   inline void add_closure(closure* closure);
 
-  inline void handle_connect_command(const std::string& sender,
+  void handle_connect_command(const std::string& sender,
                                    const std::string& endpoint);
 
-  inline void handle_bind_command(
+  void handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
       server_function server_function);
 
-  inline void handle_unbind_command(
+  void handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint);
 
