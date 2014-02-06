@@ -18,6 +18,7 @@
 #define RPCZ_REACTOR_H
 
 #include <map>
+#include <set>
 #include <vector>
 #include <boost/noncopyable.hpp>
 #include <zmq.hpp>
@@ -33,7 +34,9 @@ class reactor : boost::noncopyable {
   reactor();
   ~reactor();
 
+  // Will own socket and callback.
   void add_socket(zmq::socket_t* socket, closure* callback);
+  void del_socket(zmq::socket_t* socket);
 
   void run_closure_at(uint64 timestamp, closure *callback);
 
@@ -43,10 +46,15 @@ class reactor : boost::noncopyable {
 
  private:
   long process_closure_run_map();
+  void rebuild_poll_items();
+  void process_del_sockets();
 
+ private:
   bool should_quit_;
   bool is_dirty_;
   std::vector<std::pair<zmq::socket_t*, closure*> > sockets_;
+  typedef std::set<zmq::socket_t*> socket_set;
+  socket_set del_sockets_;
   std::vector<zmq::pollitem_t> pollitems_;
   typedef std::map<uint64, std::vector<closure*> > closure_run_map;
   closure_run_map closure_run_map_;

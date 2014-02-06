@@ -168,9 +168,10 @@ void broker_thread::handle_unbind_command(
     endpoint_to_socket::const_iterator it = bind_map_.find(endpoint);
     if (it == bind_map_.end()) return;
     assert((*it).second);
-    (*it).second->close();  // close binding socket
-    // TODO: reactor_ delete socket
+    reactor_.del_socket((*it).second);  // delete before next zmq_poll()
+    bind_map_.erase(it);
 
+    // TODO: Not delelted yet. Callback on deleted.
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, 0);

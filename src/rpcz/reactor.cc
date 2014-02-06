@@ -60,18 +60,47 @@ void reactor::add_socket(zmq::socket_t* socket, closure* closure) {
   is_dirty_ = true;
 }
 
-namespace {
-void rebuild_poll_items(
-    const std::vector<std::pair<zmq::socket_t*, closure*> >& sockets,
-    std::vector<zmq::pollitem_t>* pollitems) {
-  pollitems->resize(sockets.size());
-  for (size_t i = 0; i < sockets.size(); ++i) {
-    zmq::socket_t& socket = *sockets[i].first;
+void reactor::del_socket(zmq::socket_t* socket)
+{
+  del_sockets_.insert(socket);
+  is_dirty_ = true;
+  // Close and delete socket in loop().
+}
+
+void reactor::rebuild_poll_items() {
+  process_del_sockets();
+  del_sockets_.clear();
+
+  pollitems_.resize(sockets_.size());
+  for (size_t i = 0; i < sockets_.size(); ++i) {
+    zmq::socket_t& socket = *sockets_[i].first;
     zmq::pollitem_t pollitem = {socket, 0, ZMQ_POLLIN, 0};
-    (*pollitems)[i] = pollitem;
+    pollitems_[i] = pollitem;
   }
 }
-}  // namespace
+
+void reactor::process_del_sockets()
+{
+  if (del_sockets_.empty()) return;
+  if (sockets_.empty()) return;
+  size_t nSize = sockets_.size();
+  for (size_t i = nSize - 1; i > 0; i--) {
+    zmq::socket_t* socket = sockets_[i].first;
+    socket_set::const_iterator it = del_sockets_.find(socket);
+    if (it == del_sockets_.end())
+        continue;
+
+    delete socket;  // will close it
+    delete sockets_[i].second;  // delele callback
+    sockets_[i] = sockets_[--nSize];  // fill with the last
+    sockets_.pop_back();
+    assert(nSize == sockets_.size());
+
+    del_sockets_.erase(it);
+    if (del_sockets_.empty())
+        return;
+  }
+}
 
 void reactor::run_closure_at(uint64 timestamp, closure* closure) {
   closure_run_map_[timestamp].push_back(closure);
@@ -80,7 +109,7 @@ void reactor::run_closure_at(uint64 timestamp, closure* closure) {
 int reactor::loop() {
   while (!should_quit_) {
     if (is_dirty_) {
-      rebuild_poll_items(sockets_, &pollitems_);
+      rebuild_poll_items();
       is_dirty_ = false;
     }
     long poll_timeout = process_closure_run_map();
