@@ -11,11 +11,21 @@ set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
 
 include_directories(${PROJECT_BINARY_DIR})
 set(RPCZ_SOURCES
-    application.cc application_options.cc client_connection.cc clock.cc
-    connection.cc connection_manager.cc connection_manager_thread.cc
+    application.cc
+    application_options.cc
+    broker_thread.cc
+    client_connection.cc
+    clock.cc
+    connection.cc
+    connection_manager.cc 
     event_id_generator.cc
-    reactor.cc rpc_controller.cc rpc_channel_impl.cc server.cc server_impl.cc
-    sync_event.cc zmq_utils.cc
+    reactor.cc
+    rpc_controller.cc
+    rpc_channel_impl.cc
+    server.cc
+    server_impl.cc
+    sync_event.cc
+    zmq_utils.cc
     ${PROTO_SOURCES})
 file(GLOB RPCZ_HEADERS *.hpp)
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
