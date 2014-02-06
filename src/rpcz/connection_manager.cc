@@ -36,7 +36,7 @@
 #include "application_options.hpp"
 #include "client_connection.hpp"
 #include "connection.hpp"
-#include "connection_manager_thread.hpp"
+#include "broker_thread.hpp"
 #include "internal_commands.hpp"
 #include "logging.hpp"
 #include "rpcz/callback.hpp"
@@ -121,7 +121,7 @@ connection_manager::connection_manager()
         new boost::thread(&worker_thread, this, boost::ref(*context_), frontend_endpoint_));
   }
   sync_event event;
-  broker_thread_ = boost::thread(&connection_manager_thread::run,
+  broker_thread_ = boost::thread(&broker_thread::run,
                                  boost::ref(*context_), nthreads, &event,
                                  frontend_socket);
   event.wait();

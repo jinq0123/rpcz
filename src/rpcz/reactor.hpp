@@ -27,7 +27,7 @@ namespace rpcz {
 
 class closure;
 
-// Non-thread-safe. Only used in connection_manager_thread.
+// Non-thread-safe. Only used in broker_thread.
 class reactor : boost::noncopyable {
  public:
   reactor();

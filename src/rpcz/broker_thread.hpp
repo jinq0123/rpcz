@@ -15,8 +15,8 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_CONNECTION_MANAGER_THREAD_H
-#define RPCZ_CONNECTION_MANAGER_THREAD_H
+#ifndef RPCZ_BROKER_THREAD_H
+#define RPCZ_BROKER_THREAD_H
 
 #include "client_request_callback.hpp"
 #include "event_id_generator.hpp"
@@ -27,9 +27,9 @@ namespace rpcz {
 
 class sync_event;
 
-class connection_manager_thread {
+class broker_thread {
  public:
-  connection_manager_thread(
+  broker_thread(
       zmq::context_t & context,
       int nthreads,
       sync_event* ready_event,
@@ -93,4 +93,4 @@ class connection_manager_thread {
 
 }  // namespace rpcz
 
-#endif  // RPCZ_CONNECTION_MANAGER_THREAD_H
+#endif  // RPCZ_BROKER_THREAD_H

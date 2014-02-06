@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "connection_manager_thread.hpp"
+#include "broker_thread.hpp"
 
 #include "internal_commands.hpp"
 #include "logging.hpp"
@@ -26,7 +26,7 @@
 
 namespace rpcz {
 
-connection_manager_thread::connection_manager_thread(
+broker_thread::broker_thread(
     zmq::context_t & context, int nthreads, sync_event* ready_event,
     zmq::socket_t* frontend_socket)
     : context_(context),
@@ -35,11 +35,11 @@ connection_manager_thread::connection_manager_thread(
     wait_for_workers_ready_reply(nthreads);
     ready_event->signal();
     reactor_.add_socket(frontend_socket, new_permanent_callback(
-        this, &connection_manager_thread::handle_frontend_socket,
+        this, &broker_thread::handle_frontend_socket,
         frontend_socket));
 }
 
-void connection_manager_thread::wait_for_workers_ready_reply(int nthreads) {
+void broker_thread::wait_for_workers_ready_reply(int nthreads) {
   for (int i = 0; i < nthreads; ++i) {
       message_iterator iter(*frontend_socket_);
       std::string sender = message_to_string(iter.next());
@@ -51,15 +51,15 @@ void connection_manager_thread::wait_for_workers_ready_reply(int nthreads) {
   }
 }
 
-void connection_manager_thread::run(zmq::context_t & context,
+void broker_thread::run(zmq::context_t & context,
         int nthreads, sync_event* ready_event,
         zmq::socket_t* frontend_socket) {
-    connection_manager_thread cmt(
+    broker_thread cmt(
         context, nthreads, ready_event, frontend_socket);
     cmt.reactor_.loop();
 }
 
-void connection_manager_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
+void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     message_iterator iter(*frontend_socket);
     std::string sender = message_to_string(iter.next());
     CHECK_EQ(0, iter.next().size());
@@ -110,7 +110,7 @@ void connection_manager_thread::handle_frontend_socket(zmq::socket_t* frontend_s
     }
 }
 
-void connection_manager_thread::begin_worker_command(char command) {
+void broker_thread::begin_worker_command(char command) {
     send_string(frontend_socket_, workers_[current_worker_], ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
     send_char(frontend_socket_, command, ZMQ_SNDMORE);
@@ -120,12 +120,12 @@ void connection_manager_thread::begin_worker_command(char command) {
     }
 }
 
-void connection_manager_thread::add_closure(closure* closure) {
+void broker_thread::add_closure(closure* closure) {
     begin_worker_command(krunclosure);
     send_pointer(frontend_socket_, closure, 0);
 }
 
-void connection_manager_thread::handle_connect_command(
+void broker_thread::handle_connect_command(
         const std::string& sender, const std::string& endpoint) {
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
     connections_.push_back(socket);
@@ -133,7 +133,7 @@ void connection_manager_thread::handle_connect_command(
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     socket->connect(endpoint.c_str());
     reactor_.add_socket(socket, new_permanent_callback(
-            this, &connection_manager_thread::handle_client_socket,
+            this, &broker_thread::handle_client_socket,
             socket));
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
@@ -141,7 +141,7 @@ void connection_manager_thread::handle_connect_command(
     send_uint64(frontend_socket_, connections_.size() - 1, 0);
 }
 
-void connection_manager_thread::handle_bind_command(
+void broker_thread::handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
       server_function server_function) {
@@ -154,7 +154,7 @@ void connection_manager_thread::handle_bind_command(
     bind_map_[endpoint] = socket;  // for unbind
     // reactor will own socket and callback.
     reactor_.add_socket(socket, new_permanent_callback(
-        this, &connection_manager_thread::handle_server_socket,
+        this, &broker_thread::handle_server_socket,
         socket_id, server_function));
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
@@ -162,7 +162,7 @@ void connection_manager_thread::handle_bind_command(
     send_empty_message(frontend_socket_, 0);
 }
 
-void connection_manager_thread::handle_unbind_command(
+void broker_thread::handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint) {
     endpoint_to_socket::const_iterator it = bind_map_.find(endpoint);
@@ -176,7 +176,7 @@ void connection_manager_thread::handle_unbind_command(
     send_empty_message(frontend_socket_, 0);
 }
 
-void connection_manager_thread::handle_server_socket(uint64 socket_id,
+void broker_thread::handle_server_socket(uint64 socket_id,
         server_function server_function) {
     message_iterator iter(*server_sockets_[socket_id]);
     begin_worker_command(krunserver_function);
@@ -185,7 +185,7 @@ void connection_manager_thread::handle_server_socket(uint64 socket_id,
     forward_messages(iter, *frontend_socket_);
 }
 
-void connection_manager_thread::send_request(message_iterator& iter) {
+void broker_thread::send_request(message_iterator& iter) {
     uint64 connection_id = interpret_message<uint64>(iter.next());
     remote_response_wrapper remote_response_wrapper =
         interpret_message<rpcz::remote_response_wrapper>(iter.next());
@@ -195,7 +195,7 @@ void connection_manager_thread::send_request(message_iterator& iter) {
       reactor_.run_closure_at(
           remote_response_wrapper.start_time +
               remote_response_wrapper.deadline_ms,
-          new_callback(this, &connection_manager_thread::handle_timeout, event_id));
+          new_callback(this, &broker_thread::handle_timeout, event_id));
     }
     zmq::socket_t*& socket = connections_[connection_id];
     send_string(socket, "", ZMQ_SNDMORE);
@@ -203,7 +203,7 @@ void connection_manager_thread::send_request(message_iterator& iter) {
     forward_messages(iter, *socket);
 }
 
-void connection_manager_thread::handle_client_socket(zmq::socket_t* socket) {
+void broker_thread::handle_client_socket(zmq::socket_t* socket) {
     message_iterator iter(*socket);
     if (iter.next().size() != 0) {
       return;
@@ -224,7 +224,7 @@ void connection_manager_thread::handle_client_socket(zmq::socket_t* socket) {
     remote_response_map_.erase(response_iter);
 }
 
-void connection_manager_thread::handle_timeout(event_id event_id) {
+void broker_thread::handle_timeout(event_id event_id) {
     remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
     if (response_iter == remote_response_map_.end()) {
         return;
@@ -236,7 +236,7 @@ void connection_manager_thread::handle_timeout(event_id event_id) {
     remote_response_map_.erase(response_iter);
 }
 
-void connection_manager_thread::send_reply(message_iterator& iter) {
+void broker_thread::send_reply(message_iterator& iter) {
     uint64 socket_id = interpret_message<uint64>(iter.next());
     zmq::socket_t* socket = server_sockets_[socket_id];
     forward_messages(iter, *socket);
