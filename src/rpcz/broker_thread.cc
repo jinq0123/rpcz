@@ -168,10 +168,15 @@ void broker_thread::handle_unbind_command(
     endpoint_to_socket::const_iterator it = bind_map_.find(endpoint);
     if (it == bind_map_.end()) return;
     assert((*it).second);
-    reactor_.del_socket((*it).second);  // delete before next zmq_poll()
+    reactor_.del_socket((*it).second,
+        new_callback(this, &broker_thread::handle_socket_deleted, std::string(sender)));
     bind_map_.erase(it);
+    // Socket is not delelted yet.
+    // It will callback on deleted before next zmq_poll().
+}
 
-    // TODO: Not delelted yet. Callback on deleted.
+void broker_thread::handle_socket_deleted(const std::string sender)
+{
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, 0);

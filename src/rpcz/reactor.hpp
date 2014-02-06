@@ -34,10 +34,14 @@ class reactor : boost::noncopyable {
   reactor();
   ~reactor();
 
+  // TODO: use boost::function. Callback ownship sucks.
+
   // Will own socket and callback.
   void add_socket(zmq::socket_t* socket, closure* callback);
-  void del_socket(zmq::socket_t* socket);
+  // Delete socket and callback on deleted. Will not own callback.
+  void del_socket(zmq::socket_t* socket, closure* callback);
 
+  // Will not own callback.
   void run_closure_at(uint64 timestamp, closure *callback);
 
   int loop();
@@ -53,8 +57,8 @@ class reactor : boost::noncopyable {
   bool should_quit_;
   bool is_dirty_;
   std::vector<std::pair<zmq::socket_t*, closure*> > sockets_;
-  typedef std::set<zmq::socket_t*> socket_set;
-  socket_set del_sockets_;
+  typedef std::multimap<zmq::socket_t*, closure*> socket_to_closure;
+  socket_to_closure del_sockets_;
   std::vector<zmq::pollitem_t> pollitems_;
   typedef std::map<uint64, std::vector<closure*> > closure_run_map;
   closure_run_map closure_run_map_;

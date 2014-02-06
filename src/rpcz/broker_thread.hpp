@@ -62,6 +62,9 @@ class broker_thread {
       const std::string& sender,
       const std::string& endpoint);
 
+  // Callback on reactor deleted socket.
+  void handle_socket_deleted(const std::string sender);
+
   void handle_server_socket(uint64 socket_id,
       server_function server_function);
 

@@ -56,20 +56,22 @@ reactor::~reactor() {
 }
 
 void reactor::add_socket(zmq::socket_t* socket, closure* closure) {
+  assert(closure);
   sockets_.push_back(std::make_pair(socket, closure));
   is_dirty_ = true;
 }
 
-void reactor::del_socket(zmq::socket_t* socket)
+void reactor::del_socket(zmq::socket_t* socket, closure* callback)
 {
-  del_sockets_.insert(socket);
+  assert(callback);
+  del_sockets_.insert(std::make_pair(socket, callback));
   is_dirty_ = true;
   // Close and delete socket in loop().
 }
 
 void reactor::rebuild_poll_items() {
   process_del_sockets();
-  del_sockets_.clear();
+  del_sockets_.clear();  // TODO: callback not deleted.
 
   pollitems_.resize(sockets_.size());
   for (size_t i = 0; i < sockets_.size(); ++i) {
@@ -83,12 +85,15 @@ void reactor::process_del_sockets()
 {
   if (del_sockets_.empty()) return;
   if (sockets_.empty()) return;
+
   size_t nSize = sockets_.size();
   for (size_t i = nSize - 1; i > 0; i--) {
+    typedef socket_to_closure::const_iterator const_iterator;
+    typedef std::pair<const_iterator, const_iterator> range;
     zmq::socket_t* socket = sockets_[i].first;
-    socket_set::const_iterator it = del_sockets_.find(socket);
-    if (it == del_sockets_.end())
-        continue;
+    range r = del_sockets_.equal_range(socket);
+    if (r.first == r.second)
+      continue;
 
     delete socket;  // will close it
     delete sockets_[i].second;  // delele callback
@@ -96,9 +101,11 @@ void reactor::process_del_sockets()
     sockets_.pop_back();
     assert(nSize == sockets_.size());
 
-    del_sockets_.erase(it);
+    for (const_iterator it = r.first; it != r.second; ++it)
+      (*it).second->run();
+    del_sockets_.erase(r.first, r.second);
     if (del_sockets_.empty())
-        return;
+      return;
   }
 }
 
