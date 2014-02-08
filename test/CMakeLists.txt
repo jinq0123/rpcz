@@ -9,14 +9,14 @@ include(build_deps)
 
 if(MSVC)
 
-# Set gtest glog include dir in CMake UI.
-# Set gtest glot lib dir in VC.
-
+# Set gtest glog include dir and library in CMake UI.
 set(GLOG_INCLUDE_DIR "" CACHE PATH "GLog include dir")
-include_directories(${GLOG_INCLUDE_DIR})    
-set(GLOG_LIBRARIES "libglog")
-
+set(GLOG_LIBRARY_DEBUG "" CACHE FILEPATH "GLog debug library")
+set(GLOG_LIBRARY_RELEASE "" CACHE FILEPATH "GLog release library")
 set(GTEST_INCLUDE_DIR "" CACHE PATH "GTest include dir")
+set(GTEST_LIBRARY_DEBUG "" CACHE FILEPATH "GTest debug library")
+set(GTEST_LIBRARY_RELEASE "" CACHE FILEPATH "GTest release library")
+include_directories(${GLOG_INCLUDE_DIR})
 include_directories(${GTEST_INCLUDE_DIR})    
 
 else(MSVC)
@@ -44,13 +44,21 @@ function(rpcz_test TESTNAME)
   add_executable(${TESTNAME} ${OPTIONS_SRCS})
   
   set(LIBS rpcz rpcz_gtest_main
-      gtest ${GLOG_LIBRARIES}
   )
 if(NOT MSVC)
-  list(APPEND LIBS pthread)
+  list(APPEND LIBS pthread
+      gtest ${GLOG_LIBRARIES}
+  )
 endif(NOT MSVC)
+
   list(APPEND LIBS ${OPTIONS_LIBS})
   target_link_libraries(${TESTNAME} ${LIBS})
+if(MSVC)
+  target_link_libraries(${TESTNAME} optimized ${GLOG_LIBRARY_RELEASE})
+  target_link_libraries(${TESTNAME} optimized ${GTEST_LIBRARY_RELEASE})
+  target_link_libraries(${TESTNAME} debug ${GLOG_LIBRARY_DEBUG})
+  target_link_libraries(${TESTNAME} debug ${GTEST_LIBRARY_DEBUG})
+endif(MSVC)  
   add_test(${TESTNAME} ${TESTNAME})
 endfunction()
 
