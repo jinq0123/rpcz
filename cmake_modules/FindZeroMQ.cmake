@@ -3,7 +3,9 @@
 #
 #  ZeroMQ_FOUND - system has libzmq
 #  ZeroMQ_INCLUDE_DIRS - the libzmq include directories
-#  ZeroMQ_LIBRARIES - link these to use libzmq
+#  ZeroMQ_LIBRARIES - Libraries to link (may include
+#                     target_link_libraries debug/optimized keywords).
+#                     Link these to use libzmq.
 
 include(LibFindMacros)
 
@@ -28,10 +30,19 @@ ELSEIF (WIN32)
 	  PATHS ${ZEROMQ_ROOT}/include ${CMAKE_INCLUDE_PATH}
 	)
 	# Finally the library itself
-	find_library(ZeroMQ_LIBRARY
+	find_library(ZeroMQ_LIBRARY_RELEASE
 	  NAMES libzmq
 	  PATHS ${ZEROMQ_ROOT}/lib ${CMAKE_LIB_PATH}
 	)
+	find_library(ZeroMQ_LIBRARY_DEBUG
+	  NAMES libzmq_d
+	  PATHS ${ZEROMQ_ROOT}/lib ${CMAKE_LIB_PATH}
+	)
+	if (ZeroMQ_LIBRARY_RELEASE AND ZeroMQ_LIBRARY_DEBUG)
+	  set(ZeroMQ_LIBRARY optimized ${ZeroMQ_LIBRARY_RELEASE} debug ${ZeroMQ_LIBRARY_DEBUG})
+	else()
+	  set(ZeroMQ_LIBRARY ${ZeroMQ_LIBRARY_RELEASE})
+	endif()
 ENDIF()
 
 # Set the include dir variables and the libraries and let libfind_process do the rest.
