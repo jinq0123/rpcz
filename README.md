@@ -11,7 +11,7 @@ Introduction
 * The API offers both asynchronous (callbacks) and synchronous (blocking) style functionality. Both styles allow specifying deadlines in millisecond resolution. 
 * RPCZ is built on top of ZeroMQ for handling the low-level I/O details in a lock-free manner. 
 * The Python module is a Cython wrapper around the C++ API. 
-* RPCZ has been tested on Ubuntu 11.10 and Mac OS X Lion. I believe it should not be hard to get it to compile on Windows but I have not tried. 
+* RPCZ has been tested on Windows, Ubuntu 11.10 and Mac OS X Lion.
     
 CMake
 -----
