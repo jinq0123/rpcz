@@ -6,7 +6,7 @@ endif()
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
 if(MSVC OR BORLAND)
-  # To use Boost automatic linking.
+  # Boost automatic linking typically requests static libraries.
   set(Boost_USE_STATIC_LIBS TRUE)
 endif()
 
