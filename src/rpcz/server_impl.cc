@@ -36,6 +36,7 @@
 #include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/rpc_controller.hpp"
+#include "rpcz/rpc_service.hpp"
 #include "rpcz/rpcz.pb.h"
 #include "rpcz/service.hpp"
 #include "zmq_utils.hpp"

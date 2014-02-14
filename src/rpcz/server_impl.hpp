@@ -64,17 +64,6 @@ class server_impl : boost::noncopyable {
   bind_endpoint_set endpoints_;
 };
 
-// rpc_service is a low-level request handler: requests and replies are void*.
-// It is exposed here for language bindings. Do not use directly.
-class rpc_service {
- public:
-  virtual ~rpc_service() {}
-
-  virtual void dispatch_request(const std::string& method,
-                               const void* payload, size_t payload_len,
-                               server_channel* channel_) = 0;
-};
-
 }  // namespace rpcz
 
 #endif  // RPCZ_SERVER_IMPL_H
