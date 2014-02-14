@@ -5,6 +5,11 @@ if (NOT CMAKE_BUILD_TYPE)
 endif()
 message("-- Build type: ${CMAKE_BUILD_TYPE}")
 
+if(MSVC OR BORLAND)
+  # Boost automatic linking typically requests static libraries.
+  set(Boost_USE_STATIC_LIBS ON)
+endif()
+
 option(rpcz_build_tests "Build rpcz's tests." OFF)
 option(rpcz_build_static "Build static library." OFF)
 option(rpcz_build_examples "Build rpcz's examples." OFF)
