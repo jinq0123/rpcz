@@ -23,6 +23,7 @@
 #include "rpcz/common.hpp"  // for scoped_ptr
 
 namespace rpcz {
+class rpc_service;
 class service;
 class server_impl;
 
@@ -39,14 +40,18 @@ class server : boost::noncopyable {
   // external clients. If you use the first form, the service name from the
   // protocol buffer definition will be used. Does not take ownership of the
   // provided service.
-  void register_service(service & service);
-  void register_service(service & service, const std::string& name);
+  void register_service(service& service);
+  void register_service(service& service, const std::string& name);
 
   void bind(const std::string& endpoint);
 
   // TODO: unregister_service()
   // TODO: register_service() after bind()
   // TODO: register_service_factory(), which creates service for each connection.
+
+  // TODO: delete register_rpc_service()
+  // Registers a low-level rpc_service. It takes ownership of the rpc_service
+  void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  private:
   scoped_ptr<server_impl> impl_;

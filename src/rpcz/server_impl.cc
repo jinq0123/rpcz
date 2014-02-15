@@ -105,7 +105,7 @@ class server_channel_impl : public server_channel {
 class proto_rpc_service : public rpc_service {
  public:
   // Does not take ownership of the provided service.
-  explicit proto_rpc_service(service & service) : service_(service) {
+  explicit proto_rpc_service(service& service) : service_(service) {
   }
 
   virtual void dispatch_request(const std::string& method,
@@ -138,7 +138,7 @@ class proto_rpc_service : public rpc_service {
   }
 
  private:
-  service & service_;
+  service& service_;
 };
 
 server_impl::server_impl()
@@ -159,23 +159,24 @@ server_impl::~server_impl() {
   assert(service_map_.empty());
 }
 
-void server_impl::register_service(rpcz::service & service) {
-  register_service(service, service.GetDescriptor()->name());
+void server_impl::register_service(rpcz::service& service, const std::string& name) {
+  register_rpc_service(
+      new proto_rpc_service(service), name);  // deleted in unregister_service()
 }
 
-void server_impl::register_service(rpcz::service & service, const std::string& name) {
+void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
+                                  const std::string& name) {
   unregister_service(name);
-  // Registers a low-level rpc_service. Owns the new proto_rpc_service.
-  service_map_[name] = new proto_rpc_service(service);  // Delete in unregister_service().
+  service_map_[name] = rpc_service;
 }
 
-void server_impl::unregister_service(const std::string & name)
+void server_impl::unregister_service(const std::string& name)
 {
-  rpc_service_map::const_iterator service_it = service_map_.find(name);
-  if (service_it == service_map_.end())
-    return;
-  delete (*service_it).second;  // new in register_service()
-  service_map_.erase(service_it);
+  rpc_service_map::const_iterator it = service_map_.find(name);
+  if (it == service_map_.end()) return;
+  assert((*it).second);
+  delete (*it).second;
+  service_map_.erase(it);
 }
 
 void server_impl::bind(const std::string& endpoint) {

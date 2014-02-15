@@ -40,18 +40,19 @@ class server_impl : boost::noncopyable {
 
   // Registers an rpc service with this server_impl. All registrations must occur
   // before bind() is called. The name parameter identifies the service for
-  // external clients. If you use the first form, the service name from the
-  // protocol buffer definition will be used. Does not take ownership of the
-  // provided service.
-  void register_service(service & service);
-  void register_service(service & service, const std::string& name);
+  // external clients. Does not take ownership of the provided service.
+  void register_service(service& service, const std::string& name);
 
   void bind(const std::string& endpoint);
 
   // TODO: register_service() after bind()
 
+  // TODO: delete register_rpc_service()
+  // Registers a low-level rpc_service. Owns rpc_service.
+  void register_rpc_service(rpc_service* rpc_service, const std::string& name);
+
  private:
-  void unregister_service(const std::string & name);
+  void unregister_service(const std::string& name);
 
  private:
   void handle_request(const client_connection& connection,
