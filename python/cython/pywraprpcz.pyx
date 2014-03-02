@@ -212,6 +212,18 @@ def create_rpc_channel_wrap(endpoint):
     channel.thisptr = create_rpc_channel(make_string(endpoint))
     return channel
 
+def terminate_wrap():
+    terminate()
+
+def run_wrap():
+    with nogil:
+        run()
+
+def set_connection_manager_threads_wrap(n):
+    set_connection_manager_threads(n)
+
+def set_zmq_io_threads_wrap(n):
+    set_zmq_io_threads(n)
 
 cdef extern from "rpcz/server.hpp" namespace "rpcz":
     cdef cppclass _server "rpcz::server":

@@ -148,7 +148,7 @@ void broker_thread::handle_bind_command(
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
-    socket->bind(endpoint.c_str());
+    socket->bind(endpoint.c_str());  // TODO: catch exception
     uint64 socket_id = server_sockets_.size();
     server_sockets_.push_back(socket);
     bind_map_[endpoint] = socket;  // for unbind
