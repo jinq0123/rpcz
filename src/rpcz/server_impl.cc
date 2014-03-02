@@ -159,13 +159,14 @@ server_impl::~server_impl() {
   assert(service_map_.empty());
 }
 
-void server_impl::register_service(rpcz::service& service, const std::string& name) {
+void server_impl::register_service(rpcz::service& service,
+                                   const std::string& name) {
   register_rpc_service(
       new proto_rpc_service(service), name);  // deleted in unregister_service()
 }
 
 void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
-                                  const std::string& name) {
+                                       const std::string& name) {
   unregister_service(name);
   service_map_[name] = rpc_service;
 }

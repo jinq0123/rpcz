@@ -215,7 +215,7 @@ def create_rpc_channel_wrap(endpoint):
 
 cdef extern from "rpcz/server.hpp" namespace "rpcz":
     cdef cppclass _server "rpcz::server":
-        void register_service(PythonRpcService&, string name)
+        void register_rpc_service(PythonRpcService*, string name)
         void bind(string endpoint)
 
 
@@ -228,7 +228,7 @@ cdef class Server:
     def register_service(self, service, name=None):
         cdef PythonRpcService* rpc_service = new PythonRpcService(
             rpc_handler_bridge, service)
-        self.thisptr.register_service(deref(rpc_service), make_string(name))
+        self.thisptr.register_rpc_service(rpc_service, make_string(name))
     def bind(self, endpoint):
         self.thisptr.bind(make_string(endpoint))
 

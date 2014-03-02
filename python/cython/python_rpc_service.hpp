@@ -13,15 +13,18 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef ZRPC_RPC_SERVICE_H
 #define ZRPC_RPC_SERVICE_H
 
 #include <string>
 #include "Python.h"
-#include "rpcz/rpcz.hpp"
+#include "rpcz/rpc_service.hpp"
 
 namespace rpcz {
+
+class server_channel;
 
 // A subclass of RpcService that helps forwarding the requests to Python-land.
 class PythonRpcService : public rpc_service {
