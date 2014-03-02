@@ -12,9 +12,8 @@ class SearchService(search_rpcz.SearchService):
     response.results.append("this is result2")
     reply.send(response)
 
-app = rpcz.Application()
-server = rpcz.Server(app)
+server = rpcz.Server()
 server.register_service(SearchService(), "SearchService")
 server.bind("tcp://*:5555")
 print "Serving requests on port 5555"
-app.run()
+rpcz.Application.run()
