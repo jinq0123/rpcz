@@ -21,6 +21,7 @@ set(RPCZ_SOURCES
     event_id_generator.cc
     reactor.cc
     rpc_controller.cc
+    rpc_channel.cc
     rpc_channel_impl.cc
     server.cc
     server_impl.cc
