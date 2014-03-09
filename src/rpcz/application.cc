@@ -29,11 +29,6 @@
 namespace rpcz {
 namespace application {
 
-rpc_channel* create_rpc_channel(const std::string& endpoint) {
-  return rpc_channel::create(
-      connection_manager::get()->connect(endpoint));
-}
-
 void run() {
   connection_manager::get()->run();
 }

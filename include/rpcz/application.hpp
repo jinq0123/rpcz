@@ -31,11 +31,6 @@ class rpc_channel;
 // RPCZ client or server application.
 namespace application {
 
-  // Creates an rpc_channel to the given endpoint. Attach it to a Stub and you
-  // can start making calls through this channel from any thread. No locking
-  // needed. It is your responsibility to delete this object.
-  rpc_channel* create_rpc_channel(const std::string& endpoint);  // TODO: move to rpc_channel
-
   // Blocks the current thread until another thread calls terminate.
   void run();
 

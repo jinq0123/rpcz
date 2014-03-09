@@ -22,7 +22,7 @@
 using namespace std;
 
 int main() {
-  examples::SearchService_Stub search_stub(rpcz::application::create_rpc_channel(
+  examples::SearchService_Stub search_stub(rpcz::rpc_channel::create(
           "tcp://localhost:5555"), true);
   examples::SearchRequest request;
   examples::SearchResponse response;

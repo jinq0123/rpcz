@@ -54,7 +54,14 @@ class rpc_channel {
 
   static rpc_channel* create(connection connection);
 
+  // Creates an rpc_channel to the given endpoint. Attach it to a Stub and you
+  // can start making calls through this channel from any thread. No locking
+  // needed. It is your responsibility to delete this object.
+  static rpc_channel* create(const std::string& endpoint);
+
   virtual ~rpc_channel() {};
-};
-}  // namespace
-#endif
+};  // class rpc_channel
+
+}  // namespace rpcz
+
+#endif  // RPCZ_RPC_CHANNEL_H

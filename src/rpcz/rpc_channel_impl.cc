@@ -18,16 +18,22 @@
 
 #include <google/protobuf/descriptor.h>
 #include <zmq.hpp>
+
 #include "rpcz/callback.hpp"
-#include "logging.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/sync_event.hpp"
+#include "connection_manager.hpp"
+#include "logging.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {
 
 rpc_channel* rpc_channel::create(connection connection) {
   return new rpc_channel_impl(connection);
+}
+
+rpc_channel* rpc_channel::create(const std::string& endpoint) {
+  return create(connection_manager::get()->connect(endpoint));
 }
 
 rpc_channel_impl::rpc_channel_impl(connection connection)

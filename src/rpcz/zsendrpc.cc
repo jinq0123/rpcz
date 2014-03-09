@@ -108,7 +108,7 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  scoped_ptr<rpc_channel> channel(application::create_rpc_channel(endpoint));
+  scoped_ptr<rpc_channel> channel(rpc_channel::create(endpoint));
   rpc_controller rpc_controller;
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
