@@ -126,7 +126,7 @@ cdef extern from "rpcz/rpc_channel.hpp" namespace "rpcz":
                           string request, string* response,
                           _rpc_controller* rpc_controller, 
                           closure* callback) except +
-
+    _rpc_channel * rpc_channel_create "rpcz::rpc_channel::create" (string endpoint)
 
 cdef class RpcChannel:
     cdef _rpc_channel *thisptr
@@ -200,7 +200,6 @@ cdef extern from "python_rpc_service.hpp" namespace "rpcz":
 
 
 cdef extern from "rpcz/application.hpp" namespace "rpcz::application":
-    _rpc_channel* create_rpc_channel(string)
     void terminate()
     void run() nogil
     void set_connection_manager_threads(int n)
@@ -209,7 +208,7 @@ cdef extern from "rpcz/application.hpp" namespace "rpcz::application":
 
 def create_rpc_channel_wrap(endpoint):
     cdef RpcChannel channel = RpcChannel.__new__(RpcChannel)
-    channel.thisptr = create_rpc_channel(make_string(endpoint))
+    channel.thisptr = rpc_channel_create(make_string(endpoint))
     return channel
 
 def terminate_wrap():
