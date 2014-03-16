@@ -38,10 +38,16 @@ class server : boost::noncopyable {
   // Registers an rpc service with this server. All registrations must occur
   // before bind() is called. The name parameter identifies the service for
   // external clients. If you use the first form, the service name from the
-  // protocol buffer definition will be used. Does not take ownership of the
-  // provided service.
+  // protocol buffer definition will be used.
+  // It does not take ownership of the provided service.
   void register_service(service& service);
   void register_service(service& service, const std::string& name);
+
+  template <typename Service>
+  void register_service();
+
+  template <typename Service>
+  void register_service(const std::string& name);
 
   void bind(const std::string& endpoint);
 
@@ -56,6 +62,19 @@ class server : boost::noncopyable {
  private:
   scoped_ptr<server_impl> impl_;
 };  // class server
+
+template <typename Service>
+void register_service()
+{
+    // TODO: register_service_factory();
+}
+
+template <typename Service>
+void register_service(const std::string& name)
+{
+    // TODO: register_service_factory();
+}
+
 
 }  // namespace rpcz
 
