@@ -22,6 +22,7 @@
 #include <set>
 #include <boost/noncopyable.hpp>
 #include "rpcz/connection_manager_ptr.hpp"
+#include "rpcz/service_factory_ptr.hpp"
 
 namespace rpcz {
 class client_connection;
@@ -42,6 +43,8 @@ class server_impl : boost::noncopyable {
   // before bind() is called. The name parameter identifies the service for
   // external clients. Does not take ownership of the provided service.
   void register_service(service& service, const std::string& name);
+
+  void register_service_factory(service_factory_ptr factory, const std::string& name);
 
   void bind(const std::string& endpoint);
 

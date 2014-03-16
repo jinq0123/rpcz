@@ -165,6 +165,11 @@ void server_impl::register_service(rpcz::service& service,
       new proto_rpc_service(service), name);  // deleted in unregister_service()
 }
 
+void server_impl::register_service_factory(service_factory_ptr factory,
+                                           const std::string& name) {
+  // TODO
+}
+
 void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
                                        const std::string& name) {
   unregister_service(name);

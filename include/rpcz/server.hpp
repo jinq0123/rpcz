@@ -21,6 +21,7 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 #include "rpcz/common.hpp"  // for scoped_ptr
+#include "rpcz/service_factory_ptr.hpp"
 
 namespace rpcz {
 class rpc_service;
@@ -60,21 +61,22 @@ class server : boost::noncopyable {
   void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  private:
+  // TODO: Public it to allow customised factory.
+  void register_service_factory(service_factory_ptr factory, const std::string & name);
+
+ private:
   scoped_ptr<server_impl> impl_;
 };  // class server
 
 template <typename Service>
-void register_service()
-{
-    // TODO: register_service_factory();
+void register_service() {
+  register_service<Service>(Service::descriptor()->name);
 }
 
 template <typename Service>
-void register_service(const std::string& name)
-{
-    // TODO: register_service_factory();
+void register_service(const std::string& name) {
+  register_service_factory(default_service_factory<Service>(), name);
 }
-
 
 }  // namespace rpcz
 

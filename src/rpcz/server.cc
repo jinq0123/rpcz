@@ -48,4 +48,9 @@ void server::bind(const std::string& endpoint) {
   impl_->bind(endpoint);
 }
 
+void server::register_service_factory(service_factory_ptr factory,
+                                      const std::string & name) {
+  impl_->register_service_factory(factory, name);
+}
+
 }  // namespace rpcz
