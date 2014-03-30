@@ -18,17 +18,13 @@
 #ifndef RPCZ_SERVER_IMPL_H
 #define RPCZ_SERVER_IMPL_H
 
-#include <map>
 #include <set>
 #include <boost/noncopyable.hpp>
 #include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/service_factory_ptr.hpp"
 
 namespace rpcz {
-class client_connection;
-class message_iterator;
 class rpc_service;
-class server_channel;
 class service;
 
 // A server_impl object maps incoming RPC requests to a provided service interface.
@@ -58,12 +54,7 @@ class server_impl : boost::noncopyable {
   void unregister_service(const std::string& name);
 
  private:
-  void handle_request(const client_connection& connection,
-                      message_iterator& iter);
-
   connection_manager_ptr connection_manager_ptr_;
-  typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
-  rpc_service_map service_map_;  // Owns rpc_service. Delete in destructor.
   typedef std::set<std::string> bind_endpoint_set;
   bind_endpoint_set endpoints_;
 };

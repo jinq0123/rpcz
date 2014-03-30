@@ -78,8 +78,8 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
         break;
       case kBind: {
         std::string endpoint(message_to_string(iter.next()));
-        server_function sf(interpret_message<server_function>(iter.next()));
-        handle_bind_command(sender, endpoint, sf);
+        // XXX server_function sf(interpret_message<server_function>(iter.next()));
+        handle_bind_command(sender, endpoint);
         break;
       }
       case kUnbind: {
@@ -143,8 +143,7 @@ void broker_thread::handle_connect_command(
 
 void broker_thread::handle_bind_command(
       const std::string& sender,
-      const std::string& endpoint,
-      server_function server_function) {
+      const std::string& endpoint) {
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -154,8 +153,7 @@ void broker_thread::handle_bind_command(
     bind_map_[endpoint] = socket;  // for unbind
     // reactor will own socket and callback.
     reactor_.add_socket(socket, new_permanent_callback(
-        this, &broker_thread::handle_server_socket,
-        socket_id, server_function));
+        this, &broker_thread::handle_server_socket, socket_id));
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -182,12 +180,12 @@ void broker_thread::handle_socket_deleted(const std::string sender)
     send_empty_message(frontend_socket_, 0);
 }
 
-void broker_thread::handle_server_socket(uint64 socket_id,
-        server_function server_function) {
+void broker_thread::handle_server_socket(uint64 socket_id) {
     message_iterator iter(*server_sockets_[socket_id]);
     begin_worker_command(krunserver_function);
-    send_object(frontend_socket_, server_function, ZMQ_SNDMORE);
+    // XXX send_object(frontend_socket_, server_function, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, socket_id, ZMQ_SNDMORE);
+    // XXX Call request_handler...
     forward_messages(iter, *frontend_socket_);
 }
 

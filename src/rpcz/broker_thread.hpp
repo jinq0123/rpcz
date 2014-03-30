@@ -21,7 +21,6 @@
 #include "client_request_callback.hpp"
 #include "event_id_generator.hpp"
 #include "reactor.hpp"
-#include "server_function.hpp"
 
 namespace rpcz {
 
@@ -55,8 +54,7 @@ class broker_thread {
 
   void handle_bind_command(
       const std::string& sender,
-      const std::string& endpoint,
-      server_function server_function);
+      const std::string& endpoint);
 
   void handle_unbind_command(
       const std::string& sender,
@@ -65,8 +63,7 @@ class broker_thread {
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
 
-  void handle_server_socket(uint64 socket_id,
-      server_function server_function);
+  void handle_server_socket(uint64 socket_id);
 
   inline void send_request(message_iterator& iter);
 

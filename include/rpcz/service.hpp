@@ -20,6 +20,8 @@
 #include <assert.h>
 #include <string>
 
+#include "server_channel.hpp"
+
 namespace google {
 namespace protobuf {
 class Message;
@@ -29,18 +31,6 @@ class ServiceDescriptor;
 }  // namespace google
 
 namespace rpcz {
-
-class server_channel {
- public:
-  virtual void send(const google::protobuf::Message& response) = 0;
-  virtual void send_error(int application_error,
-                         const std::string& error_message = "") = 0;
-  virtual ~server_channel() {}
-
-  // Hack to allow language bindings to do the serialization at their
-  // end. Do not use directly.
-  virtual void send0(const std::string& response) = 0;
-};
 
 template <typename MessageType>
 class reply {

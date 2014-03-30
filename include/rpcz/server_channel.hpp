@@ -13,18 +13,16 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_SERVICE_H
-#define RPCZ_SERVICE_H
+#ifndef RPCZ_SERVER_CHANNEL_H
+#define RPCZ_SERVER_CHANNEL_H
 
-#include <assert.h>
 #include <string>
 
 namespace google {
 namespace protobuf {
 class Message;
-class MethodDescriptor;
-class ServiceDescriptor;
 }  // namespace protobuf
 }  // namespace google
 
@@ -42,50 +40,6 @@ class server_channel {
   virtual void send0(const std::string& response) = 0;
 };
 
-template <typename MessageType>
-class reply {
- public:
-  explicit reply(server_channel* channel) :
-      channel_(channel), replied_(false) {
-  }
+}  // namespace rpcz
 
-  ~reply() { }
-
-  void send(const MessageType& response) {
-    assert(!replied_);
-    channel_->send(response);
-    delete channel_;
-    replied_ = true;
-  }
-
-  void Error(int application_error, const std::string& error_message="") {
-    assert(!replied_);
-    channel_->send_error(application_error, error_message);
-    delete channel_;
-    replied_ = true;
-  }
-
- private:
-  server_channel* channel_;
-  bool replied_;
-};
-
-class service {
- public:
-  service() { };
-
-  virtual ~service() {};
-
-  virtual const google::protobuf::ServiceDescriptor* GetDescriptor() = 0;
-
-  virtual const google::protobuf::Message& GetRequestPrototype(
-      const google::protobuf::MethodDescriptor*) const = 0;
-  virtual const google::protobuf::Message& GetResponsePrototype(
-      const google::protobuf::MethodDescriptor*) const = 0;
-
-  virtual void call_method(const google::protobuf::MethodDescriptor* method,
-                          const google::protobuf::Message& request,
-                          server_channel* server_channel) = 0;
-};
-}  // namespace
-#endif
+#endif  // RPCZ_SERVER_CHANNEL_H

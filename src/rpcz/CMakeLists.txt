@@ -20,6 +20,7 @@ set(RPCZ_SOURCES
     connection_manager.cc 
     event_id_generator.cc
     reactor.cc
+    request_handler.cc
     rpc_controller.cc
     rpc_channel.cc
     rpc_channel_impl.cc

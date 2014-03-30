@@ -126,10 +126,5 @@ class rpc_error : public std::runtime_error {
   int application_error_code_;
 };
 
-class invalid_message_error : public std::runtime_error {
- public:
-  explicit invalid_message_error(const std::string& message)
-      : std::runtime_error(message) {}
-};
 }  // namespace
 #endif

@@ -37,70 +37,10 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_service.hpp"
-#include "rpcz/rpcz.pb.h"
 #include "rpcz/service.hpp"
-#include "zmq_utils.hpp"
+#include "server_channel_impl.hpp"
 
 namespace rpcz {
-
-class server_channel_impl : public server_channel {
- public:
-  server_channel_impl(const client_connection& connection)
-      : connection_(connection) {
-      }
-
-  virtual void send(const google::protobuf::Message& response) {
-    rpc_response_header generic_rpc_response;
-    int msg_size = response.ByteSize();
-    scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
-    if (!response.SerializeToArray(payload->data(), msg_size)) {
-      throw invalid_message_error("Invalid response message");
-    }
-    send_generic_response(generic_rpc_response,
-                        payload.release());
-  }
-
-  virtual void send0(const std::string& response) {
-    rpc_response_header generic_rpc_response;
-    send_generic_response(generic_rpc_response,
-                        string_to_message(response));
-  }
-
-  virtual void send_error(int application_error,
-                          const std::string& error_message="") {
-    rpc_response_header generic_rpc_response;
-    zmq::message_t* payload = new zmq::message_t();
-    generic_rpc_response.set_status(status::APPLICATION_ERROR);
-    generic_rpc_response.set_application_error(application_error);
-    if (!error_message.empty()) {
-      generic_rpc_response.set_error(error_message);
-    }
-    send_generic_response(generic_rpc_response,
-                        payload);
-  }
-
- private:
-  client_connection connection_;
-  scoped_ptr<google::protobuf::Message> request_;
-
-  // Sends the response back to a function server_impl through the reply function.
-  // Takes ownership of the provided payload message.
-  void send_generic_response(const rpc_response_header& generic_rpc_response,
-                           zmq::message_t* payload) {
-    size_t msg_size = generic_rpc_response.ByteSize();
-    zmq::message_t* zmq_response_message = new zmq::message_t(msg_size);
-    CHECK(generic_rpc_response.SerializeToArray(
-            zmq_response_message->data(),
-            msg_size));
-
-    message_vector v;
-    v.push_back(zmq_response_message);
-    v.push_back(payload);
-    connection_.reply(&v);
-  }
-
-  friend class proto_rpc_service;
-};
 
 class proto_rpc_service : public rpc_service {
  public:
@@ -152,11 +92,12 @@ server_impl::~server_impl() {
     connection_manager_ptr_->unbind(v);
   endpoints_.clear();
 
+  // XXX Move to request_handler
   // Delete proto_rpc_service pointers.
-  rpc_service_map map_copy = service_map_;
-  BOOST_FOREACH(const rpc_service_map::value_type & v, map_copy)
-      unregister_service(v.first);
-  assert(service_map_.empty());
+  //rpc_service_map map_copy = service_map_;
+  //BOOST_FOREACH(const rpc_service_map::value_type & v, map_copy)
+  //    unregister_service(v.first);
+  //assert(service_map_.empty());
 }
 
 void server_impl::register_service(rpcz::service& service,
@@ -173,61 +114,25 @@ void server_impl::register_service_factory(service_factory_ptr factory,
 void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
                                        const std::string& name) {
   unregister_service(name);
-  service_map_[name] = rpc_service;
+  // XXX service_map_[name] = rpc_service;
 }
 
 void server_impl::unregister_service(const std::string& name)
 {
-  rpc_service_map::const_iterator it = service_map_.find(name);
-  if (it == service_map_.end()) return;
-  assert((*it).second);
-  delete (*it).second;
-  service_map_.erase(it);
+  // XXX
+  //rpc_service_map::const_iterator it = service_map_.find(name);
+  //if (it == service_map_.end()) return;
+  //assert((*it).second);
+  //delete (*it).second;
+  //service_map_.erase(it);
 }
 
 void server_impl::bind(const std::string& endpoint) {
   // Record endpoints for unbind later. (Server can multi bind.)
   if (!endpoints_.insert(endpoint).second)
     return;  // already bound
-  server_function f = boost::bind(&server_impl::handle_request, this, _1, _2);
-  connection_manager_ptr_->bind(endpoint, f);
+  // XXX server_function f = boost::bind(&server_impl::handle_request, this, _1, _2);
+  connection_manager_ptr_->bind(endpoint);
 }
 
-void server_impl::handle_request(const client_connection& connection,
-                            message_iterator& iter) {
-  if (!iter.has_more()) {
-    return;
-  }
-  rpc_request_header rpc_request_header;
-  scoped_ptr<server_channel> channel(new server_channel_impl(connection));
-  {
-    zmq::message_t& msg = iter.next();
-    if (!rpc_request_header.ParseFromArray(msg.data(), msg.size())) {
-      // Handle bad rpc.
-      DLOG(INFO) << "Received bad header.";
-      channel->send_error(application_error::INVALID_HEADER);
-      return;
-    };
-  }
-  if (!iter.has_more()) {
-    return;
-  }
-  zmq::message_t& payload = iter.next();
-  if (iter.has_more()) {
-    return;
-  }
-
-  rpc_service_map::const_iterator service_it = service_map_.find(
-      rpc_request_header.service());
-  if (service_it == service_map_.end()) {
-    // Handle invalid service.
-    DLOG(INFO) << "Invalid service: " << rpc_request_header.service();
-    channel->send_error(application_error::NO_SUCH_SERVICE);
-    return;
-  }
-  rpcz::rpc_service* service = service_it->second;
-  service->dispatch_request(rpc_request_header.method(),
-                           payload.data(), payload.size(),
-                           channel.release());
-}
-}  // namespace
+}  // namespace rpcz

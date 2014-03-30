@@ -20,6 +20,7 @@
 #include <zmq.hpp>
 
 #include "rpcz/callback.hpp"
+#include "rpcz/invalid_message_error.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/sync_event.hpp"
 #include "logging.hpp"

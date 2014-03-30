@@ -41,6 +41,7 @@
 #include "logging.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/sync_event.hpp"
+#include "server_function.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {
@@ -168,13 +169,12 @@ connection connection_manager::connect(const std::string& endpoint) {
   return connection(connection_id);
 }
 
-void connection_manager::bind(const std::string& endpoint,
-                             server_function function) {
+void connection_manager::bind(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kBind, ZMQ_SNDMORE);
   send_string(&socket, endpoint, ZMQ_SNDMORE);
-  send_object(&socket, function, 0);
+  // XXX send_object(&socket, function, 0);
   zmq::message_t msg;
   socket.recv(&msg);
   socket.recv(&msg);

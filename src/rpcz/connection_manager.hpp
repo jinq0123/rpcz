@@ -26,7 +26,6 @@
 #include "connection_manager_status.hpp"
 #include "rpcz/common.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
-#include "server_function.hpp"
 
 namespace zmq {
 class context_t;
@@ -85,12 +84,9 @@ class connection_manager : boost::noncopyable {
   // to communicate with this endpoint.
   connection connect(const std::string& endpoint);
 
-  // binds a socket to the given endpoint and registers server_function as a
-  // handler for requests to this socket. The function gets executed on one of
-  // the worker threads. When the function returns, the endpoint is already
-  // bound.
-  void bind(const std::string& endpoint, server_function function);
-  // Unbind socket and unregister server_function.
+  // binds a socket to the given endpoint. 
+  void bind(const std::string& endpoint);
+  // Unbind socket of the given endpoint.
   void unbind(const std::string& endpoint);
 
   // Executes the closure on one of the worker threads.
