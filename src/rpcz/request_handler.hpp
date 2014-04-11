@@ -11,7 +11,9 @@ class client_connection;
 class message_iterator;
 class rpc_service;
 
+// Each client has its request_hander.
 // Used in broker thread.
+// TODO: Run in the same worker thread.
 // Non-thread-safe.
 class request_handler {
  public:

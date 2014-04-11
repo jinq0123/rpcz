@@ -182,10 +182,12 @@ void broker_thread::handle_socket_deleted(const std::string sender)
 
 void broker_thread::handle_server_socket(uint64 socket_id) {
     message_iterator iter(*server_sockets_[socket_id]);
-    begin_worker_command(krunserver_function);
-    // XXX send_object(frontend_socket_, server_function, ZMQ_SNDMORE);
+    std::string sender(message_to_string(iter.next()));
+    if (iter.next().size() != 0) return;
+	request_handler * handler = request_handler_manager_.get_request_handler(sender);
+    begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, krunserver_function)
+	send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, socket_id, ZMQ_SNDMORE);
-    // XXX Call request_handler...
     forward_messages(iter, *frontend_socket_);
 }
 

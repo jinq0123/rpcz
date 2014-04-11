@@ -30,9 +30,10 @@ const char kUnbind  = 0x04;      // unbind an endpoint.
 const char kReply   = 0x05;      // reply to a request
 const char kQuit    = 0x0f;      // Starts the quit second.
 
+// TODO: Use CamelName style.
 // Messages sent from the broker to a worker thread:
 const char krunclosure        = 0x11;   // run a closure
-const char krunserver_function = 0x12;   // Handle a request (a reply path
+const char kHandleRequest     = 0x12;   // Handle a request (a reply path
                                         // is given)
 const char kInvokeclient_request_callback = 0x13;  // run a user supplied
                                                  // function that processes

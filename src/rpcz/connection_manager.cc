@@ -67,16 +67,12 @@ void worker_thread(connection_manager* connection_manager,
       case krunclosure:
         interpret_message<closure*>(iter.next())->run();
         break;
-      case krunserver_function: {
-        server_function sf =
-            interpret_message<server_function>(iter.next());
+      case kHandleRequest: {
+        request_handler * handler =
+            interpret_message<request_handler*>(iter.next());
         uint64 socket_id = interpret_message<uint64>(iter.next());
-        std::string sender(message_to_string(iter.next()));
-        if (iter.next().size() != 0) {
-          break;
-        }
         std::string event_id(message_to_string(iter.next()));
-        sf(client_connection(connection_manager, socket_id, sender, event_id),
+        handler->handle_request(client_connection(connection_manager, socket_id, sender, event_id),
            iter);
         }
         break;
