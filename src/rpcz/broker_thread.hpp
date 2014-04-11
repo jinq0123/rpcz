@@ -21,6 +21,7 @@
 #include "client_request_callback.hpp"
 #include "event_id_generator.hpp"
 #include "reactor.hpp"
+#include "request_handler_manager.hpp"
 
 namespace rpcz {
 
@@ -89,6 +90,7 @@ class broker_thread {
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;
   int current_worker_;
+  request_handler_manager request_handler_manager_;
 };
 
 }  // namespace rpcz

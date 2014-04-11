@@ -44,6 +44,8 @@
 #include "server_function.hpp"
 #include "zmq_utils.hpp"
 
+#include "request_handler.hpp"  // TODO: extract worker_thread
+
 namespace rpcz {
 
 connection_manager::weak_ptr connection_manager::this_weak_ptr_;
@@ -71,6 +73,7 @@ void worker_thread(connection_manager* connection_manager,
         request_handler * handler =
             interpret_message<request_handler*>(iter.next());
         uint64 socket_id = interpret_message<uint64>(iter.next());
+		std::string sender(message_to_string(iter.next()));
         std::string event_id(message_to_string(iter.next()));
         handler->handle_request(client_connection(connection_manager, socket_id, sender, event_id),
            iter);
