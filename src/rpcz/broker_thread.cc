@@ -78,7 +78,6 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
         break;
       case kBind: {
         std::string endpoint(message_to_string(iter.next()));
-        // XXX server_function sf(interpret_message<server_function>(iter.next()));
         handle_bind_command(sender, endpoint);
         break;
       }

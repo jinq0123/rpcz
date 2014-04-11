@@ -41,7 +41,6 @@
 #include "logging.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/sync_event.hpp"
-#include "server_function.hpp"
 #include "zmq_utils.hpp"
 
 #include "request_handler.hpp"  // TODO: extract worker_thread
@@ -173,7 +172,6 @@ void connection_manager::bind(const std::string& endpoint) {
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kBind, ZMQ_SNDMORE);
   send_string(&socket, endpoint, ZMQ_SNDMORE);
-  // XXX send_object(&socket, function, 0);
   zmq::message_t msg;
   socket.recv(&msg);
   socket.recv(&msg);

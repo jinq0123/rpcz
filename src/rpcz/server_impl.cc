@@ -131,7 +131,6 @@ void server_impl::bind(const std::string& endpoint) {
   // Record endpoints for unbind later. (Server can multi bind.)
   if (!endpoints_.insert(endpoint).second)
     return;  // already bound
-  // XXX server_function f = boost::bind(&server_impl::handle_request, this, _1, _2);
   connection_manager_ptr_->bind(endpoint);
 }
 

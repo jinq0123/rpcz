@@ -196,7 +196,7 @@ TEST_F(connection_manager_test, TestBindServer) {
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
-  cm->bind("inproc://server.point");  // XXX, &handle_request);
+  cm->bind("inproc://server.point");
   connection c = cm->connect("inproc://server.point");
   message_vector v;
   v.push_back(string_to_message("317"));
@@ -210,7 +210,7 @@ TEST_F(connection_manager_test, TestUnbind) {
   ASSERT_EQ(0, connection_manager::use_count());
   connection_manager_ptr cm = connection_manager::get();
   const char kEndpoint[] = "inproc://server.point";
-  cm->bind(kEndpoint);  // XXX, &handle_request);
+  cm->bind(kEndpoint);
   cm->unbind(kEndpoint);
 }
 
