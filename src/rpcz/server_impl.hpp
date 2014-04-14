@@ -22,6 +22,7 @@
 #include <boost/noncopyable.hpp>
 #include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/service_factory_ptr.hpp"
+#include "service_factory_map.hpp"
 
 namespace rpcz {
 class rpc_service;
@@ -58,6 +59,8 @@ class server_impl : boost::noncopyable {
   typedef std::set<std::string> bind_endpoint_set;
   bind_endpoint_set endpoints_;
   bool binding_;  // To ignore registeration after bind.
+  service_factory_map service_factory_map_;
+  // TODO: use thread-safe service_factories to allow register after bind.
 };
 
 }  // namespace rpcz

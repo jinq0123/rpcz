@@ -15,7 +15,7 @@ request_handler_manager::~request_handler_manager(void)
 }
 
 request_handler * request_handler_manager::create_handler(
-	const std::string & sender)
+	const std::string & sender, const service_factory_map & factories)
 {
 	assert(handler_map_.find(sender) == handler_map_.end());
 	// New request_handler. TODO: delete request_handler

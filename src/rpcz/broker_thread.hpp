@@ -22,6 +22,7 @@
 #include "event_id_generator.hpp"
 #include "reactor.hpp"
 #include "request_handler_manager.hpp"
+#include "service_factory_map.hpp"
 
 namespace rpcz {
 
@@ -55,7 +56,8 @@ class broker_thread {
 
   void handle_bind_command(
       const std::string& sender,
-      const std::string& endpoint);
+      const std::string& endpoint,
+	  const service_factory_map& factories);
 
   void handle_unbind_command(
       const std::string& sender,
@@ -64,7 +66,8 @@ class broker_thread {
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
 
-  void handle_server_socket(uint64 socket_id);
+  void handle_server_socket(uint64 socket_id,
+	  const service_factory_map * factories);  // TODO: use reference instead of pointer
 
   inline void send_request(message_iterator& iter);
 

@@ -5,6 +5,7 @@
 
 #include <boost/unordered_map.hpp>
 #include "request_handler_ptr.hpp"
+#include "service_factory_map.hpp"
 
 namespace rpcz {
 
@@ -18,10 +19,12 @@ public:
 	virtual ~request_handler_manager(void);
 
 public:
-	inline request_handler * get_handler(const std::string & sender);
+	inline request_handler * get_handler(const std::string & sender,
+		const service_factory_map & factories);
 
 private:
-	request_handler * create_handler(const std::string & sender);
+	request_handler * create_handler(const std::string & sender,
+		const service_factory_map & factories);
 
 private:
 	typedef boost::unordered_map<std::string, request_handler_ptr> handler_map;
@@ -29,12 +32,12 @@ private:
 };
 
 request_handler * request_handler_manager::get_handler(
-	const std::string & sender)
+	const std::string & sender, const service_factory_map & factories)
 {
 	handler_map::const_iterator iter = handler_map_.find(sender);
 	if (iter != handler_map_.end())
 		return (*iter).second.get();
-	return create_handler(sender);
+	return create_handler(sender, factories);
 }
 
 }  // namespace rpcz

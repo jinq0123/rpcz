@@ -167,11 +167,13 @@ connection connection_manager::connect(const std::string& endpoint) {
   return connection(connection_id);
 }
 
-void connection_manager::bind(const std::string& endpoint) {
+void connection_manager::bind(const std::string& endpoint,
+	const service_factory_map & factories) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kBind, ZMQ_SNDMORE);
   send_string(&socket, endpoint, ZMQ_SNDMORE);
+  send_pointer(&socket, &factories, 0);
   zmq::message_t msg;
   socket.recv(&msg);
   socket.recv(&msg);

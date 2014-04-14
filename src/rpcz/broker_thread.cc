@@ -78,7 +78,10 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
         break;
       case kBind: {
         std::string endpoint(message_to_string(iter.next()));
-        handle_bind_command(sender, endpoint);
+		const service_factory_map * factories
+			= interpret_message<const service_factory_map *>(iter.next());
+		assert(factories);
+        handle_bind_command(sender, endpoint, *factories);
         break;
       }
       case kUnbind: {
@@ -142,7 +145,8 @@ void broker_thread::handle_connect_command(
 
 void broker_thread::handle_bind_command(
       const std::string& sender,
-      const std::string& endpoint) {
+      const std::string& endpoint,
+	  const service_factory_map & factories) {
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -152,7 +156,7 @@ void broker_thread::handle_bind_command(
     bind_map_[endpoint] = socket;  // for unbind
     // reactor will own socket and callback.
     reactor_.add_socket(socket, new_permanent_callback(
-        this, &broker_thread::handle_server_socket, socket_id));
+        this, &broker_thread::handle_server_socket, socket_id, &factories));
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -179,11 +183,14 @@ void broker_thread::handle_socket_deleted(const std::string sender)
     send_empty_message(frontend_socket_, 0);
 }
 
-void broker_thread::handle_server_socket(uint64 socket_id) {
+void broker_thread::handle_server_socket(uint64 socket_id,
+		const service_factory_map * factories) {
+	assert(factories);
     message_iterator iter(*server_sockets_[socket_id]);
     std::string sender(message_to_string(iter.next()));
     if (iter.next().size() != 0) return;
-	request_handler * handler = request_handler_manager_.get_handler(sender);
+	request_handler * handler = request_handler_manager_
+		.get_handler(sender, *factories);
 	assert(NULL != handler);
     begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, krunserver_function)
 	send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);

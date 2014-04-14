@@ -26,6 +26,7 @@
 #include "connection_manager_status.hpp"
 #include "rpcz/common.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
+#include "service_factory_map.hpp"
 
 namespace zmq {
 class context_t;
@@ -85,7 +86,7 @@ class connection_manager : boost::noncopyable {
   connection connect(const std::string& endpoint);
 
   // binds a socket to the given endpoint. 
-  void bind(const std::string& endpoint);
+  void bind(const std::string& endpoint, const service_factory_map & factories);
   // Unbind socket of the given endpoint.
   void unbind(const std::string& endpoint);
 
