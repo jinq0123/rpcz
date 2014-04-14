@@ -31,12 +31,12 @@ server::server()
 server::~server() {
 }
 
-void server::register_service(rpcz::service& service) {
-  impl_->register_service(service, service.GetDescriptor()->name());
+void server::register_singleton_service(rpcz::service& service) {
+  impl_->register_singleton_service(service, service.GetDescriptor()->name());
 }
 
-void server::register_service(rpcz::service& service, const std::string& name) {
-  impl_->register_service(service, name);
+void server::register_singleton_service(rpcz::service& service, const std::string& name) {
+  impl_->register_singleton_service(service, name);
 }
 
 void server::register_rpc_service(rpcz::rpc_service* rpc_service,

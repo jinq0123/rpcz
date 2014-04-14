@@ -21,6 +21,7 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 #include "rpcz/common.hpp"  // for scoped_ptr
+#include "rpcz/default_service_factory.hpp"
 #include "rpcz/service_factory_ptr.hpp"
 
 namespace rpcz {
@@ -36,13 +37,16 @@ class server : boost::noncopyable {
   server();
   ~server();
 
-  // Registers an rpc service with this server. All registrations must occur
-  // before bind() is called. The name parameter identifies the service for
-  // external clients. If you use the first form, the service name from the
+  // Registers an rpc service with this server. 
+  // All registrations must occur before bind() is called. TODO: allow after bind()
+  // The name parameter identifies the service for external clients.
+  // If you use the first form, the service name from the
   // protocol buffer definition will be used.
   // It does not take ownership of the provided service.
-  void register_service(service& service);
-  void register_service(service& service, const std::string& name);
+  // Singleton service means all client share the same service instance.
+  // service must be thread-safe if using multi worker threads.
+  void register_singleton_service(service& service);
+  void register_singleton_service(service& service, const std::string& name);
 
   template <typename Service>
   void register_service();
@@ -71,13 +75,14 @@ class server : boost::noncopyable {
 };  // class server
 
 template <typename Service>
-void register_service() {
-  register_service<Service>(Service::descriptor()->name);
+void server::register_service() {
+  register_service<Service>(Service::descriptor()->name());
 }
 
 template <typename Service>
-void register_service(const std::string& name) {
-  register_service_factory(default_service_factory<Service>(), name);
+void server::register_service(const std::string& name) {
+  service_factory_ptr factory(new default_service_factory<Service>);  // shared_ptr
+  register_service_factory(factory, name);
 }
 
 }  // namespace rpcz
