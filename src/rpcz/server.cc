@@ -21,6 +21,7 @@
 
 #include "rpcz/service.hpp"
 #include "server_impl.hpp"
+#include "singleton_service_factory.hpp"
 
 namespace rpcz {
 
@@ -32,11 +33,12 @@ server::~server() {
 }
 
 void server::register_singleton_service(rpcz::service& service) {
-  impl_->register_singleton_service(service, service.GetDescriptor()->name());
+  register_singleton_service(service, service.GetDescriptor()->name());
 }
 
 void server::register_singleton_service(rpcz::service& service, const std::string& name) {
-  impl_->register_singleton_service(service, name);
+  service_factory_ptr factory(new singleton_service_factory(service));  // shared_ptr
+  impl_->register_service_factory(factory, name);
 }
 
 void server::register_rpc_service(rpcz::rpc_service* rpc_service,

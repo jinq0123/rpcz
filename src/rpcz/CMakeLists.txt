@@ -27,6 +27,7 @@ set(RPCZ_SOURCES
     rpc_channel_impl.cc
     server.cc
     server_impl.cc
+    singleton_service_factory.cc
     sync_event.cc
     zmq_utils.cc
     ${PROTO_SOURCES})
