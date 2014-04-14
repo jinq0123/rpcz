@@ -54,7 +54,6 @@ class server : boost::noncopyable {
 
   // TODO: unregister_service()
   // TODO: register_service() after bind()
-  // TODO: register_service_factory(), which creates service for each connection.
 
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. It takes ownership of the rpc_service
@@ -62,6 +61,7 @@ class server : boost::noncopyable {
 
  private:
   // TODO: Public it to allow customised factory.
+  // service_factory creates service for each connection.
   void register_service_factory(service_factory_ptr factory, const std::string & name);
 
  private:

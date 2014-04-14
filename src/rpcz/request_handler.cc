@@ -2,6 +2,8 @@
 
 #include "request_handler.hpp"
 
+#include <boost/foreach.hpp>
+
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/rpcz.pb.h"  // for rpc_request_header
 #include "server_channel_impl.hpp"
@@ -13,6 +15,11 @@ request_handler::request_handler() {
 }
 
 request_handler::~request_handler() {
+  // Delete proto_rpc_service pointers.
+  rpc_service_map map_copy = service_map_;
+  BOOST_FOREACH(const rpc_service_map::value_type & v, map_copy)
+      unregister_rpc_service(v.first);
+  assert(service_map_.empty());
 }
 
 void request_handler::handle_request(const client_connection& connection,
@@ -52,5 +59,19 @@ void request_handler::handle_request(const client_connection& connection,
                            payload.data(), payload.size(),
                            channel.release());
 }  // handle_request()
+
+void request_handler::register_rpc_service(rpcz::rpc_service* rpc_service,
+                                           const std::string& name) {
+  unregister_rpc_service(name);
+  service_map_[name] = rpc_service;
+}
+
+void request_handler::unregister_rpc_service(const std::string& name) {
+  rpc_service_map::const_iterator iter = service_map_.find(name);
+  if (iter == service_map_.end()) return;
+  assert((*iter).second);
+  delete (*iter).second;
+  service_map_.erase(iter);
+}
 
 }  // namespace rpcz

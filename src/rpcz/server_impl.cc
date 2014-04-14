@@ -91,13 +91,6 @@ server_impl::~server_impl() {
   BOOST_FOREACH(const bind_endpoint_set::value_type & v, endpoints_)
     connection_manager_ptr_->unbind(v);
   endpoints_.clear();
-
-  // XXX Move to request_handler
-  // Delete proto_rpc_service pointers.
-  //rpc_service_map map_copy = service_map_;
-  //BOOST_FOREACH(const rpc_service_map::value_type & v, map_copy)
-  //    unregister_service(v.first);
-  //assert(service_map_.empty());
 }
 
 void server_impl::register_service(rpcz::service& service,
@@ -117,8 +110,7 @@ void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
   // XXX service_map_[name] = rpc_service;
 }
 
-void server_impl::unregister_service(const std::string& name)
-{
+void server_impl::unregister_service(const std::string& name) {
   // XXX
   //rpc_service_map::const_iterator it = service_map_.find(name);
   //if (it == service_map_.end()) return;

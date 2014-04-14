@@ -24,6 +24,14 @@ class request_handler {
   void handle_request(const client_connection& connection,
                       message_iterator& iter);
 
+ public:
+  // register_rpc_service() will take the ownership of rpc_service.
+  void register_rpc_service(rpcz::rpc_service* rpc_service,
+                            const std::string& name);
+
+ private:
+  void unregister_rpc_service(const std::string& name);
+
  private:
   typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
   rpc_service_map service_map_;  // Owns rpc_service. Delete in destructor.
