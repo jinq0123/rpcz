@@ -103,8 +103,9 @@ void server_impl::register_service(rpcz::service& service,
 
 void server_impl::register_service_factory(service_factory_ptr factory,
                                            const std::string& name) {
-  if (binding_) return;
-  // TODO
+  assert(factory);
+  if (binding_) return;  // Must register before bind().
+  service_factory_map_[name] = factory;
 }
 
 void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
