@@ -20,6 +20,7 @@ request_handler * request_handler_manager::create_handler(
 	assert(handler_map_.find(sender) == handler_map_.end());
 	// New request_handler. TODO: delete request_handler
 	request_handler_ptr handler_ptr(new request_handler);  // shared_ptr
+	// XXX Create service for this handler...
 	handler_map_.insert(std::make_pair(sender, handler_ptr));
 	return handler_ptr.get();
 }

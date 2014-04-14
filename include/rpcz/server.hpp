@@ -53,7 +53,9 @@ class server : boost::noncopyable {
   void bind(const std::string& endpoint);
 
   // TODO: unregister_service()
-  // TODO: register_service() after bind()
+
+  // Must register service before bind.
+  // Registeration after bind will be ignored.
 
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. It takes ownership of the rpc_service

@@ -44,7 +44,7 @@ class server_impl : boost::noncopyable {
 
   void bind(const std::string& endpoint);
 
-  // TODO: register_service() after bind()
+  // Must register service before bind. Registeration after bind will be ignored.
 
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. Owns rpc_service.
@@ -57,6 +57,7 @@ class server_impl : boost::noncopyable {
   connection_manager_ptr connection_manager_ptr_;
   typedef std::set<std::string> bind_endpoint_set;
   bind_endpoint_set endpoints_;
+  bool binding_;  // To ignore registeration after bind.
 };
 
 }  // namespace rpcz
