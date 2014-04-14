@@ -1,11 +1,11 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_SERVICE_FACTORY_H
-#define RPCZ_SERVICE_FACTORY_H
+#ifndef RPCZ_SERVICE_FACTORY_HPP
+#define RPCZ_SERVICE_FACTORY_HPP
+
+#include "service_ptr.hpp"
 
 namespace rpcz {
-
-class service;
 
 class service_factory {
  public:
@@ -13,9 +13,9 @@ class service_factory {
   virtual ~service_factory() {};
 
  public:
-  virtual service * create() = 0;
+  virtual service_ptr make() = 0;
 };
 
 }  // namespace rpcz
 
-#endif  // RPCZ_SERVICE_FACTORY_H
+#endif  // RPCZ_SERVICE_FACTORY_HPP
