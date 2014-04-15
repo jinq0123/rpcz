@@ -12,7 +12,7 @@ public:
 	singleton_service_factory(service & svc);
 
 public:
-	virtual service_ptr make();
+	virtual service * create();
 
 private:
 	service & service_;

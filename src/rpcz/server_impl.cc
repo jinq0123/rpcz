@@ -37,15 +37,6 @@ server_impl::~server_impl() {
   endpoints_.clear();
 }
 
-// DEL
-//void server_impl::register_singleton_service(rpcz::service& service,
-//                                             const std::string& name) {
-//  if (binding_) return;
-//  // XXX Singleton factory...
-//  register_rpc_service(
-//      new proto_rpc_service(service), name);  // deleted in unregister_service()
-//}
-
 void server_impl::register_service_factory(service_factory_ptr factory,
                                            const std::string& name) {
   assert(factory);

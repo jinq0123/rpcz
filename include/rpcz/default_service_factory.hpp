@@ -11,8 +11,8 @@ namespace rpcz {
 template <typename Service>
 class default_service_factory : public service_factory {
  public:
-  virtual service_ptr make() {
-	  return boost::make_shared<Service>();
+  virtual service * create() {
+	  return new Service;
   }
 };
 

@@ -3,17 +3,16 @@
 #ifndef RPCZ_SERVICE_FACTORY_HPP
 #define RPCZ_SERVICE_FACTORY_HPP
 
-#include "service_ptr.hpp"
-
 namespace rpcz {
 
+class service;
 class service_factory {
  public:
   service_factory() {};
   virtual ~service_factory() {};
 
  public:
-  virtual service_ptr make() = 0;
+  virtual service * create() = 0;
 };
 
 }  // namespace rpcz

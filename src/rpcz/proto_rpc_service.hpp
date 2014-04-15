@@ -18,7 +18,9 @@
 #ifndef RPCZ_PROTO_RPC_SERVICE_HPP
 #define RPCZ_PROTO_RPC_SERVICE_HPP
 
+#include <assert.h>
 #include <string>
+
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/service.hpp"
@@ -28,8 +30,13 @@ namespace rpcz {
 
 class proto_rpc_service : public rpc_service {
  public:
-  // Does not take ownership of the provided service.
-  explicit proto_rpc_service(service& service) : service_(service) {
+  // It will take ownership of the provided service.
+  explicit proto_rpc_service(service * svc) : service_(svc) {
+      assert(svc);
+  }
+
+  virtual ~proto_rpc_service() {
+      delete service_;
   }
 
   virtual void dispatch_request(const std::string& method,
@@ -39,7 +46,7 @@ class proto_rpc_service : public rpc_service {
         static_cast<server_channel_impl*>(channel_));
 
     const ::google::protobuf::MethodDescriptor* descriptor =
-        service_.GetDescriptor()->FindMethodByName(
+        service_->GetDescriptor()->FindMethodByName(
             method);
     if (descriptor == NULL) {
       // Invalid method name
@@ -48,7 +55,7 @@ class proto_rpc_service : public rpc_service {
       return;
     }
     channel->request_.reset(CHECK_NOTNULL(
-            service_.GetRequestPrototype(descriptor).New()));
+            service_->GetRequestPrototype(descriptor).New()));
     if (!channel->request_->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
@@ -56,13 +63,13 @@ class proto_rpc_service : public rpc_service {
       return;
     }
     server_channel_impl* channel_ptr = channel.release();
-    service_.call_method(descriptor,
+    service_->call_method(descriptor,
                          *channel_ptr->request_,
                          channel_ptr);
   }
 
  private:
-  service& service_;
+  service * service_;
 };
 
 }  // namespace rpcz

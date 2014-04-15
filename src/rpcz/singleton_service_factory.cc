@@ -12,9 +12,9 @@ singleton_service_factory::singleton_service_factory(service & svc)
 	: service_(svc) {
 }
 
-service_ptr singleton_service_factory::make()
+service * singleton_service_factory::create()
 {
-	return boost::make_shared<mono_state_service>(service_);
+	return new mono_state_service(service_);
 }
 
 }  // namespace rpcz

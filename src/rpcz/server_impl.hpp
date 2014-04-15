@@ -36,12 +36,9 @@ class server_impl : boost::noncopyable {
   server_impl();
   ~server_impl();
 
-  // Registers an rpc service with this server_impl.
-  // All registrations must occur before bind() is called. TODO: allow ater
+  // Registers an rpc service factory with this server_impl.
+  // All registrations must occur before bind() is called. TODO: allow after
   // The name parameter identifies the service for external clients. 
-  // Does not take ownership of the provided service.
-  // Singleton means all clients share the same service instance.
-  // DEL void register_singleton_service(service& service, const std::string& name);
 
   void register_service_factory(service_factory_ptr factory, const std::string& name);
 
