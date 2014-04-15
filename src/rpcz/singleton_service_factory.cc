@@ -4,6 +4,8 @@
 
 #include <boost/make_shared.hpp>
 
+#include "mono_state_service.hpp"
+
 namespace rpcz {
 
 singleton_service_factory::singleton_service_factory(service & svc)
