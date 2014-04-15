@@ -15,27 +15,11 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "server_impl.hpp"
+#ifndef RPCZ_PROTO_RPC_SERVICE_HPP
+#define RPCZ_PROTO_RPC_SERVICE_HPP
 
-#include <signal.h>
-#include <string.h>
-#include <functional>
-#include <iostream>
-#include <utility>
-
-#include <boost/bind.hpp>
-#include <boost/foreach.hpp>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/stubs/common.h>
-#include <zmq.hpp>
-
-#include "client_connection.hpp"
-#include "connection_manager.hpp"
-#include "logging.hpp"
-#include "rpcz/application.hpp"
-#include "rpcz/callback.hpp"
-#include "rpcz/rpc_controller.hpp"
+#include <string>
+#include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/service.hpp"
 #include "server_channel_impl.hpp"
@@ -81,56 +65,6 @@ class proto_rpc_service : public rpc_service {
   service& service_;
 };
 
-server_impl::server_impl()
-  : connection_manager_ptr_(connection_manager::get()),
-	binding_(false) {
-  assert(connection_manager_ptr_);
-}
-
-server_impl::~server_impl() {
-  // unbind first
-  BOOST_FOREACH(const bind_endpoint_set::value_type & v, endpoints_)
-    connection_manager_ptr_->unbind(v);
-  endpoints_.clear();
-}
-
-void server_impl::register_singleton_service(rpcz::service& service,
-                                   const std::string& name) {
-  if (binding_) return;
-  // XXX Singleton factory...
-  register_rpc_service(
-      new proto_rpc_service(service), name);  // deleted in unregister_service()
-}
-
-void server_impl::register_service_factory(service_factory_ptr factory,
-                                           const std::string& name) {
-  assert(factory);
-  if (binding_) return;  // Must register before bind().
-  service_factory_map_[name] = factory;
-}
-
-void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
-                                       const std::string& name) {
-  if (binding_) return;
-  unregister_service(name);
-  // XXX service_map_[name] = rpc_service;
-}
-
-void server_impl::unregister_service(const std::string& name) {
-  // XXX
-  //rpc_service_map::const_iterator it = service_map_.find(name);
-  //if (it == service_map_.end()) return;
-  //assert((*it).second);
-  //delete (*it).second;
-  //service_map_.erase(it);
-}
-
-void server_impl::bind(const std::string& endpoint) {
-  binding_ = true;  // Stop registeration after bind.
-  // Record endpoints for unbind later. (Server can multi bind.)
-  if (!endpoints_.insert(endpoint).second)
-    return;  // already bound
-  connection_manager_ptr_->bind(endpoint, service_factory_map_);
-}
-
 }  // namespace rpcz
+
+#endif  // RPCZ_PROTO_RPC_SERVICE_HPP

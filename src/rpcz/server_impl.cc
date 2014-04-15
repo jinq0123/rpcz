@@ -17,69 +17,12 @@
 
 #include "server_impl.hpp"
 
-#include <signal.h>
-#include <string.h>
-#include <functional>
-#include <iostream>
-#include <utility>
-
-#include <boost/bind.hpp>
 #include <boost/foreach.hpp>
-#include <google/protobuf/descriptor.h>
-#include <google/protobuf/message.h>
-#include <google/protobuf/stubs/common.h>
-#include <zmq.hpp>
 
-#include "client_connection.hpp"
 #include "connection_manager.hpp"
-#include "logging.hpp"
-#include "rpcz/application.hpp"
-#include "rpcz/callback.hpp"
-#include "rpcz/rpc_controller.hpp"
-#include "rpcz/rpc_service.hpp"
-#include "rpcz/service.hpp"
-#include "server_channel_impl.hpp"
+#include "proto_rpc_service.hpp"
 
 namespace rpcz {
-
-class proto_rpc_service : public rpc_service {
- public:
-  // Does not take ownership of the provided service.
-  explicit proto_rpc_service(service& service) : service_(service) {
-  }
-
-  virtual void dispatch_request(const std::string& method,
-                               const void* payload, size_t payload_len,
-                               server_channel* channel_) {
-    scoped_ptr<server_channel_impl> channel(
-        static_cast<server_channel_impl*>(channel_));
-
-    const ::google::protobuf::MethodDescriptor* descriptor =
-        service_.GetDescriptor()->FindMethodByName(
-            method);
-    if (descriptor == NULL) {
-      // Invalid method name
-      DLOG(INFO) << "Invalid method name: " << method,
-      channel->send_error(application_error::NO_SUCH_METHOD);
-      return;
-    }
-    channel->request_.reset(CHECK_NOTNULL(
-            service_.GetRequestPrototype(descriptor).New()));
-    if (!channel->request_->ParseFromArray(payload, payload_len)) {
-      DLOG(INFO) << "Failed to parse request.";
-      // Invalid proto;
-      channel->send_error(application_error::INVALID_MESSAGE);
-      return;
-    }
-    server_channel_impl* channel_ptr = channel.release();
-    service_.call_method(descriptor,
-                         *channel_ptr->request_,
-                         channel_ptr);
-  }
-
- private:
-  service& service_;
-};
 
 server_impl::server_impl()
   : connection_manager_ptr_(connection_manager::get()),
