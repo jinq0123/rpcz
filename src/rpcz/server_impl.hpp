@@ -41,7 +41,7 @@ class server_impl : boost::noncopyable {
   // The name parameter identifies the service for external clients. 
   // Does not take ownership of the provided service.
   // Singleton means all clients share the same service instance.
-  void register_singleton_service(service& service, const std::string& name);
+  // DEL void register_singleton_service(service& service, const std::string& name);
 
   void register_service_factory(service_factory_ptr factory, const std::string& name);
 
@@ -52,9 +52,6 @@ class server_impl : boost::noncopyable {
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. Owns rpc_service.
   void register_rpc_service(rpc_service* rpc_service, const std::string& name);
-
- private:
-  void unregister_service(const std::string& name);
 
  private:
   connection_manager_ptr connection_manager_ptr_;

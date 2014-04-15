@@ -37,13 +37,14 @@ server_impl::~server_impl() {
   endpoints_.clear();
 }
 
-void server_impl::register_singleton_service(rpcz::service& service,
-                                   const std::string& name) {
-  if (binding_) return;
-  // XXX Singleton factory...
-  register_rpc_service(
-      new proto_rpc_service(service), name);  // deleted in unregister_service()
-}
+// DEL
+//void server_impl::register_singleton_service(rpcz::service& service,
+//                                             const std::string& name) {
+//  if (binding_) return;
+//  // XXX Singleton factory...
+//  register_rpc_service(
+//      new proto_rpc_service(service), name);  // deleted in unregister_service()
+//}
 
 void server_impl::register_service_factory(service_factory_ptr factory,
                                            const std::string& name) {
@@ -55,17 +56,8 @@ void server_impl::register_service_factory(service_factory_ptr factory,
 void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
                                        const std::string& name) {
   if (binding_) return;
-  unregister_service(name);
+  // unregister_service(name);
   // XXX service_map_[name] = rpc_service;
-}
-
-void server_impl::unregister_service(const std::string& name) {
-  // XXX
-  //rpc_service_map::const_iterator it = service_map_.find(name);
-  //if (it == service_map_.end()) return;
-  //assert((*it).second);
-  //delete (*it).second;
-  //service_map_.erase(it);
 }
 
 void server_impl::bind(const std::string& endpoint) {
