@@ -21,6 +21,10 @@ request_handler * request_handler_manager::create_handler(
 	// New request_handler. TODO: delete request_handler
 	request_handler_ptr handler_ptr(new request_handler);  // shared_ptr
 	// XXX Create service for this handler...
+	BOOST_FOREACH(service_factory_map::value_type & v, factories)
+	{
+		handler_ptr->register_rpc_service();
+	}
 	handler_map_.insert(std::make_pair(sender, handler_ptr));
 	return handler_ptr.get();
 }
