@@ -63,7 +63,7 @@ class server : boost::noncopyable {
 
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. It takes ownership of the rpc_service
-  void register_rpc_service(rpc_service* rpc_service, const std::string& name);
+  // TODO: void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  private:
   // TODO: Public it to allow customised factory.

@@ -53,12 +53,13 @@ void server_impl::register_service_factory(service_factory_ptr factory,
   service_factory_map_[name] = factory;
 }
 
-void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
-                                       const std::string& name) {
-  if (binding_) return;
-  // unregister_service(name);
-  // XXX service_map_[name] = rpc_service;
-}
+// TODO
+//void server_impl::register_rpc_service(rpcz::rpc_service* rpc_service,
+//                                       const std::string& name) {
+//  if (binding_) return;
+//  // unregister_service(name);
+//  // XXX service_map_[name] = rpc_service;
+//}
 
 void server_impl::bind(const std::string& endpoint) {
   binding_ = true;  // Stop registeration after bind.
