@@ -175,39 +175,6 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   thread.join();
 }
 
-// DEL
-//void handle_request(client_connection connection,
-//                   message_iterator& request) {
-//  int value = boost::lexical_cast<int>(message_to_string(request.next()));
-//  message_vector v;
-//  v.push_back(string_to_message(boost::lexical_cast<std::string>(value + 1)));
-//  connection.reply(&v);
-//}
-
-void handle_server_response(sync_event* sync,
-                            connection_manager_status status,
-                            message_iterator& iter) {
-  CHECK_EQ(CMSTATUS_DONE, status);
-  CHECK_EQ("318", message_to_string(iter.next()));
-  sync->signal();
-}
-
-TEST_F(connection_manager_test, TestBindServer) {
-  ASSERT_EQ(0, connection_manager::use_count());
-  application::set_zmq_context(&context);
-  application::set_connection_manager_threads(4);
-  connection_manager_ptr cm = connection_manager::get();
-  service_factory_map m;
-  cm->bind("inproc://server.point", m);
-  connection c = cm->connect("inproc://server.point");
-  message_vector v;
-  v.push_back(string_to_message("317"));
-  sync_event event;
-  c.send_request(v, -1,
-                boost::bind(&handle_server_response, &event, _1, _2));
-  event.wait();
-}
-
 TEST_F(connection_manager_test, TestUnbind) {
   ASSERT_EQ(0, connection_manager::use_count());
   connection_manager_ptr cm = connection_manager::get();
