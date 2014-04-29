@@ -66,7 +66,7 @@ class broker_thread {
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
 
-  void handle_server_socket(uint64 socket_id,
+  void handle_server_socket(uint64 server_socket_idx,
 	  const service_factory_map * factories);  // TODO: use reference instead of pointer
 
   inline void send_request(message_iterator& iter);

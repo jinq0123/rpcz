@@ -33,13 +33,13 @@ class client_connection {
   void reply(message_vector* v);
 
  private:
-  client_connection(connection_manager* manager, uint64 socket_id,
+  client_connection(connection_manager* manager, uint64 server_socket_idx,
                    std::string& sender, std::string& event_id)
-      : manager_(manager), socket_id_(socket_id), sender_(sender),
-      event_id_(event_id) {}
+      : manager_(manager), server_socket_idx_(server_socket_idx),
+	    sender_(sender), event_id_(event_id) {};
 
   connection_manager* manager_;
-  uint64 socket_id_;
+  uint64 server_socket_idx_;
   const std::string sender_;
   const std::string event_id_;
   friend void worker_thread(connection_manager*, zmq::context_t &, std::string);

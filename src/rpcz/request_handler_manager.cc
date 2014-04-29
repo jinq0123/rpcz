@@ -22,7 +22,7 @@ request_handler * request_handler_manager::create_handler(
 	const std::string & sender, const service_factory_map & factories)
 {
 	assert(handler_map_.find(sender) == handler_map_.end());
-	// New request_handler. TODO: delete request_handler
+	// New request_handler. TODO: delete request_handler on disconnection
 	request_handler_ptr handler_ptr(new request_handler);  // shared_ptr
 	// Create services for this handler...
 	BOOST_FOREACH(const service_factory_map::value_type & v, factories)
@@ -33,6 +33,7 @@ request_handler * request_handler_manager::create_handler(
 			new proto_rpc_service(service), v.first);
 	}
 	handler_map_.insert(std::make_pair(sender, handler_ptr));
+	// TODO: request_handler.set_client_connection(sender)
 	return handler_ptr.get();
 }
 

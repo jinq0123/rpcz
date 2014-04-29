@@ -151,12 +151,13 @@ void broker_thread::handle_bind_command(
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     socket->bind(endpoint.c_str());  // TODO: catch exception
-    uint64 socket_id = server_sockets_.size();
+    uint64 server_socket_idx = server_sockets_.size();
     server_sockets_.push_back(socket);
     bind_map_[endpoint] = socket;  // for unbind
     // reactor will own socket and callback.
     reactor_.add_socket(socket, new_permanent_callback(
-        this, &broker_thread::handle_server_socket, socket_id, &factories));
+        this, &broker_thread::handle_server_socket,
+		server_socket_idx, &factories));
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -183,10 +184,10 @@ void broker_thread::handle_socket_deleted(const std::string sender)
     send_empty_message(frontend_socket_, 0);
 }
 
-void broker_thread::handle_server_socket(uint64 socket_id,
+void broker_thread::handle_server_socket(uint64 server_socket_idx,
 		const service_factory_map * factories) {
 	assert(factories);
-    message_iterator iter(*server_sockets_[socket_id]);
+    message_iterator iter(*server_sockets_[server_socket_idx]);
     std::string sender(message_to_string(iter.next()));
     if (iter.next().size() != 0) return;
 	request_handler * handler = request_handler_manager_
@@ -194,7 +195,7 @@ void broker_thread::handle_server_socket(uint64 socket_id,
 	assert(NULL != handler);
     begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, krunserver_function)
 	send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
-    send_uint64(frontend_socket_, socket_id, ZMQ_SNDMORE);
+    send_uint64(frontend_socket_, server_socket_idx, ZMQ_SNDMORE);
 	send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
 }
@@ -251,8 +252,8 @@ void broker_thread::handle_timeout(event_id event_id) {
 }
 
 void broker_thread::send_reply(message_iterator& iter) {
-    uint64 socket_id = interpret_message<uint64>(iter.next());
-    zmq::socket_t* socket = server_sockets_[socket_id];
+    uint64 server_socket_idx = interpret_message<uint64>(iter.next());
+    zmq::socket_t* socket = server_sockets_[server_socket_idx];
     forward_messages(iter, *socket);
 }
 
