@@ -11,7 +11,10 @@
 
 namespace rpcz {
 
-request_handler::request_handler() {
+request_handler::request_handler(uint64 server_socket_idx,
+								 const std::string & sender)
+	: server_socket_idx_(server_socket_idx),
+	  sender_(sender) {
 }
 
 request_handler::~request_handler() {

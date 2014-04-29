@@ -20,11 +20,11 @@ public:
 
 public:
 	inline request_handler * get_handler(const std::string & sender,
-		const service_factory_map & factories);
+		const service_factory_map & factories, uint64 server_socket_idx);
 
 private:
 	request_handler * create_handler(const std::string & sender,
-		const service_factory_map & factories);
+		const service_factory_map & factories, uint64 server_socket_idx);
 
 private:
 	typedef boost::unordered_map<std::string, request_handler_ptr> handler_map;
@@ -32,12 +32,14 @@ private:
 };
 
 request_handler * request_handler_manager::get_handler(
-	const std::string & sender, const service_factory_map & factories)
+	const std::string & sender,
+	const service_factory_map & factories,
+	uint64 server_socket_idx)
 {
 	handler_map::const_iterator iter = handler_map_.find(sender);
 	if (iter != handler_map_.end())
 		return (*iter).second.get();
-	return create_handler(sender, factories);
+	return create_handler(sender, factories, server_socket_idx);
 }
 
 }  // namespace rpcz

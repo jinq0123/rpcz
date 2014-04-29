@@ -191,12 +191,12 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
     std::string sender(message_to_string(iter.next()));
     if (iter.next().size() != 0) return;
 	request_handler * handler = request_handler_manager_
-		.get_handler(sender, *factories);
+		.get_handler(sender, *factories, server_socket_idx);
 	assert(NULL != handler);
-    begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, krunserver_function)
+    begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, kHandleRequest)
 	send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
-    send_uint64(frontend_socket_, server_socket_idx, ZMQ_SNDMORE);
-	send_string(frontend_socket_, sender, ZMQ_SNDMORE);
+    // XXX send_uint64(frontend_socket_, server_socket_idx, ZMQ_SNDMORE);
+	// XXX send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
 }
 

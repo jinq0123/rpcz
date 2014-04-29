@@ -17,7 +17,7 @@ class rpc_service;
 // Non-thread-safe.
 class request_handler {
  public:
-  request_handler();
+  request_handler(uint64 server_socket_idx, const std::string & sender);
   ~request_handler();
 
  public:
@@ -31,6 +31,10 @@ class request_handler {
 
  private:
   void unregister_rpc_service(const std::string& name);
+
+ private:
+  const uint64 server_socket_idx_;
+  const std::string sender_;
 
  private:
   typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
