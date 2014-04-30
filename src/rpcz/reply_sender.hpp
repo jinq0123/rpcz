@@ -15,14 +15,15 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_SERVER_CHANNEL_IMPL_H
-#define RPCZ_SERVER_CHANNEL_IMPL_H
+#ifndef RPCZ_REPLY_SENDER_H
+#define RPCZ_REPLY_SENDER_H
 
 #include <zmq.hpp>  // for message_t
 
 #include "client_connection.hpp"
 #include "logging.hpp"  // for CHECK()
 #include "rpcz/invalid_message_error.hpp"
+#include "rpcz/reply_context.hpp"
 #include "rpcz/rpc_controller.hpp"  // for status::APPLICATION_ERROR
 #include "zmq_utils.hpp"  // for string_to_message()
 
@@ -30,17 +31,17 @@
 
 namespace rpcz {
 
-// TODO: rename to reply_sender... reply_sender(reply_context(reply_broker, event_id))
-
 // Copyable.
-class server_channel_impl {
+class reply_sender {
  public:
-  server_channel_impl(const client_connection& connection,
-                      const std::string & event_id)
-      : connection_(&connection), event_id_(event_id) {
-      }
+  // It copies reply_context.
+  reply_sender(const reply_context& reply_context)
+      : reply_context_(reply_context) {
+  }
 
   virtual void send(const google::protobuf::Message& response) {
+    if (NULL == reply_context_.connection)
+        return;
     rpc_response_header generic_rpc_response;
     int msg_size = response.ByteSize();
     scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -52,6 +53,8 @@ class server_channel_impl {
   }
 
   virtual void send0(const std::string& response) {
+    if (NULL == reply_context_.connection)
+        return;
     rpc_response_header generic_rpc_response;
     send_generic_response(generic_rpc_response,
                         string_to_message(response));
@@ -59,6 +62,8 @@ class server_channel_impl {
 
   virtual void send_error(int application_error,
                           const std::string& error_message="") {
+    if (NULL == reply_context_.connection)
+        return;
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();
     generic_rpc_response.set_status(status::APPLICATION_ERROR);
@@ -84,13 +89,14 @@ class server_channel_impl {
     message_vector v;
     v.push_back(zmq_response_message);
     v.push_back(payload);
-    connection_->reply(event_id_, &v);
+    assert(reply_context_.connection);
+    reply_context_.connection.connection->reply(
+        reply_context.event_id_, &v);
   }
 
 private:
-  const client_connection * connection_;
-  const std::string event_id_;
+  const reply_context reply_context_;  // context copy
 };  // class server_channel_impl
 
 }  // namespace rpcz
-#endif  // RPCZ_SERVER_CHANNEL_IMPL_H
+#endif  // RPCZ_REPLY_SENDER_H
