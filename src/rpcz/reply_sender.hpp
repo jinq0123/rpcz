@@ -37,11 +37,11 @@ class reply_sender {
   // It copies reply_context.
   reply_sender(const reply_context& reply_context)
       : reply_context_(reply_context) {
+    assert(NULL != reply_context_.client_connection);
   }
 
   virtual void send(const google::protobuf::Message& response) {
-    if (NULL == reply_context_.connection)
-        return;
+    assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     int msg_size = response.ByteSize();
     scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -53,8 +53,7 @@ class reply_sender {
   }
 
   virtual void send0(const std::string& response) {
-    if (NULL == reply_context_.connection)
-        return;
+    assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     send_generic_response(generic_rpc_response,
                         string_to_message(response));
@@ -62,8 +61,7 @@ class reply_sender {
 
   virtual void send_error(int application_error,
                           const std::string& error_message="") {
-    if (NULL == reply_context_.connection)
-        return;
+    assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();
     generic_rpc_response.set_status(status::APPLICATION_ERROR);
@@ -89,9 +87,9 @@ class reply_sender {
     message_vector v;
     v.push_back(zmq_response_message);
     v.push_back(payload);
-    assert(reply_context_.connection);
-    reply_context_.connection.connection->reply(
-        reply_context.event_id_, &v);
+    assert(NULL != reply_context_.client_connection);
+    reply_context_.client_connection->reply(
+        reply_context_.event_id, &v);
   }
 
 private:

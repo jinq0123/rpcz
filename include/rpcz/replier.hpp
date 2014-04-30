@@ -23,6 +23,8 @@
 
 #include "rpcz/reply_context.hpp"
 
+// TODO: Delete replier. Use reply_sender(ctx) directly.
+
 namespace rpcz {
 
 template <typename MessageType>
@@ -31,6 +33,7 @@ class replier {
   // It copies reply_context.
   explicit replier(const reply_context & reply_context) :
       reply_context_(reply_context), replied_(false) {
+    assert(NULL != reply_context.client_connection);
   }
 
   ~replier() { }
@@ -39,14 +42,14 @@ class replier {
     assert(!replied_);
     replied_ = true;
 
-    // XXX channel_->send(response);
+    reply_sender(reply_context_).send(response);
   }
 
   void Error(int application_error, const std::string& error_message="") {
     assert(!replied_);
     replied_ = true;
 
-    // XXX channel_->send_error(application_error, error_message);
+    reply_sender(reply_context_).send_error(application_error, error_message);
   }
 
  private:

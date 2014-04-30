@@ -25,6 +25,7 @@
 #include <google/protobuf/message.h>  // for Message
 
 #include "logging.hpp"  // for INFO
+#include "reply_sender.hpp"
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/service.hpp"
@@ -45,13 +46,15 @@ class proto_rpc_service : public rpc_service {
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
                                 const reply_context& reply_context) {
+    assert(NULL != reply_context.client_connection);
     const ::google::protobuf::MethodDescriptor* descriptor =
         service_->GetDescriptor()->FindMethodByName(
             method);
     if (descriptor == NULL) {
       // Invalid method name
       DLOG(INFO) << "Invalid method name: " << method;
-      // XXX channel->send_error(application_error::NO_SUCH_METHOD);
+      reply_sender(reply_context)
+          .send_error(application_error::NO_SUCH_METHOD);
       return;
     }
 
@@ -61,7 +64,8 @@ class proto_rpc_service : public rpc_service {
     if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
-      // XXX channel->send_error(application_error::INVALID_MESSAGE);
+      reply_sender(reply_context)
+          .send_error(application_error::INVALID_MESSAGE);
       return;
     }
     service_->call_method(descriptor, *request, reply_context);
