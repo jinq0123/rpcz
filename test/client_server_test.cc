@@ -38,9 +38,10 @@ using namespace std;
 namespace rpcz {
 
 void super_done(SearchResponse *response,
-               rpc_controller* newrpc, replier<SearchResponse> replier) {
+               rpc_controller* newrpc,
+               const reply_context & reply_context) {
   delete newrpc;
-  replier.send(*response);
+  reply_sender(reply_context).send(*response);
   delete response;
 }
 

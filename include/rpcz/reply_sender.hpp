@@ -18,83 +18,45 @@
 #ifndef RPCZ_REPLY_SENDER_H
 #define RPCZ_REPLY_SENDER_H
 
-#include <zmq.hpp>  // for message_t
+#include <string>
 
-#include "client_connection.hpp"
-#include "logging.hpp"  // for CHECK()
-#include "rpcz/invalid_message_error.hpp"
-#include "rpcz/reply_context.hpp"
-#include "rpcz/rpc_controller.hpp"  // for status::APPLICATION_ERROR
-#include "zmq_utils.hpp"  // for string_to_message()
+namespace google {
+namespace protobuf {
+class Message;
+}  // namespace protobuf
+}  // namespace google
 
-// TODO: Use requester/responser instead of client/server
+namespace zmq {
+class message_t;
+}  // namespace zmq
 
 namespace rpcz {
 
-// Copyable.
+class rpc_response_header;
+struct reply_context;
+
 class reply_sender {
  public:
-  // It copies reply_context.
   reply_sender(const reply_context& reply_context)
-      : reply_context_(reply_context) {
-    assert(NULL != reply_context_.client_connection);
-  }
+      : reply_context_(reply_context) {}
+  ~reply_sender() {}
 
-  virtual void send(const google::protobuf::Message& response) {
-    assert(NULL != reply_context_.client_connection);
-    rpc_response_header generic_rpc_response;
-    int msg_size = response.ByteSize();
-    scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
-    if (!response.SerializeToArray(payload->data(), msg_size)) {
-      throw invalid_message_error("Invalid response message");
-    }
-    send_generic_response(generic_rpc_response,
-                        payload.release());
-  }
-
-  virtual void send0(const std::string& response) {
-    assert(NULL != reply_context_.client_connection);
-    rpc_response_header generic_rpc_response;
-    send_generic_response(generic_rpc_response,
-                        string_to_message(response));
-  }
-
-  virtual void send_error(int application_error,
-                          const std::string& error_message="") {
-    assert(NULL != reply_context_.client_connection);
-    rpc_response_header generic_rpc_response;
-    zmq::message_t* payload = new zmq::message_t();
-    generic_rpc_response.set_status(status::APPLICATION_ERROR);
-    generic_rpc_response.set_application_error(application_error);
-    if (!error_message.empty()) {
-      generic_rpc_response.set_error(error_message);
-    }
-    send_generic_response(generic_rpc_response,
-                        payload);
-  }
+ public:
+  void send(const google::protobuf::Message& response) const;
+  void send0(const std::string& response) const;
+  void send_error(int application_error,
+      const std::string& error_message="") const;
 
  private:
-  // Sends the response back to a function server_impl through the reply function.
+  // Sends the response back.
   // Takes ownership of the provided payload message.
-  void send_generic_response(const rpc_response_header& generic_rpc_response,
-                           zmq::message_t* payload) {
-    size_t msg_size = generic_rpc_response.ByteSize();
-    zmq::message_t* zmq_response_message = new zmq::message_t(msg_size);
-    CHECK(generic_rpc_response.SerializeToArray(
-            zmq_response_message->data(),
-            msg_size));
-
-    message_vector v;
-    v.push_back(zmq_response_message);
-    v.push_back(payload);
-    assert(NULL != reply_context_.client_connection);
-    reply_context_.client_connection->reply(
-        reply_context_.event_id, &v);
-  }
+  void send_generic_response(
+      const rpc_response_header& generic_rpc_response,
+      zmq::message_t* payload) const;
 
 private:
-  const reply_context reply_context_;  // context copy
-};  // class server_channel_impl
+  const reply_context & reply_context_;
+};  // class reply_sender
 
 }  // namespace rpcz
 #endif  // RPCZ_REPLY_SENDER_H

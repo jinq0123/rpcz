@@ -15,8 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_REPLY_SENDER_H
-#define RPCZ_REPLY_SENDER_H
+#include "rpcz/reply_sender.hpp"
 
 #include <zmq.hpp>  // for message_t
 
@@ -31,16 +30,7 @@
 
 namespace rpcz {
 
-// Copyable.
-class reply_sender {
- public:
-  // It copies reply_context.
-  reply_sender(const reply_context& reply_context)
-      : reply_context_(reply_context) {
-    assert(NULL != reply_context_.client_connection);
-  }
-
-  virtual void send(const google::protobuf::Message& response) {
+void reply_sender::send(const google::protobuf::Message& response) const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     int msg_size = response.ByteSize();
@@ -49,18 +39,18 @@ class reply_sender {
       throw invalid_message_error("Invalid response message");
     }
     send_generic_response(generic_rpc_response,
-                        payload.release());
-  }
+                          payload.release());
+}
 
-  virtual void send0(const std::string& response) {
+void reply_sender::send0(const std::string& response) const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     send_generic_response(generic_rpc_response,
-                        string_to_message(response));
-  }
+                          string_to_message(response));
+}
 
-  virtual void send_error(int application_error,
-                          const std::string& error_message="") {
+void reply_sender::send_error(int application_error,
+                              const std::string& error_message="") const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();
@@ -69,20 +59,18 @@ class reply_sender {
     if (!error_message.empty()) {
       generic_rpc_response.set_error(error_message);
     }
-    send_generic_response(generic_rpc_response,
-                        payload);
-  }
+    send_generic_response(generic_rpc_response, payload);
+}
 
- private:
-  // Sends the response back to a function server_impl through the reply function.
-  // Takes ownership of the provided payload message.
-  void send_generic_response(const rpc_response_header& generic_rpc_response,
-                           zmq::message_t* payload) {
+// Sends the response back.
+// Takes ownership of the provided payload message.
+void reply_sender::send_generic_response(
+        const rpc_response_header& generic_rpc_response,
+        zmq::message_t* payload) const {
     size_t msg_size = generic_rpc_response.ByteSize();
     zmq::message_t* zmq_response_message = new zmq::message_t(msg_size);
     CHECK(generic_rpc_response.SerializeToArray(
-            zmq_response_message->data(),
-            msg_size));
+        zmq_response_message->data(), msg_size));
 
     message_vector v;
     v.push_back(zmq_response_message);
@@ -90,11 +78,6 @@ class reply_sender {
     assert(NULL != reply_context_.client_connection);
     reply_context_.client_connection->reply(
         reply_context_.event_id, &v);
-  }
-
-private:
-  const reply_context reply_context_;  // context copy
-};  // class server_channel_impl
+}
 
 }  // namespace rpcz
-#endif  // RPCZ_REPLY_SENDER_H

@@ -18,12 +18,13 @@
 #ifndef RPCZ_REPLIER_H
 #define RPCZ_REPLIER_H
 
+// TODO: Delete replier. Use reply_sender(ctx) directly.
+#if 0
+
 #include <assert.h>
 #include <string>
 
 #include "rpcz/reply_context.hpp"
-
-// TODO: Delete replier. Use reply_sender(ctx) directly.
 
 namespace rpcz {
 
@@ -58,4 +59,7 @@ class replier {
 };
 
 }  // namespace rpcz
+
+#endif  // 0
+
 #endif  // RPCZ_REPLIER_H

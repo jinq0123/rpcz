@@ -59,7 +59,6 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "#define RPCZ_$filename_identifier$__INCLUDED\n"
     "\n"
     "#include <string>\n"
-    "#include <rpcz/replier.hpp>\n"
     "#include <rpcz/service.hpp>\n"
     "\n"
     "namespace google {\n"
@@ -72,6 +71,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "class closure;\n"
     "class rpc_channel;\n"
     "class rpc_controller;\n"
+    "struct reply_context;\n"
     "}  //namesacpe rpcz\n"
     ,
     "filename", file_->name(),
@@ -117,6 +117,7 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     "#include <google/protobuf/descriptor.h>\n"
     "#include <google/protobuf/stubs/once.h>\n"
     "#include <rpcz/rpcz.hpp>\n"
+    "\n"
     "namespace {\n",
     "basename", StripProto(file_->name()));
 
