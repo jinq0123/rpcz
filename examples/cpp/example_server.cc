@@ -13,11 +13,13 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include <iostream>
-#include "rpcz/rpcz.hpp"
+
 #include "cpp/search.pb.h"
 #include "cpp/search.rpcz.h"
+#include "rpcz/rpcz.hpp"
 
 using namespace std;
 
@@ -27,12 +29,13 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      rpcz::replier<SearchResponse> replier) {
+      const rpcz::reply_context& reply_context) {
     cout << "Got request for '" << request.query() << "'" << endl;
     SearchResponse response;
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
-    replier.send(response);
+    rpcz::reply_sender(reply_context).send(response);
+    // TODO: simplify it. Req/Resp and sender all in context.
   }
 
 };

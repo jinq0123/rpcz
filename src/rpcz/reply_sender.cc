@@ -50,7 +50,7 @@ void reply_sender::send0(const std::string& response) const {
 }
 
 void reply_sender::send_error(int application_error,
-                              const std::string& error_message="") const {
+        const std::string& error_message/* = "" */) const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();

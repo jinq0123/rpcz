@@ -25,6 +25,8 @@
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
+#include "rpcz/reply_context.hpp"
+#include "rpcz/reply_sender.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/server.hpp"
@@ -39,9 +41,9 @@ namespace rpcz {
 
 void super_done(SearchResponse *response,
                rpc_controller* newrpc,
-               const reply_context & reply_context) {
+               reply_context reply_ctx) {
   delete newrpc;
-  reply_sender(reply_context).send(*response);
+  reply_sender(reply_ctx).send(*response);
   delete response;
 }
 
@@ -58,39 +60,36 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      replier<SearchResponse> replier) {
+      const reply_context& reply_ctx) {
     if (request.query() == "foo") {
-      replier.Error(-4, "I don't like foo.");
+      reply_sender(reply_ctx).send_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      replier.Error(17, "I don't like bar.");
+      reply_sender(reply_ctx).send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
       rpc_controller* newrpc = new rpc_controller;
       SearchResponse* response = new SearchResponse;
-      backend_->Search(request, response, newrpc, new_callback(super_done,
-                                                               response,
-                                                               newrpc,
-                                                               replier));
+      backend_->Search(request, response, newrpc,
+          new_callback(super_done, response, newrpc, reply_ctx));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      delayed_replier_.reset(new search_replier(replier));
+      old_reply_context_ = reply_ctx;
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
-      if (delayed_replier_.get())
-          delayed_replier_->send(SearchResponse());
-      replier.send(SearchResponse());
+      reply_sender(old_reply_context_).send(SearchResponse());
+      reply_sender(reply_ctx).send(SearchResponse());
     } else if (request.query() == "terminate") {
-      replier.send(SearchResponse());
+      reply_sender(reply_ctx).send(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      replier.send(response);
+      reply_sender(reply_ctx).send(response);
     }
   }
 
@@ -99,8 +98,7 @@ class SearchServiceImpl : public SearchService {
  private:
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
-  typedef replier<SearchResponse> search_replier;
-  scoped_ptr<search_replier> delayed_replier_;
+  reply_context old_reply_context_;
   connection_manager_ptr cm_;
 };
 
@@ -109,10 +107,10 @@ class BackendSearchServiceImpl : public SearchService {
  public:
   virtual void Search(
       const SearchRequest&,
-      replier<SearchResponse> replier) {
+      const reply_context& reply_ctx) {
     SearchResponse response;
     response.add_results("42!");
-    replier.send(response);
+    reply_sender(reply_ctx).send(response);
   }
 };
 

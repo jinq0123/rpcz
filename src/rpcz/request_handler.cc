@@ -5,8 +5,9 @@
 #include <boost/foreach.hpp>
 
 #include "logging.hpp"
-#include "reply_sender.hpp"
 #include "rpcz/reply_context.hpp"
+#include "rpcz/reply_sender.hpp"
+#include "rpcz/rpc_controller.hpp"  // for application_error
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/rpcz.pb.h"  // for rpc_request_header
 #include "zmq_utils.hpp"  // for message_iterator

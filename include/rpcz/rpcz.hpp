@@ -20,7 +20,7 @@
 // Master include file
 #include "rpcz/application.hpp"
 #include "rpcz/callback.hpp"
-#include "rpcz/reply_context.hpp"
+#include "rpcz/reply_sender.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"

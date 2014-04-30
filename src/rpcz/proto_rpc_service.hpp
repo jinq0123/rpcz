@@ -25,8 +25,10 @@
 #include <google/protobuf/message.h>  // for Message
 
 #include "logging.hpp"  // for INFO
-#include "reply_sender.hpp"
 #include "rpcz/common.hpp"  // for scoped_ptr
+#include "rpcz/reply_context.hpp"
+#include "rpcz/reply_sender.hpp"
+#include "rpcz/rpc_controller.hpp"  // for application_error
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/service.hpp"
 
