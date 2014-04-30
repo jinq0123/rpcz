@@ -24,7 +24,6 @@
 #include "logging.hpp"  // for CHECK()
 #include "rpcz/invalid_message_error.hpp"
 #include "rpcz/rpc_controller.hpp"  // for status::APPLICATION_ERROR
-#include "rpcz/server_channel.hpp"
 #include "zmq_utils.hpp"  // for string_to_message()
 
 // TODO: Use requester/responser instead of client/server
@@ -34,7 +33,7 @@ namespace rpcz {
 // TODO: rename to reply_sender... reply_sender(reply_context(reply_broker, event_id))
 
 // Copyable.
-class server_channel_impl : public server_channel {
+class server_channel_impl {
  public:
   server_channel_impl(const client_connection& connection,
                       const std::string & event_id)
@@ -90,12 +89,8 @@ class server_channel_impl : public server_channel {
 
 private:
   const client_connection * connection_;
-  // DEL scoped_ptr<google::protobuf::Message> request_;
   const std::string event_id_;
-
-  // DEL friend class proto_rpc_service;
 };  // class server_channel_impl
 
 }  // namespace rpcz
-
 #endif  // RPCZ_SERVER_CHANNEL_IMPL_H

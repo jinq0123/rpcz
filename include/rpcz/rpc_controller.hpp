@@ -95,7 +95,6 @@ class rpc_controller : boost::noncopyable {
   scoped_ptr<sync_event> sync_event_;
 
   friend class rpc_channel_impl;
-  friend class server_channel_impl;
 };
 
 class rpc_error : public std::runtime_error {
