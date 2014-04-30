@@ -150,7 +150,7 @@ void ServiceGenerator::GenerateMethodSignatures(
       printer->Print(
           sub_vars,
           "$virtual$void $name$(const $input_type$& request,\n"
-          "                     ::rpcz::reply< $output_type$> response);\n");
+          "                     ::rpcz::replier< $output_type$> replier);\n");
     }
   }
 }
@@ -221,8 +221,8 @@ void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
 
     printer->Print(sub_vars,
       "void $classname$::$name$(const $input_type$&,\n"
-      "                         ::rpcz::reply< $output_type$> reply) {\n"
-      "  reply.Error(::rpcz::application_error::METHOD_NOT_IMPLEMENTED,\n"
+      "                         ::rpcz::replier< $output_type$> replier) {\n"
+      "  replier.Error(::rpcz::application_error::METHOD_NOT_IMPLEMENTED,\n"
       "              \"Method $name$() not implemented.\");\n"
       "}\n"
       "\n");
@@ -251,7 +251,7 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
       "    case $index$:\n"
       "      $name$(\n"
       "          *::google::protobuf::down_cast<const $input_type$*>(&request),\n"
-      "          ::rpcz::reply< $output_type$>(channel));\n"
+      "          ::rpcz::replier< $output_type$>(channel));\n"
       "      break;\n");
   }
 

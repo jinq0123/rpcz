@@ -33,26 +33,28 @@ class ServiceDescriptor;
 namespace rpcz {
 
 template <typename MessageType>
-class reply {
+class replier {
  public:
-  explicit reply(server_channel* channel) :
+  explicit replier(server_channel* channel) :
       channel_(channel), replied_(false) {
   }
 
-  ~reply() { }
+  ~replier() { }
 
   void send(const MessageType& response) {
     assert(!replied_);
+    replied_ = true;
+
     channel_->send(response);
     // DEL delete channel_;
-    replied_ = true;
   }
 
   void Error(int application_error, const std::string& error_message="") {
     assert(!replied_);
+    replied_ = true;
+
     channel_->send_error(application_error, error_message);
     // DEL delete channel_;
-    replied_ = true;
   }
 
  private:

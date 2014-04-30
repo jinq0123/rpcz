@@ -27,12 +27,12 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      rpcz::reply<SearchResponse> reply) {
+      rpcz::replier<SearchResponse> replier) {
     cout << "Got request for '" << request.query() << "'" << endl;
     SearchResponse response;
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
-    reply.send(response);
+    replier.send(response);
   }
 
 };

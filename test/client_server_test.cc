@@ -38,9 +38,9 @@ using namespace std;
 namespace rpcz {
 
 void super_done(SearchResponse *response,
-               rpc_controller* newrpc, reply<SearchResponse> reply) {
+               rpc_controller* newrpc, replier<SearchResponse> replier) {
   delete newrpc;
-  reply.send(*response);
+  replier.send(*response);
   delete response;
 }
 
@@ -48,7 +48,7 @@ class SearchServiceImpl : public SearchService {
  public:
   // Will take ownership of backend.
   SearchServiceImpl(SearchService_Stub* backend)
-      : backend_(backend), delayed_reply_(NULL)
+      : backend_(backend), delayed_replier_(NULL)
       , cm_(connection_manager::get()) {};
 
   ~SearchServiceImpl() {
@@ -56,38 +56,38 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      reply<SearchResponse> reply) {
+      replier<SearchResponse> replier) {
     if (request.query() == "foo") {
-      reply.Error(-4, "I don't like foo.");
+      replier.Error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      reply.Error(17, "I don't like bar.");
+      replier.Error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
       rpc_controller* newrpc = new rpc_controller;
       SearchResponse* response = new SearchResponse;
       backend_->Search(request, response, newrpc, new_callback(super_done,
                                                                response,
                                                                newrpc,
-                                                               reply));
+                                                               replier));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      delayed_reply_ = reply;
+      delayed_replier_ = replier;
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
-      delayed_reply_.send(SearchResponse());
-      reply.send(SearchResponse());
+      delayed_replier_.send(SearchResponse());
+      replier.send(SearchResponse());
     } else if (request.query() == "terminate") {
-      reply.send(SearchResponse());
+      replier.send(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      reply.send(response);
+      replier.send(response);
     }
   }
 
@@ -96,7 +96,7 @@ class SearchServiceImpl : public SearchService {
  private:
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
-  reply<SearchResponse> delayed_reply_;
+  replier<SearchResponse> delayed_replier_;
   connection_manager_ptr cm_;
 };
 
@@ -105,10 +105,10 @@ class BackendSearchServiceImpl : public SearchService {
  public:
   virtual void Search(
       const SearchRequest&,
-      reply<SearchResponse> reply) {
+      replier<SearchResponse> replier) {
     SearchResponse response;
     response.add_results("42!");
-    reply.send(response);
+    replier.send(response);
   }
 };
 
