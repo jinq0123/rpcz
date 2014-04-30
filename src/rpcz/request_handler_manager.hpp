@@ -5,6 +5,7 @@
 
 #include <boost/unordered_map.hpp>
 #include "request_handler_ptr.hpp"
+#include "rpcz/common.hpp"  // for uint64
 #include "service_factory_map.hpp"
 
 namespace rpcz {

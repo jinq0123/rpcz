@@ -39,11 +39,13 @@ class proto_rpc_service : public rpc_service {
       delete service_;
   }
 
+  // It does not take the ownership of channel.
   virtual void dispatch_request(const std::string& method,
                                const void* payload, size_t payload_len,
-                               server_channel* channel_) {
-    scoped_ptr<server_channel_impl> channel(
-        static_cast<server_channel_impl*>(channel_));
+                               server_channel* channel) {
+    // DEL
+    //scoped_ptr<server_channel_impl> channel(
+    //    static_cast<server_channel_impl*>(channel_));
 
     const ::google::protobuf::MethodDescriptor* descriptor =
         service_->GetDescriptor()->FindMethodByName(
@@ -54,18 +56,17 @@ class proto_rpc_service : public rpc_service {
       channel->send_error(application_error::NO_SUCH_METHOD);
       return;
     }
-    channel->request_.reset(CHECK_NOTNULL(
-            service_->GetRequestPrototype(descriptor).New()));
-    if (!channel->request_->ParseFromArray(payload, payload_len)) {
+
+    scoped_ptr<google::protobuf::Message> request;
+    request.reset(CHECK_NOTNULL(
+        service_->GetRequestPrototype(descriptor).New()));
+    if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
       channel->send_error(application_error::INVALID_MESSAGE);
       return;
     }
-    server_channel_impl* channel_ptr = channel.release();
-    service_->call_method(descriptor,
-                         *channel_ptr->request_,
-                         channel_ptr);
+    service_->call_method(descriptor, *request, channel);
   }
 
  private:

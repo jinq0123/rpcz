@@ -71,12 +71,8 @@ void worker_thread(connection_manager* connection_manager,
       case kHandleRequest: {
         request_handler * handler =
             interpret_message<request_handler*>(iter.next());
-        uint64 server_socket_idx = interpret_message<uint64>(iter.next());
-		std::string sender(message_to_string(iter.next()));  // XXX needless?
-        std::string event_id(message_to_string(iter.next()));
-        handler->handle_request(client_connection(connection_manager,
-			server_socket_idx, sender, event_id), iter);
-		// TODO: handler->handle_request(event_id, iter)...
+        assert(handler);
+        handler->handle_request(iter);
         }
         break;
       case kInvokeclient_request_callback: {

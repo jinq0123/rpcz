@@ -44,19 +44,19 @@ class reply {
   void send(const MessageType& response) {
     assert(!replied_);
     channel_->send(response);
-    delete channel_;
+    // DEL delete channel_;
     replied_ = true;
   }
 
   void Error(int application_error, const std::string& error_message="") {
     assert(!replied_);
     channel_->send_error(application_error, error_message);
-    delete channel_;
+    // DEL delete channel_;
     replied_ = true;
   }
 
  private:
-  server_channel* channel_;
+  server_channel* channel_;  // XXX: use copy, no delete
   bool replied_;
 };
 

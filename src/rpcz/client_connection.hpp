@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_CLIENT_CONNECTION_H
 #define RPCZ_CLIENT_CONNECTION_H
@@ -30,19 +31,17 @@ class message_vector;
 
 class client_connection {
  public:
-  void reply(message_vector* v);
+  void reply(const std::string& event_id, message_vector* v) const;
+
+ public:
+  client_connection(uint64 server_socket_idx, const std::string& sender);
 
  private:
-  client_connection(connection_manager* manager, uint64 server_socket_idx,
-                   std::string& sender, std::string& event_id)
-      : manager_(manager), server_socket_idx_(server_socket_idx),
-	    sender_(sender), event_id_(event_id) {};
-
-  connection_manager* manager_;
-  uint64 server_socket_idx_;
+  connection_manager & manager_;
+  const uint64 server_socket_idx_;
   const std::string sender_;
-  const std::string event_id_;
-  friend void worker_thread(connection_manager*, zmq::context_t &, std::string);
+
+  // DEL friend void worker_thread(connection_manager*, zmq::context_t &, std::string);
 };
 
 }  // namespace rpcz

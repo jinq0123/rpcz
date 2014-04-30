@@ -27,12 +27,16 @@
 #include "rpcz/server_channel.hpp"
 #include "zmq_utils.hpp"  // for string_to_message()
 
+// TODO: Use requester/responser instead of client/server
+
 namespace rpcz {
 
+// Copyable.
 class server_channel_impl : public server_channel {
  public:
-  server_channel_impl(const client_connection& connection)
-      : connection_(connection) {
+  server_channel_impl(const client_connection& connection,
+                      const std::string & event_id)
+      : connection_(&connection), event_id_(event_id) {
       }
 
   virtual void send(const google::protobuf::Message& response) {
@@ -66,9 +70,6 @@ class server_channel_impl : public server_channel {
   }
 
  private:
-  client_connection connection_;
-  scoped_ptr<google::protobuf::Message> request_;
-
   // Sends the response back to a function server_impl through the reply function.
   // Takes ownership of the provided payload message.
   void send_generic_response(const rpc_response_header& generic_rpc_response,
@@ -82,10 +83,15 @@ class server_channel_impl : public server_channel {
     message_vector v;
     v.push_back(zmq_response_message);
     v.push_back(payload);
-    connection_.reply(&v);
+    connection_->reply(event_id_, &v);
   }
 
-  friend class proto_rpc_service;
+private:
+  const client_connection * connection_;
+  // DEL scoped_ptr<google::protobuf::Message> request_;
+  const std::string event_id_;
+
+  // DEL friend class proto_rpc_service;
 };  // class server_channel_impl
 
 }  // namespace rpcz
