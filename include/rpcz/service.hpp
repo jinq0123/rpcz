@@ -45,7 +45,7 @@ class service {
   // TODO: need request_context.
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
-                           const reply_context& reply_context) = 0;
+                           const reply_context& reply_ctx) = 0;
 };  // class service
 
 }  // namespace rpcz

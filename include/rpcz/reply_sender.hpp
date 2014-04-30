@@ -37,8 +37,8 @@ struct reply_context;
 
 class reply_sender {
  public:
-  reply_sender(const reply_context& reply_context)
-      : reply_context_(reply_context) {}
+  reply_sender(const reply_context& reply_ctx)
+      : reply_context_(reply_ctx) {}
   ~reply_sender() {}
 
  public:

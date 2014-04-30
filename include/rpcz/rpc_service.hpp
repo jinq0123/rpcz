@@ -32,7 +32,7 @@ class rpc_service {
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                const reply_context& reply_context) = 0;
+                                const reply_context& reply_ctx) = 0;
                                 // use rpc_context
 };
 

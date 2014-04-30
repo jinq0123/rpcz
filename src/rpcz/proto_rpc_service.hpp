@@ -47,15 +47,15 @@ class proto_rpc_service : public rpc_service {
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                const reply_context& reply_context) {
-    assert(NULL != reply_context.client_connection);
+                                const reply_context& reply_ctx) {
+    assert(NULL != reply_ctx.client_connection);
     const ::google::protobuf::MethodDescriptor* descriptor =
         service_->GetDescriptor()->FindMethodByName(
             method);
     if (descriptor == NULL) {
       // Invalid method name
       DLOG(INFO) << "Invalid method name: " << method;
-      reply_sender(reply_context)
+      reply_sender(reply_ctx)
           .send_error(application_error::NO_SUCH_METHOD);
       return;
     }
@@ -66,11 +66,11 @@ class proto_rpc_service : public rpc_service {
     if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
-      reply_sender(reply_context)
+      reply_sender(reply_ctx)
           .send_error(application_error::INVALID_MESSAGE);
       return;
     }
-    service_->call_method(descriptor, *request, reply_context);
+    service_->call_method(descriptor, *request, reply_ctx);
   }
 
  private:
