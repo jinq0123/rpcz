@@ -21,10 +21,13 @@
 #include <assert.h>
 #include <string>
 
+#include <google/protobuf/descriptor.h>  // for FindMethodByName()
+#include <google/protobuf/message.h>  // for Message
+
+#include "logging.hpp"  // for INFO
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/service.hpp"
-#include "server_channel_impl.hpp"
 
 namespace rpcz {
 
