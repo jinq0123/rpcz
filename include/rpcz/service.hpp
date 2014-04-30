@@ -28,7 +28,7 @@ class ServiceDescriptor;
 
 namespace rpcz {
 
-class server_channel;
+struct reply_context;
 
 class service {
  public:
@@ -42,9 +42,10 @@ class service {
   virtual const google::protobuf::Message& GetResponsePrototype(
       const google::protobuf::MethodDescriptor*) const = 0;
 
+  // TODO: need request_context.
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
-                          const google::protobuf::Message& request,
-                          server_channel* server_channel) = 0;
+                           const google::protobuf::Message& request,
+                           const reply_context& reply_context) = 0;
 };  // class service
 
 }  // namespace rpcz

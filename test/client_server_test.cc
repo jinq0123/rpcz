@@ -48,8 +48,9 @@ class SearchServiceImpl : public SearchService {
  public:
   // Will take ownership of backend.
   SearchServiceImpl(SearchService_Stub* backend)
-      : backend_(backend), delayed_replier_(NULL)
-      , cm_(connection_manager::get()) {};
+      : backend_(backend), 
+        cm_(connection_manager::get()) {
+  }
 
   ~SearchServiceImpl() {
   }
@@ -73,12 +74,13 @@ class SearchServiceImpl : public SearchService {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      delayed_replier_ = replier;
+      delayed_replier_.reset(new search_replier(replier));
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
-      delayed_replier_.send(SearchResponse());
+      if (delayed_replier_.get())
+          delayed_replier_->send(SearchResponse());
       replier.send(SearchResponse());
     } else if (request.query() == "terminate") {
       replier.send(SearchResponse());
@@ -96,7 +98,8 @@ class SearchServiceImpl : public SearchService {
  private:
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
-  replier<SearchResponse> delayed_replier_;
+  typedef replier<SearchResponse> search_replier;
+  scoped_ptr<search_replier> delayed_replier_;
   connection_manager_ptr cm_;
 };
 

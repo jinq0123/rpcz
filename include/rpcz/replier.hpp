@@ -21,15 +21,16 @@
 #include <assert.h>
 #include <string>
 
-#include "server_channel.hpp"
+#include "rpcz/reply_context.hpp"
 
 namespace rpcz {
 
 template <typename MessageType>
 class replier {
  public:
-  explicit replier(server_channel* channel) :
-      channel_(channel), replied_(false) {
+  // It copies reply_context.
+  explicit replier(const reply_context & reply_context) :
+      reply_context_(reply_context), replied_(false) {
   }
 
   ~replier() { }
@@ -38,20 +39,18 @@ class replier {
     assert(!replied_);
     replied_ = true;
 
-    channel_->send(response);
-    // DEL delete channel_;
+    // XXX channel_->send(response);
   }
 
   void Error(int application_error, const std::string& error_message="") {
     assert(!replied_);
     replied_ = true;
 
-    channel_->send_error(application_error, error_message);
-    // DEL delete channel_;
+    // XXX channel_->send_error(application_error, error_message);
   }
 
  private:
-  server_channel* channel_;  // XXX: use copy, no delete
+  const reply_context reply_context_;  // cotext copy
   bool replied_;
 };
 

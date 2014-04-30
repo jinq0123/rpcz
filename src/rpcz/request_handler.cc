@@ -4,9 +4,11 @@
 
 #include <boost/foreach.hpp>
 
+#include "logging.hpp"
+#include "rpcz/reply_context.hpp"
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/rpcz.pb.h"  // for rpc_request_header
-#include "server_channel_impl.hpp"
+// DEL #include "server_channel_impl.hpp"
 #include "zmq_utils.hpp"  // for message_iterator
 
 namespace rpcz {
@@ -29,13 +31,14 @@ void request_handler::handle_request(message_iterator& iter) {
   std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
   if (!iter.has_more()) return;
   rpc_request_header rpc_request_header;
-  server_channel_impl channel(client_connection_, event_id);
+  reply_context context = { &client_connection_, event_id };
   {
     zmq::message_t& msg = iter.next();
     if (!rpc_request_header.ParseFromArray(msg.data(), msg.size())) {
       // Handle bad rpc.
       DLOG(INFO) << "Received bad header.";
-      channel.send_error(application_error::INVALID_HEADER);
+      // XXX channel.send_error(application_error::INVALID_HEADER);
+      // XXX reply_sender(context).send_error(...)
       return;
     };
   }
@@ -47,13 +50,14 @@ void request_handler::handle_request(message_iterator& iter) {
   if (service_it == service_map_.end()) {
     // Handle invalid service.
     DLOG(INFO) << "Invalid service: " << rpc_request_header.service();
-    channel.send_error(application_error::NO_SUCH_SERVICE);
+    // XXX channel.send_error(application_error::NO_SUCH_SERVICE);
+    // XXX reply_sender::send_error(context, ...)
     return;
   }
   rpcz::rpc_service* service = service_it->second;
   service->dispatch_request(rpc_request_header.method(),
                            payload.data(), payload.size(),
-                           &channel);  // TODO: use channel reference
+                           context);
 }  // handle_request()
 
 void request_handler::register_rpc_service(rpcz::rpc_service* rpc_service,

@@ -31,6 +31,8 @@
 
 namespace rpcz {
 
+// TODO: rename to reply_sender... reply_sender(reply_context(reply_broker, event_id))
+
 // Copyable.
 class server_channel_impl : public server_channel {
  public:
