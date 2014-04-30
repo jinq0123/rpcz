@@ -13,14 +13,10 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_SERVICE_H
 #define RPCZ_SERVICE_H
-
-#include <assert.h>
-#include <string>
-
-#include "server_channel.hpp"
 
 namespace google {
 namespace protobuf {
@@ -32,40 +28,11 @@ class ServiceDescriptor;
 
 namespace rpcz {
 
-template <typename MessageType>
-class replier {
- public:
-  explicit replier(server_channel* channel) :
-      channel_(channel), replied_(false) {
-  }
-
-  ~replier() { }
-
-  void send(const MessageType& response) {
-    assert(!replied_);
-    replied_ = true;
-
-    channel_->send(response);
-    // DEL delete channel_;
-  }
-
-  void Error(int application_error, const std::string& error_message="") {
-    assert(!replied_);
-    replied_ = true;
-
-    channel_->send_error(application_error, error_message);
-    // DEL delete channel_;
-  }
-
- private:
-  server_channel* channel_;  // XXX: use copy, no delete
-  bool replied_;
-};
+class server_channel;
 
 class service {
  public:
-  service() { };
-
+  service() {};
   virtual ~service() {};
 
   virtual const google::protobuf::ServiceDescriptor* GetDescriptor() = 0;
@@ -78,6 +45,7 @@ class service {
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                           const google::protobuf::Message& request,
                           server_channel* server_channel) = 0;
-};
-}  // namespace
-#endif
+};  // class service
+
+}  // namespace rpcz
+#endif  // RPCZ_SERVICE_H

@@ -1,3 +1,5 @@
+// Author: Jin Qing (http://blog.csdn.net/jq0123)
+
 #ifndef RPCZ_MONO_STATE_SERVICE_HPP
 #define RPCZ_MONO_STATE_SERVICE_HPP
 
