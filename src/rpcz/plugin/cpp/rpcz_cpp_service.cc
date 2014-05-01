@@ -140,7 +140,7 @@ void ServiceGenerator::GenerateMethodSignatures(
       printer->Print(sub_vars,
                      "$virtual$void $name$(const $input_type$& request,\n"
                      "                     $output_type$* response,\n"
-                     "                     ::rpcz::rpc_controller* rpc_controller,"
+                     "                     ::rpcz::rpc_controller* rpc_controller,\n"
                      "                     ::rpcz::closure* done);\n");
       printer->Print(sub_vars,
                      "$virtual$void $name$(const $input_type$& request,\n"
