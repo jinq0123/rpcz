@@ -123,33 +123,31 @@ connection_manager::connection_manager()
   event.wait();
 }
 
-connection_manager_ptr connection_manager::get()
+connection_manager_ptr connection_manager::get_new()
 {
-  connection_manager_ptr p = this_weak_ptr_.lock();
-  if (p) return p;
   lock_guard lock(this_weak_ptr_mutex_);
-  p = this_weak_ptr_.lock();
+  connection_manager_ptr p = this_weak_ptr_.lock();
   if (p) return p;
   p.reset(new connection_manager);
   this_weak_ptr_ = p;
   return p;
 }
 
-long connection_manager::use_count()
+bool connection_manager::is_destroyed()
 {
-    return this_weak_ptr_.use_count();
+    return 0 == this_weak_ptr_.use_count();
 }
 
-zmq::socket_t& connection_manager::get_frontend_socket() {
-  zmq::socket_t* socket = socket_.get();
-  if (socket == NULL) {
-    socket = new zmq::socket_t(*context_, ZMQ_DEALER);
+// used by get_frontend_socket()
+zmq::socket_t& connection_manager::new_frontend_socket() {
+    assert(NULL == socket_.get());
+    zmq::socket_t* socket = new zmq::socket_t(*context_, ZMQ_DEALER);
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     socket->connect(frontend_endpoint_.c_str());
-    socket_.reset(socket);
-  }
-  return *socket;
+    assert(NULL == socket_.get());
+    socket_.reset(socket);  // set thread specific socket
+    return *socket;
 }
 
 connection connection_manager::connect(const std::string& endpoint) {
@@ -165,7 +163,7 @@ connection connection_manager::connect(const std::string& endpoint) {
 }
 
 void connection_manager::bind(const std::string& endpoint,
-	const service_factory_map & factories) {
+    const service_factory_map & factories) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kBind, ZMQ_SNDMORE);

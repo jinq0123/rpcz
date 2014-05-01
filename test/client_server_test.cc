@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include <iostream>
 #include <boost/thread/thread.hpp>
@@ -61,10 +62,11 @@ class SearchServiceImpl : public SearchService {
   virtual void Search(
       const SearchRequest& request,
       const reply_context& reply_ctx) {
+    reply_sender sender(reply_ctx);
     if (request.query() == "foo") {
-      reply_sender(reply_ctx).send_error(-4, "I don't like foo.");
+      sender.send_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      reply_sender(reply_ctx).send_error(17, "I don't like bar.");
+      sender.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
       rpc_controller* newrpc = new rpc_controller;
       SearchResponse* response = new SearchResponse;
@@ -81,15 +83,15 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
       reply_sender(old_reply_context_).send(SearchResponse());
-      reply_sender(reply_ctx).send(SearchResponse());
+      sender.send(SearchResponse());
     } else if (request.query() == "terminate") {
-      reply_sender(reply_ctx).send(SearchResponse());
+      sender.send(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      reply_sender(reply_ctx).send(response);
+      sender.send(response);
     }
   }
 
@@ -118,7 +120,7 @@ class server_test : public ::testing::Test {
  public:
   server_test() :
       context_(new zmq::context_t(1)) /* scoped_ptr */ {
-    EXPECT_EQ(0, connection_manager::use_count());
+    EXPECT_TRUE(connection_manager::is_destroyed());
     application::set_zmq_context(context_.get());
     application::set_connection_manager_threads(10);
     frontend_connection_.reset(new connection);
@@ -138,7 +140,7 @@ class server_test : public ::testing::Test {
     frontend_connection_.reset();
     backend_connection_.reset();
 
-    EXPECT_EQ(0, connection_manager::use_count());
+    EXPECT_TRUE(connection_manager::is_destroyed());
     context_.reset();
   }
 

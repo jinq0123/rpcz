@@ -73,8 +73,8 @@ class connection_manager : boost::noncopyable {
 
  public:
   // Dynamic singleton. Auto destruct.
-  static connection_manager_ptr get();
-  static long use_count();
+  static inline connection_manager_ptr get();
+  static bool is_destroyed();  // for debug
 
  public:
   // Blocks the current thread until all connection managers have completed.
@@ -99,6 +99,16 @@ class connection_manager : boost::noncopyable {
   // Releases all the threads that are blocked inside run()
   void terminate();
 
+ public:
+  // Get thread specific frontend socket.
+  inline zmq::socket_t& get_frontend_socket();
+
+ private:
+  zmq::socket_t& new_frontend_socket();
+
+ private:
+  static connection_manager_ptr get_new();  // used by get()
+
  private:
   typedef boost::weak_ptr<connection_manager> weak_ptr;
   typedef boost::lock_guard<boost::mutex> lock_guard;
@@ -109,18 +119,26 @@ class connection_manager : boost::noncopyable {
   scoped_ptr<zmq::context_t> own_context_;
   zmq::context_t* context_;  // Use own_context_ or external context
 
-  inline zmq::socket_t& get_frontend_socket();
-
   boost::thread broker_thread_;
   boost::thread_group worker_threads_;
   boost::thread_specific_ptr<zmq::socket_t> socket_;
   std::string frontend_endpoint_;
   scoped_ptr<sync_event> is_terminating_;
-
-  friend class connection;
-  friend class client_connection;
-  friend class connection_managerThread;
 };  // class connection_manager
+
+connection_manager_ptr connection_manager::get()
+{
+    connection_manager_ptr p = this_weak_ptr_.lock();
+    if (p) return p;
+    return get_new();
+}
+
+zmq::socket_t& connection_manager::get_frontend_socket() {
+    zmq::socket_t* socket = socket_.get();
+    if (socket)
+        return *socket;
+    return new_frontend_socket();
+}
 
 }  // namespace rpcz
 

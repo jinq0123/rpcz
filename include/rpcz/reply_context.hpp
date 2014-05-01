@@ -13,6 +13,7 @@ class client_connection;
 // Copyable.
 struct reply_context {
     client_connection * client_connection;  // TODO: rename to reply_broker
+    // TODO: Do not use client_connection pointer, because connection may be deleted.
     std::string event_id;
 };
 

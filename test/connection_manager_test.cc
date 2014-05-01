@@ -42,7 +42,7 @@ class connection_manager_test : public ::testing::Test {
 };
 
 TEST_F(connection_manager_test, TestStartsAndFinishes) {
-  ASSERT_EQ(0, connection_manager::use_count());
+  ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
@@ -98,7 +98,7 @@ void expect_timeout(connection_manager_status status,
 }
 
 TEST_F(connection_manager_test, TestTimeoutAsync) {
-  ASSERT_EQ(0, connection_manager::use_count());
+  ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
 
@@ -153,7 +153,7 @@ void SendManyMessages(connection connection, int thread_id) {
 }
 
 TEST_F(connection_manager_test, ManyClientsTest) {
-  ASSERT_EQ(0, connection_manager::use_count());
+  ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
 
@@ -176,7 +176,7 @@ TEST_F(connection_manager_test, ManyClientsTest) {
 }
 
 TEST_F(connection_manager_test, TestUnbind) {
-  ASSERT_EQ(0, connection_manager::use_count());
+  ASSERT_TRUE(connection_manager::is_destroyed());
   connection_manager_ptr cm = connection_manager::get();
   const char kEndpoint[] = "inproc://server.point";
   service_factory_map m;
@@ -198,7 +198,7 @@ void DoThis(zmq::context_t * context) {
 }
 
 TEST_F(connection_manager_test, ProcessesSingleCallback) {
-  ASSERT_EQ(0, connection_manager::use_count());
+  ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
@@ -236,7 +236,7 @@ void add_many_closures() {
 }
 
 TEST_F(connection_manager_test, ProcessesManyCallbacksFromManyThreads) {
-  ASSERT_EQ(0, connection_manager::use_count());
+  ASSERT_TRUE(connection_manager::is_destroyed());
   const int thread_count = 10;
   application::set_zmq_context(&context);
   application::set_connection_manager_threads(thread_count);

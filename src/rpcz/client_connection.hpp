@@ -40,8 +40,6 @@ class client_connection {
   connection_manager & manager_;
   const uint64 server_socket_idx_;
   const std::string sender_;
-
-  // DEL friend void worker_thread(connection_manager*, zmq::context_t &, std::string);
 };
 
 }  // namespace rpcz
