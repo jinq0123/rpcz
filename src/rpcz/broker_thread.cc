@@ -78,9 +78,9 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
         break;
       case kBind: {
         std::string endpoint(message_to_string(iter.next()));
-		const service_factory_map * factories
-			= interpret_message<const service_factory_map *>(iter.next());
-		assert(factories);
+        const service_factory_map * factories
+            = interpret_message<const service_factory_map *>(iter.next());
+        assert(factories);
         handle_bind_command(sender, endpoint, *factories);
         break;
       }
@@ -146,7 +146,7 @@ void broker_thread::handle_connect_command(
 void broker_thread::handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
-	  const service_factory_map & factories) {
+      const service_factory_map & factories) {
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -157,7 +157,7 @@ void broker_thread::handle_bind_command(
     // reactor will own socket and callback.
     reactor_.add_socket(socket, new_permanent_callback(
         this, &broker_thread::handle_server_socket,
-		server_socket_idx, &factories));
+        server_socket_idx, &factories));
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -185,16 +185,16 @@ void broker_thread::handle_socket_deleted(const std::string sender)
 }
 
 void broker_thread::handle_server_socket(uint64 server_socket_idx,
-		const service_factory_map * factories) {
-	assert(factories);
+        const service_factory_map * factories) {
+    assert(factories);
     message_iterator iter(*server_sockets_[server_socket_idx]);
     std::string sender(message_to_string(iter.next()));
     if (iter.next().size() != 0) return;
-	request_handler * handler = request_handler_manager_
-		.get_handler(sender, *factories, server_socket_idx);
-	assert(NULL != handler);
+    request_handler * handler = request_handler_manager_
+        .get_handler(sender, *factories, server_socket_idx);
+    assert(NULL != handler);
     begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, kHandleRequest)
-	send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
+    send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
 }
 
