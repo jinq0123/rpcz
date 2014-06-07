@@ -29,12 +29,12 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      const rpcz::reply_context& reply_ctx) {
+      rpcz::replier replier) {
     cout << "Got request for '" << request.query() << "'" << endl;
     SearchResponse response;
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
-    rpcz::replier(reply_ctx).send(response);
+    replier.send(response);
     // TODO: simplify it. Req/Resp and sender all in context.
   }
 

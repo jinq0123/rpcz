@@ -18,6 +18,8 @@
 #ifndef RPCZ_SERVICE_H
 #define RPCZ_SERVICE_H
 
+#include "rpcz/replier.hpp"
+
 namespace google {
 namespace protobuf {
 class Message;
@@ -27,8 +29,6 @@ class ServiceDescriptor;
 }  // namespace google
 
 namespace rpcz {
-
-struct reply_context;
 
 class service {
  public:
@@ -45,7 +45,7 @@ class service {
   // TODO: need request_context.
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
-                           const reply_context& reply_ctx) = 0;
+                           replier replier) = 0;
 };  // class service
 
 }  // namespace rpcz

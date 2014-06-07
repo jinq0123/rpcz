@@ -22,8 +22,6 @@
 
 namespace rpcz {
 
-struct reply_context;
-
 // rpc_service is a low-level request handler: requests and replies are void*.
 // It is exposed here for language bindings. Do not use directly.
 class rpc_service {
@@ -32,7 +30,7 @@ class rpc_service {
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                const reply_context& reply_ctx) = 0;
+                                replier replier) = 0;
                                 // use rpc_context
 };
 

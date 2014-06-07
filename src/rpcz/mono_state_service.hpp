@@ -29,8 +29,8 @@ class mono_state_service : public service {
 
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
-                           const reply_context& reply_ctx) {
-    return service_.call_method(method, request, reply_ctx);
+                           replier replier) {
+    return service_.call_method(method, request, replier);
   }
                           
  private:

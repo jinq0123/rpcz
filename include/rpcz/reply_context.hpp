@@ -10,11 +10,19 @@ namespace rpcz {
 
 class client_connection;
 
-// Copyable.
 struct reply_context {
-    client_connection * client_connection;  // TODO: rename to reply_broker
+    client_connection * clt_connection;  // TODO: rename to reply_broker
     // TODO: Do not use client_connection pointer, because connection may be deleted.
     std::string event_id;
+    bool replied;  // To assert one reply.
+
+    reply_context(client_connection * conn, const std::string & evt_id)
+        : clt_connection(conn)
+        , event_id(evt_id)
+        , replied(false)
+    {
+        assert(conn);
+    }
 };
 
 }  // namespace rpcz

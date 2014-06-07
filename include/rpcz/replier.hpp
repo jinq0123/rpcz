@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include <boost/shared_ptr.hpp>
+
 namespace google {
 namespace protobuf {
 class Message;
@@ -32,14 +34,19 @@ class message_t;
 
 namespace rpcz {
 
+class client_connection;
 class rpc_response_header;
 struct reply_context;
 
+// replier is copyable.
+// Each request has its own replier, and should reply once.
+// replier can used in callback by copy.  // XXX Need example.
+// replier's copy operator is quick, which only copies a shared_ptr.
+// XXX More comments...
 class replier {
  public:
-  replier(const reply_context& reply_ctx)
-      : reply_context_(reply_ctx) {}
-  ~replier() {}
+  replier(client_connection & connection, const std::string & event_id);
+  ~replier();
 
  public:
   void send(const google::protobuf::Message& response) const;
@@ -55,7 +62,7 @@ class replier {
       zmq::message_t* payload) const;
 
 private:
-  const reply_context & reply_context_;
+  boost::shared_ptr<reply_context> reply_context_;
 };  // class replier
 
 }  // namespace rpcz
