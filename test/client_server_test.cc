@@ -26,7 +26,6 @@
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
-#include "rpcz/reply_context.hpp"
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/rpc_controller.hpp"
