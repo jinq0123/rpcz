@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpcz/reply_sender.hpp"
+#include "rpcz/replier.hpp"
 
 #include <zmq.hpp>  // for message_t
 
@@ -30,7 +30,7 @@
 
 namespace rpcz {
 
-void reply_sender::send(const google::protobuf::Message& response) const {
+void replier::send(const google::protobuf::Message& response) const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     int msg_size = response.ByteSize();
@@ -42,14 +42,14 @@ void reply_sender::send(const google::protobuf::Message& response) const {
                           payload.release());
 }
 
-void reply_sender::send0(const std::string& response) const {
+void replier::send0(const std::string& response) const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
     send_generic_response(generic_rpc_response,
                           string_to_message(response));
 }
 
-void reply_sender::send_error(int application_error,
+void replier::send_error(int application_error,
         const std::string& error_message/* = "" */) const {
     assert(NULL != reply_context_.client_connection);
     rpc_response_header generic_rpc_response;
@@ -64,7 +64,7 @@ void reply_sender::send_error(int application_error,
 
 // Sends the response back.
 // Takes ownership of the provided payload message.
-void reply_sender::send_generic_response(
+void replier::send_generic_response(
         const rpc_response_header& generic_rpc_response,
         zmq::message_t* payload) const {
     size_t msg_size = generic_rpc_response.ByteSize();

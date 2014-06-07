@@ -27,7 +27,7 @@
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/reply_context.hpp"
-#include "rpcz/reply_sender.hpp"
+#include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/server.hpp"
@@ -44,7 +44,7 @@ void super_done(SearchResponse *response,
                rpc_controller* newrpc,
                reply_context reply_ctx) {
   delete newrpc;
-  reply_sender(reply_ctx).send(*response);
+  replier(reply_ctx).send(*response);
   delete response;
 }
 
@@ -62,7 +62,7 @@ class SearchServiceImpl : public SearchService {
   virtual void Search(
       const SearchRequest& request,
       const reply_context& reply_ctx) {
-    reply_sender sender(reply_ctx);
+    replier sender(reply_ctx);
     if (request.query() == "foo") {
       sender.send_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
@@ -82,7 +82,7 @@ class SearchServiceImpl : public SearchService {
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
-      reply_sender(old_reply_context_).send(SearchResponse());
+      replier(old_reply_context_).send(SearchResponse());
       sender.send(SearchResponse());
     } else if (request.query() == "terminate") {
       sender.send(SearchResponse());
@@ -112,7 +112,7 @@ class BackendSearchServiceImpl : public SearchService {
       const reply_context& reply_ctx) {
     SearchResponse response;
     response.add_results("42!");
-    reply_sender(reply_ctx).send(response);
+    replier(reply_ctx).send(response);
   }
 };
 

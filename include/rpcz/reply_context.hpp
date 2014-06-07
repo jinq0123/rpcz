@@ -1,4 +1,4 @@
-// Context of reply. Used by reply_sender.
+// Context of reply. Used by replier.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_REPLY_CONTEXT_H

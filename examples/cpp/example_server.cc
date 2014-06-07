@@ -34,7 +34,7 @@ class SearchServiceImpl : public SearchService {
     SearchResponse response;
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
-    rpcz::reply_sender(reply_ctx).send(response);
+    rpcz::replier(reply_ctx).send(response);
     // TODO: simplify it. Req/Resp and sender all in context.
   }
 

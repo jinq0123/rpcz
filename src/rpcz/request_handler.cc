@@ -6,7 +6,7 @@
 
 #include "logging.hpp"
 #include "rpcz/reply_context.hpp"
-#include "rpcz/reply_sender.hpp"
+#include "rpcz/replier.hpp"
 #include "rpcz/rpc_controller.hpp"  // for application_error
 #include "rpcz/rpc_service.hpp"
 #include "rpcz/rpcz.pb.h"  // for rpc_request_header
@@ -38,7 +38,7 @@ void request_handler::handle_request(message_iterator& iter) {
     if (!rpc_request_header.ParseFromArray(msg.data(), msg.size())) {
       // Handle bad rpc.
       DLOG(INFO) << "Received bad header.";
-      reply_sender(context).send_error(application_error::INVALID_HEADER);
+      replier(context).send_error(application_error::INVALID_HEADER);
       return;
     };
   }
@@ -50,7 +50,7 @@ void request_handler::handle_request(message_iterator& iter) {
   if (service_it == service_map_.end()) {
     // Handle invalid service.
     DLOG(INFO) << "Invalid service: " << rpc_request_header.service();
-    reply_sender(context).send_error(application_error::NO_SUCH_SERVICE);
+    replier(context).send_error(application_error::NO_SUCH_SERVICE);
     return;
   }
   rpcz::rpc_service* service = service_it->second;

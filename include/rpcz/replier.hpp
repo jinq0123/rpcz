@@ -35,11 +35,11 @@ namespace rpcz {
 class rpc_response_header;
 struct reply_context;
 
-class reply_sender {
+class replier {
  public:
-  reply_sender(const reply_context& reply_ctx)
+  replier(const reply_context& reply_ctx)
       : reply_context_(reply_ctx) {}
-  ~reply_sender() {}
+  ~replier() {}
 
  public:
   void send(const google::protobuf::Message& response) const;
@@ -56,7 +56,7 @@ class reply_sender {
 
 private:
   const reply_context & reply_context_;
-};  // class reply_sender
+};  // class replier
 
 }  // namespace rpcz
 #endif  // RPCZ_REPLY_SENDER_H

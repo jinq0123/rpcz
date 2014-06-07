@@ -20,7 +20,7 @@ set(RPCZ_SOURCES
     connection_manager.cc 
     event_id_generator.cc
     reactor.cc
-    reply_sender.cc
+    replier.cc
     request_handler.cc
     request_handler_manager.cc
     rpc_controller.cc
