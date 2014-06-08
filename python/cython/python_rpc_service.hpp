@@ -29,29 +29,29 @@ class server_channel;
 // A subclass of RpcService that helps forwarding the requests to Python-land.
 class PythonRpcService : public rpc_service {
  public:
-  typedef void(*Handler)(PyObject* user_data, std::string& method,
+  typedef void(*Handler)(PyObject* user_service, std::string& method,
                          void* payload, size_t payload_len,
                          replier replier_copy);
 
-  PythonRpcService(Handler handler, PyObject *user_data)
-      : user_data_(user_data), handler_(handler) {
-        Py_INCREF(user_data_);
+  PythonRpcService(Handler handler, PyObject *user_service)
+      : user_service_(user_service), handler_(handler) {
+        Py_INCREF(user_service_);
   }
 
   ~PythonRpcService() {
-    Py_DECREF(user_data_);
+    Py_DECREF(user_service_);
   }
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
                                 replier replier_copy) {
-    handler_(user_data_,
+    handler_(user_service_,
              *const_cast<std::string*>(&method),
              const_cast<void*>(payload), payload_len, replier_copy);
   }
 
  private:
-  PyObject *user_data_;
+  PyObject *user_service_;  // User defined service.
   Handler handler_;
 };
 }  // namespace rpcz

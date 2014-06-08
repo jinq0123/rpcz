@@ -180,17 +180,17 @@ cdef class Replier:
       self.thisptr = NULL
 
 
-ctypedef void(*Handler)(user_data, string method,
+ctypedef void(*Handler)(object user_service, string method,
                         void* payload, size_t payload_len,
                         _replier replier_copy) nogil
 
 
-cdef void rpc_handler_bridge(user_data, string& method,
+cdef void rpc_handler_bridge(object user_service, string& method,
                              void* payload, size_t payload_len,
                              _replier replier_copy) with gil:
   cdef Replier replier_ = Replier.__new__(Replier)
   replier_.thisptr = new _replier(replier_copy)
-  user_data._call_method(string_to_pystring(method),
+  user_service._call_method(string_to_pystring(method),
                          cstring_to_pystring(payload, payload_len),
                          replier_)
 
