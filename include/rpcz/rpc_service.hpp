@@ -20,6 +20,8 @@
 
 #include <string>
 
+#include "replier.hpp"
+
 namespace rpcz {
 
 // rpc_service is a low-level request handler: requests and replies are void*.
@@ -30,7 +32,7 @@ class rpc_service {
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                replier replier) = 0;
+                                replier replier_copy) = 0;
                                 // use rpc_context
 };
 

@@ -79,7 +79,7 @@ void ServiceGenerator::GenerateInterface(io::Printer* printer) {
     "const ::google::protobuf::ServiceDescriptor* GetDescriptor();\n"
     "void call_method(const ::google::protobuf::MethodDescriptor* method,\n"
     "                 const ::google::protobuf::Message& request,\n"
-    "                 ::rpcz::replier replier);\n"
+    "                 ::rpcz::replier replier_copy);\n"
     "const ::google::protobuf::Message& GetRequestPrototype(\n"
     "  const ::google::protobuf::MethodDescriptor* method) const;\n"
     "const ::google::protobuf::Message& GetResponsePrototype(\n"
@@ -150,7 +150,7 @@ void ServiceGenerator::GenerateMethodSignatures(
       printer->Print(
           sub_vars,
           "$virtual$void $name$(const $input_type$& request,\n"
-          "                     ::rpcz::replier replier);\n");
+          "                     ::rpcz::replier replier_copy);\n");
     }
   }
 }
@@ -221,8 +221,8 @@ void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
 
     printer->Print(sub_vars,
       "void $classname$::$name$(const $input_type$&,\n"
-      "                         ::rpcz::replier replier) {\n"
-      "  replier.send_error(\n"
+      "                         ::rpcz::replier replier_copy) {\n"
+      "  replier_copy.send_error(\n"
       "      ::rpcz::application_error::METHOD_NOT_IMPLEMENTED,\n"
       "      \"Method $name$() not implemented.\");\n"
       "}\n"
@@ -234,7 +234,7 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
   printer->Print(vars_,
     "void $classname$::call_method(const ::google::protobuf::MethodDescriptor* method,\n"
     "                              const ::google::protobuf::Message& request,\n"
-    "                              ::rpcz::replier replier) {\n"
+    "                              ::rpcz::replier replier_copy) {\n"
     "  GOOGLE_DCHECK_EQ(method->service(), $classname$_descriptor_);\n"
     "  switch(method->index()) {\n");
 
@@ -252,7 +252,7 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
       "    case $index$:\n"
       "      $name$(\n"
       "          *::google::protobuf::down_cast<const $input_type$*>(&request),\n"
-      "          replier);\n"
+      "          replier_copy);\n"
       "      break;\n");
   }
 

@@ -31,7 +31,7 @@ class PythonRpcService : public rpc_service {
  public:
   typedef void(*Handler)(PyObject* user_data, std::string& method,
                          void* payload, size_t payload_len,
-                         server_channel* channel);
+                         replier replier_copy);
 
   PythonRpcService(Handler handler, PyObject *user_data)
       : user_data_(user_data), handler_(handler) {
@@ -44,10 +44,10 @@ class PythonRpcService : public rpc_service {
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                server_channel* channel) {
+                                replier replier_copy) {
     handler_(user_data_,
              *const_cast<std::string*>(&method),
-             const_cast<void*>(payload), payload_len, channel);
+             const_cast<void*>(payload), payload_len, replier_copy);
   }
 
  private:

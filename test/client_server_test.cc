@@ -41,9 +41,9 @@ namespace rpcz {
 
 void super_done(SearchResponse *response,
                rpc_controller* newrpc,
-               replier replier) {
+               replier replier_copy) {
   delete newrpc;
-  replier.send(*response);
+  replier_copy.send(*response);
   delete response;
 }
 
@@ -60,37 +60,37 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      replier replier) {
+      replier replier_copy) {
     if (request.query() == "foo") {
-      replier.send_error(-4, "I don't like foo.");
+      replier_copy.send_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      replier.send_error(17, "I don't like bar.");
+      replier_copy.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
       rpc_controller* newrpc = new rpc_controller;
       SearchResponse* response = new SearchResponse;
       backend_->Search(request, response, newrpc,
-          new_callback(super_done, response, newrpc, replier));
+          new_callback(super_done, response, newrpc, replier_copy));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      old_replier_.reset(new rpcz::replier(replier));
+      old_replier_.reset(new replier(replier_copy));
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
       if (old_replier_.get())
         old_replier_->send(SearchResponse());
-      replier.send(SearchResponse());
+      replier_copy.send(SearchResponse());
     } else if (request.query() == "terminate") {
-      replier.send(SearchResponse());
+      replier_copy.send(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      replier.send(response);
+      replier_copy.send(response);
     }
   }
 
@@ -108,10 +108,10 @@ class BackendSearchServiceImpl : public SearchService {
  public:
   virtual void Search(
       const SearchRequest&,
-      replier replier) {
+      replier replier_copy) {
     SearchResponse response;
     response.add_results("42!");
-    replier.send(response);
+    replier_copy.send(response);
   }
 };
 

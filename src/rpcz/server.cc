@@ -42,10 +42,10 @@ void server::register_singleton_service(rpcz::service& service, const std::strin
 }
 
 // TODO:
-//void server::register_rpc_service(rpcz::rpc_service* rpc_service,
-//                                  const std::string& name) {
-//  impl_->register_rpc_service(rpc_service, name);
-//}
+void server::register_rpc_service(rpcz::rpc_service* rpc_service,
+                                  const std::string& name) {
+  // impl_->register_rpc_service(rpc_service, name);
+}
 
 void server::bind(const std::string& endpoint) {
   impl_->bind(endpoint);

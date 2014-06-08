@@ -156,14 +156,15 @@ cdef class RpcChannel:
                     python_callback_bridge, closure_wrapper))
 
 
-cdef extern from "rpcz/service.hpp" namespace "rpcz":
-  cdef cppclass _server_channel "rpcz::server_channel":
+cdef extern from "rpcz/replier.hpp" namespace "rpcz":
+  cdef cppclass _replier "rpcz::replier":
+    _replier(_replier)
     void send_error(int, string)
     void send0(string)
  
 
-cdef class ServerChannel:
-    cdef _server_channel *thisptr
+cdef class Replier:
+    cdef _replier *thisptr
     def __init__(self):
         raise TypeError("Do not initialize directly.")
     def __dealloc__(self):
@@ -181,17 +182,17 @@ cdef class ServerChannel:
 
 ctypedef void(*Handler)(user_data, string method,
                         void* payload, size_t payload_len,
-                        _server_channel* channel) nogil
+                        _replier replier_copy) nogil
 
 
 cdef void rpc_handler_bridge(user_data, string& method,
                              void* payload, size_t payload_len,
-                             _server_channel* channel) with gil:
-  cdef ServerChannel channel_ = ServerChannel.__new__(ServerChannel)
-  channel_.thisptr = channel
+                             _replier replier_copy) with gil:
+  cdef Replier replier_ = Replier.__new__(Replier)
+  replier_.thisptr = new _replier(replier_copy)
   user_data._call_method(string_to_pystring(method),
                          cstring_to_pystring(payload, payload_len),
-                         channel_)
+                         replier_)
 
 
 cdef extern from "python_rpc_service.hpp" namespace "rpcz":

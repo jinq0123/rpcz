@@ -46,14 +46,14 @@ class proto_rpc_service : public rpc_service {
 
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                replier replier) {
+                                replier replier_copy) {
     const ::google::protobuf::MethodDescriptor* descriptor =
         service_->GetDescriptor()->FindMethodByName(
             method);
     if (descriptor == NULL) {
       // Invalid method name
       DLOG(INFO) << "Invalid method name: " << method;
-      replier.send_error(application_error::NO_SUCH_METHOD);
+      replier_copy.send_error(application_error::NO_SUCH_METHOD);
       return;
     }
 
@@ -63,10 +63,10 @@ class proto_rpc_service : public rpc_service {
     if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
-      replier.send_error(application_error::INVALID_MESSAGE);
+      replier_copy.send_error(application_error::INVALID_MESSAGE);
       return;
     }
-    service_->call_method(descriptor, *request, replier);
+    service_->call_method(descriptor, *request, replier_copy);
   }
 
  private:

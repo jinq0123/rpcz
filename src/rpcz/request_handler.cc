@@ -31,13 +31,13 @@ void request_handler::handle_request(message_iterator& iter) {
   std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
   if (!iter.has_more()) return;
   rpc_request_header rpc_request_header;
-  replier replier(client_connection_, event_id);
+  replier replier_copy(client_connection_, event_id);
   {
     zmq::message_t& msg = iter.next();
     if (!rpc_request_header.ParseFromArray(msg.data(), msg.size())) {
       // Handle bad rpc.
       DLOG(INFO) << "Received bad header.";
-      replier.send_error(application_error::INVALID_HEADER);
+      replier_copy.send_error(application_error::INVALID_HEADER);
       return;
     };
   }
@@ -49,13 +49,13 @@ void request_handler::handle_request(message_iterator& iter) {
   if (service_it == service_map_.end()) {
     // Handle invalid service.
     DLOG(INFO) << "Invalid service: " << rpc_request_header.service();
-    replier.send_error(application_error::NO_SUCH_SERVICE);
+    replier_copy.send_error(application_error::NO_SUCH_SERVICE);
     return;
   }
   rpcz::rpc_service* service = service_it->second;
   service->dispatch_request(rpc_request_header.method(),
                            payload.data(), payload.size(),
-                           replier);
+                           replier_copy);
 }  // handle_request()
 
 void request_handler::register_rpc_service(rpcz::rpc_service* rpc_service,

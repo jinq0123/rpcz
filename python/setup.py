@@ -69,7 +69,7 @@ setup(
                   library_dirs=['../build/deps/lib', '../build/src/rpcz',
                       'c:/Boost/lib',
                       'E:/JinQing/Workspace/rpcz_jinq/src/rpcz/Release',
-                      'E:/JinQing/LibSrc/zeromq-3.2.3/lib/Win32',
+                      'E:/JinQing/LibSrc/zeromq-4.0.4/lib/Win32',
                       'E:/JinQing/LibSrc/protobuf-2.5.0/vsprojects/Release'],
                   language='c++')
     ],
