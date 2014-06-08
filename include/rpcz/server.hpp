@@ -59,14 +59,17 @@ class server : boost::noncopyable {
   // TODO: unregister_service()
 
   // Must register service before bind.
-  // Registeration after bind will be ignored.
+  // Registration after bind will be ignored.
+
+  // TODO: register after bind. Move register into broker thread.
+  //       service_factory_map_ owned by broker thread.
 
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. It takes ownership of the rpc_service
   void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  private:
-  // TODO: Public it to allow customised factory.
+  // TODO: Public it to allow customized factory.
   // service_factory creates service for each connection.
   void register_service_factory(service_factory_ptr factory, const std::string & name);
 

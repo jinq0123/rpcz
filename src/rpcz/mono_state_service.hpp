@@ -32,9 +32,9 @@ class mono_state_service : public service {
                            replier replier_copy) {
     return service_.call_method(method, request, replier_copy);
   }
-                          
+
  private:
-  service & service_;                          
+  service & service_;
 };
 }  // namespace rpcz
 #endif  // RPCZ_MONO_STATE_SERVICE_HPP
