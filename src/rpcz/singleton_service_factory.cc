@@ -9,12 +9,12 @@
 namespace rpcz {
 
 singleton_service_factory::singleton_service_factory(service & svc)
-	: service_(svc) {
+    : service_(svc) {
 }
 
 service * singleton_service_factory::create()
 {
-	return new mono_state_service(service_);
+    return new mono_state_service(service_);
 }
 
 }  // namespace rpcz

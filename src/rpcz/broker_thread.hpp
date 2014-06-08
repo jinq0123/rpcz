@@ -57,7 +57,7 @@ class broker_thread {
   void handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
-	  const service_factory_map& factories);
+      const service_factory_map& factories);
 
   void handle_unbind_command(
       const std::string& sender,
@@ -67,7 +67,7 @@ class broker_thread {
   void handle_socket_deleted(const std::string sender);
 
   void handle_server_socket(uint64 server_socket_idx,
-	  const service_factory_map * factories);  // TODO: use reference instead of pointer
+      const service_factory_map * factories);  // TODO: use reference instead of pointer
 
   inline void send_request(message_iterator& iter);
 

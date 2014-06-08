@@ -26,7 +26,7 @@ namespace rpcz {
 
 server_impl::server_impl()
   : connection_manager_ptr_(connection_manager::get()),
-	binding_(false) {
+    binding_(false) {
   assert(connection_manager_ptr_);
 }
 

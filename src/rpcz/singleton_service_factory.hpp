@@ -9,13 +9,13 @@ namespace rpcz {
 
 class singleton_service_factory : public service_factory {
 public:
-	singleton_service_factory(service & svc);
+    singleton_service_factory(service & svc);
 
 public:
-	virtual service * create();
+    virtual service * create();
 
 private:
-	service & service_;
+    service & service_;
 };
 
 }  // namespace rpcz

@@ -14,7 +14,7 @@ class mono_state_service : public service {
   mono_state_service(service & svc) : service_(svc) {};
 
   virtual const google::protobuf::ServiceDescriptor* GetDescriptor() {
-  	return service_.GetDescriptor();
+    return service_.GetDescriptor();
   }
 
   virtual const google::protobuf::Message& GetRequestPrototype(

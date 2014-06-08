@@ -12,7 +12,7 @@ template <typename Service>
 class default_service_factory : public service_factory {
  public:
   virtual service * create() {
-	  return new Service;
+      return new Service;
   }
 };
 
