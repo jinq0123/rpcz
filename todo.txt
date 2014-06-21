@@ -1,0 +1,9 @@
+
+* Delete
+  SearchService_Stub(::rpcz::rpc_channel* channel, 
+                   const ::std::string& service_name,
+                   bool owns_channel=false);
+  ::std::string service_name_;
+
+* Delete 
+  bool owns_channel=false

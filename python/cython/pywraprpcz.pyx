@@ -240,6 +240,7 @@ cdef class Server:
     def register_service(self, service, name=None):
         cdef PythonRpcService* rpc_service = new PythonRpcService(
             rpc_handler_bridge, service)
+        # TODO: if name is None: name = service.DESCRIPTOR.name
         self.thisptr.register_rpc_service(rpc_service, make_string(name))
     def bind(self, endpoint):
         self.thisptr.bind(make_string(endpoint))

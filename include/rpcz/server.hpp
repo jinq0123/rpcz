@@ -29,15 +29,17 @@ class rpc_service;
 class service;
 class server_impl;
 
+// TODO: Each connection's service always runs in the same worker thread.
+
 // A server object maps incoming RPC requests to a provided service interface.
-// The service interface methods are executed inside a worker thread.
+// The service interface methods are executed inside one of the worker threads.
 // Non-thread-safe.
 class server : boost::noncopyable {
  public:
   server();
   ~server();
 
-  // Registers an rpc service with this server. 
+  // Registers an rpc service with this server.
   // All registrations must occur before bind() is called. TODO: allow after bind()
   // The name parameter identifies the service for external clients.
   // If you use the first form, the service name from the

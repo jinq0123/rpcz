@@ -42,7 +42,7 @@ class service {
   virtual const google::protobuf::Message& GetResponsePrototype(
       const google::protobuf::MethodDescriptor*) const = 0;
 
-  // TODO: need request_context.
+  // TODO: need request_context. Need client address in Ctr?
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
                            replier replier_copy) = 0;
