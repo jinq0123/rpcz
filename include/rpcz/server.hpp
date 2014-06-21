@@ -42,11 +42,12 @@ class server : boost::noncopyable {
   // The name parameter identifies the service for external clients.
   // If you use the first form, the service name from the
   // protocol buffer definition will be used.
-  // It does not take ownership of the provided service.
+  // It does not take ownership of the provided service,
+  //   which must be valid during server's lifetime.
   // Singleton service means all client share the same service instance.
-  // service must be thread-safe if using multi worker threads.
-  void register_singleton_service(service& service);
-  void register_singleton_service(service& service, const std::string& name);
+  // Singleton service must be thread-safe if using multi worker threads.
+  void register_singleton_service(service& svc);
+  void register_singleton_service(service& svc, const std::string& name);
 
   template <typename Service>
   void register_service();
@@ -68,8 +69,7 @@ class server : boost::noncopyable {
   // Registers a low-level rpc_service. It takes ownership of the rpc_service
   void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
- private:
-  // TODO: Public it to allow customized factory.
+ public:
   // service_factory creates service for each connection.
   void register_service_factory(service_factory_ptr factory, const std::string & name);
 

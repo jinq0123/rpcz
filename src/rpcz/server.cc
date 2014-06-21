@@ -32,12 +32,12 @@ server::server()
 server::~server() {
 }
 
-void server::register_singleton_service(rpcz::service& service) {
-  register_singleton_service(service, service.GetDescriptor()->name());
+void server::register_singleton_service(rpcz::service& svc) {
+  register_singleton_service(svc, svc.GetDescriptor()->name());
 }
 
-void server::register_singleton_service(rpcz::service& service, const std::string& name) {
-  service_factory_ptr factory(new singleton_service_factory(service));  // shared_ptr
+void server::register_singleton_service(rpcz::service& svc, const std::string& name) {
+  service_factory_ptr factory(new singleton_service_factory(svc));  // shared_ptr
   impl_->register_service_factory(factory, name);
 }
 
