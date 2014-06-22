@@ -46,7 +46,7 @@ class PythonRpcService : public rpc_service {
                                 const void* payload, size_t payload_len,
                                 replier replier_copy) {
     handler_(user_service_,
-             *const_cast<std::string*>(&method),
+             *const_cast<std::string*>(&method),  // TODO: Need const_cast?
              const_cast<void*>(payload), payload_len, replier_copy);
   }
 
