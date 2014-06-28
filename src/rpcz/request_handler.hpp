@@ -10,7 +10,7 @@
 namespace rpcz {
 
 class message_iterator;
-class rpc_service;
+class iservice;
 
 // Each client has its request_hander.
 // Used in broker thread.
@@ -25,12 +25,11 @@ class request_handler {
   void handle_request(message_iterator& iter);
 
  public:
-  // register_rpc_service() will take the ownership of rpc_service.
-  void register_rpc_service(rpcz::rpc_service* rpc_service,
-                            const std::string& name);
+  // register_service() will take the ownership of input service.
+  void register_service(rpcz::iservice* svc, const std::string& name);
 
  private:
-  void unregister_rpc_service(const std::string& name);
+  void unregister_service(const std::string& name);
 
   // DEL
  //private:
@@ -38,8 +37,8 @@ class request_handler {
  // const std::string sender_;
 
  private:
-  typedef std::map<std::string, rpcz::rpc_service*> rpc_service_map;
-  rpc_service_map service_map_;  // Owns rpc_service. Delete in destructor.
+  typedef std::map<std::string, rpcz::iservice*> service_map;
+  service_map service_map_;  // Owns service. Delete in destructor.
 
   client_connection client_connection_;
 };

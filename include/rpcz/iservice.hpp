@@ -15,27 +15,25 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_PRC_SERVICE_H
-#define RPCZ_PRC_SERVICE_H
+#ifndef RPCZ_ISERVICE_H
+#define RPCZ_ISERVICE_H
 
 #include <string>
 
-#include "replier.hpp"
+#include "rpcz/replier.hpp"
 
 namespace rpcz {
 
-// rpc_service is a low-level request handler: requests and replies are void*.
-// It is exposed here for language bindings. Do not use directly.
-class rpc_service {
+// Service interface.
+class iservice {
  public:
-  virtual ~rpc_service() {}
-
+  // dispatch_request() is low-level request handler: requests are void*.
+  // It is exposed for all language bindings.
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
                                 replier replier_copy) = 0;
-                                // use rpc_context
 };
 
 }  // namespace rpcz
 
-#endif  // RPCZ_PRC_SERVICE_H
+#endif  // RPCZ_ISERVICE_H

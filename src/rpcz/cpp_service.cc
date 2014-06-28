@@ -15,8 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_PROTO_RPC_SERVICE_HPP
-#define RPCZ_PROTO_RPC_SERVICE_HPP
+#include "rpcz/cpp_service.hpp"
 
 #include <assert.h>
 #include <string>
@@ -28,28 +27,14 @@
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_controller.hpp"  // for application_error
-#include "rpcz/rpc_service.hpp"
-#include "rpcz/service.hpp"
 
 namespace rpcz {
 
-class proto_rpc_service : public rpc_service {
- public:
-  // It will take ownership of the provided service.
-  explicit proto_rpc_service(service * svc) : service_(svc) {
-      assert(svc);
-  }
-
-  virtual ~proto_rpc_service() {
-      delete service_;
-  }
-
-  virtual void dispatch_request(const std::string& method,
+void cpp_service::dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
                                 replier replier_copy) {
     const ::google::protobuf::MethodDescriptor* descriptor =
-        service_->GetDescriptor()->FindMethodByName(
-            method);
+        GetDescriptor()->FindMethodByName(method);
     if (descriptor == NULL) {
       // Invalid method name
       DLOG(INFO) << "Invalid method name: " << method;
@@ -59,20 +44,14 @@ class proto_rpc_service : public rpc_service {
 
     scoped_ptr<google::protobuf::Message> request;
     request.reset(CHECK_NOTNULL(
-        service_->GetRequestPrototype(descriptor).New()));
+        GetRequestPrototype(descriptor).New()));
     if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
       replier_copy.send_error(application_error::INVALID_MESSAGE);
       return;
     }
-    service_->call_method(descriptor, *request, replier_copy);
-  }
-
- private:
-  service * service_;
-};
+    call_method(descriptor, *request, replier_copy);
+}  // dispatch_request()
 
 }  // namespace rpcz
-
-#endif  // RPCZ_PROTO_RPC_SERVICE_HPP

@@ -4,7 +4,6 @@
 
 #include <boost/foreach.hpp>
 
-#include "proto_rpc_service.hpp"
 #include "request_handler.hpp"
 #include "rpcz/service_factory.hpp"
 
@@ -30,10 +29,9 @@ request_handler * request_handler_manager::create_handler(
     // Create services for this handler...
     BOOST_FOREACH(const service_factory_map::value_type & v, factories)
     {
-        service * service = v.second->create();
-        assert(service);
-        handler_ptr->register_rpc_service(
-            new proto_rpc_service(service), v.first);
+        iservice * svc = v.second->create();
+        assert(svc);
+        handler_ptr->register_service(svc, v.first);
     }
     handler_map_.insert(std::make_pair(sender, handler_ptr));
     // TODO: request_handler.set_client_connection(sender)

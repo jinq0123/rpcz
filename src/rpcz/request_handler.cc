@@ -5,9 +5,9 @@
 #include <boost/foreach.hpp>
 
 #include "logging.hpp"
+#include "rpcz/iservice.hpp"  // for dispatch_request()
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_controller.hpp"  // for application_error
-#include "rpcz/rpc_service.hpp"
 #include "rpcz/rpcz.pb.h"  // for rpc_request_header
 #include "zmq_utils.hpp"  // for message_iterator
 
@@ -20,9 +20,9 @@ request_handler::request_handler(uint64 server_socket_idx,
 
 request_handler::~request_handler() {
   // Delete proto_rpc_service pointers.
-  rpc_service_map map_copy = service_map_;
-  BOOST_FOREACH(const rpc_service_map::value_type & v, map_copy)
-      unregister_rpc_service(v.first);
+  service_map map_copy = service_map_;
+  BOOST_FOREACH(const service_map::value_type & v, map_copy)
+      unregister_service(v.first);
   assert(service_map_.empty());
 }
 
@@ -44,7 +44,7 @@ void request_handler::handle_request(message_iterator& iter) {
   if (!iter.has_more()) return;
   zmq::message_t& payload = iter.next();
   if (iter.has_more()) return;
-  rpc_service_map::const_iterator service_it = service_map_.find(
+  service_map::const_iterator service_it = service_map_.find(
       rpc_request_header.service());
   if (service_it == service_map_.end()) {
     // Handle invalid service.
@@ -52,20 +52,21 @@ void request_handler::handle_request(message_iterator& iter) {
     replier_copy.send_error(application_error::NO_SUCH_SERVICE);
     return;
   }
-  rpcz::rpc_service* service = service_it->second;
-  service->dispatch_request(rpc_request_header.method(),
-                           payload.data(), payload.size(),
-                           replier_copy);
+  rpcz::iservice* svc = service_it->second;
+  assert(svc);
+  svc->dispatch_request(rpc_request_header.method(),
+                        payload.data(), payload.size(),
+                        replier_copy);
 }  // handle_request()
 
-void request_handler::register_rpc_service(rpcz::rpc_service* rpc_service,
-                                           const std::string& name) {
-  unregister_rpc_service(name);
-  service_map_[name] = rpc_service;
+void request_handler::register_service(rpcz::iservice* svc,
+                                       const std::string& name) {
+  unregister_service(name);
+  service_map_[name] = svc;
 }
 
-void request_handler::unregister_rpc_service(const std::string& name) {
-  rpc_service_map::const_iterator iter = service_map_.find(name);
+void request_handler::unregister_service(const std::string& name) {
+  service_map::const_iterator iter = service_map_.find(name);
   if (iter == service_map_.end()) return;
   assert((*iter).second);
   delete (*iter).second;

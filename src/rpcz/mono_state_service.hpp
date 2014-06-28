@@ -4,37 +4,26 @@
 #ifndef RPCZ_MONO_STATE_SERVICE_HPP
 #define RPCZ_MONO_STATE_SERVICE_HPP
 
-#include "rpcz/service.hpp"
+#include "rpcz/iservice.hpp"
 
 namespace rpcz {
 
 // All mono_state_service instances share a same internal service.
-class mono_state_service : public service {
+class mono_state_service : public iservice {
  public:
-  mono_state_service(service & svc) : service_(svc) {};
+  mono_state_service(iservice & svc) : service_(svc) {}
+  virtual ~mono_state_service() {}
 
-  virtual const google::protobuf::ServiceDescriptor* GetDescriptor() {
-    return service_.GetDescriptor();
-  }
-
-  virtual const google::protobuf::Message& GetRequestPrototype(
-      const google::protobuf::MethodDescriptor* method) const {
-    return service_.GetRequestPrototype(method);
-  }
-  
-  virtual const google::protobuf::Message& GetResponsePrototype(
-      const google::protobuf::MethodDescriptor* method) const {
-    return service_.GetResponsePrototype(method);
-  }
-
-  virtual void call_method(const google::protobuf::MethodDescriptor* method,
-                           const google::protobuf::Message& request,
-                           replier replier_copy) {
-    return service_.call_method(method, request, replier_copy);
+ public:
+  virtual void dispatch_request(const std::string& method,
+                                const void* payload, size_t payload_len,
+                                replier replier_copy)
+  {
+    service_.dispatch_request(method, payload, payload_len, replier_copy);
   }
 
  private:
-  service & service_;
-};
+  iservice & service_;
+};  // class mono_state_service
 }  // namespace rpcz
 #endif  // RPCZ_MONO_STATE_SERVICE_HPP

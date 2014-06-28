@@ -17,7 +17,8 @@ set(RPCZ_SOURCES
     client_connection.cc
     clock.cc
     connection.cc
-    connection_manager.cc 
+    connection_manager.cc
+    cpp_service.cc
     event_id_generator.cc
     reactor.cc
     replier.cc

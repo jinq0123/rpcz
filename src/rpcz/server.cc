@@ -19,7 +19,7 @@
 
 #include <google/protobuf/descriptor.h>
 
-#include "rpcz/service.hpp"
+#include "rpcz/cpp_service.hpp"
 #include "server_impl.hpp"
 #include "singleton_service_factory.hpp"
 
@@ -32,20 +32,20 @@ server::server()
 server::~server() {
 }
 
-void server::register_singleton_service(rpcz::service& svc) {
+void server::register_singleton_service(cpp_service& svc) {
   register_singleton_service(svc, svc.GetDescriptor()->name());
 }
 
-void server::register_singleton_service(rpcz::service& svc, const std::string& name) {
+void server::register_singleton_service(iservice& svc, const std::string& name) {
   service_factory_ptr factory(new singleton_service_factory(svc));  // shared_ptr
   impl_->register_service_factory(factory, name);
 }
 
-// TODO:
-void server::register_rpc_service(rpcz::rpc_service* rpc_service,
-                                  const std::string& name) {
-  // impl_->register_rpc_service(rpc_service, name);
-}
+// TODO: DEL?
+//void server::register_rpc_service(rpc_service* rpc_service,
+//                                  const std::string& name) {
+//  // impl_->register_rpc_service(rpc_service, name);
+//}
 
 void server::bind(const std::string& endpoint) {
   impl_->bind(endpoint);

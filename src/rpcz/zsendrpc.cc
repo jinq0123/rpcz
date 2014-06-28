@@ -23,7 +23,6 @@
 #include <google/protobuf/text_format.h>
 #include "rpcz/application.hpp"
 #include "rpcz/rpc_channel.hpp"
-#include "rpcz/service.hpp"
 #include "rpcz/rpc_controller.hpp"
 
 using google::protobuf::DynamicMessageFactory;

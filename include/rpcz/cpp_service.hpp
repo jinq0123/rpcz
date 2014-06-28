@@ -15,10 +15,10 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_SERVICE_H
-#define RPCZ_SERVICE_H
+#ifndef RPCZ_CPP_SERVICE_H
+#define RPCZ_CPP_SERVICE_H
 
-#include "rpcz/replier.hpp"
+#include "rpcz/iservice.hpp"
 
 namespace google {
 namespace protobuf {
@@ -30,11 +30,9 @@ class ServiceDescriptor;
 
 namespace rpcz {
 
-class service {
+// Service for cpp.
+class cpp_service : public iservice {
  public:
-  service() {};
-  virtual ~service() {};
-
   virtual const google::protobuf::ServiceDescriptor* GetDescriptor() = 0;
 
   virtual const google::protobuf::Message& GetRequestPrototype(
@@ -43,10 +41,17 @@ class service {
       const google::protobuf::MethodDescriptor*) const = 0;
 
   // TODO: need request_context. Need client address in Ctr?
+  // High-level handler.
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
                            replier replier_copy) = 0;
-};  // class service
+
+ public:
+  // Low-level handler of iservice interface.
+  virtual void dispatch_request(const std::string& method,
+                                const void* payload, size_t payload_len,
+                                replier replier_copy);
+};  // class cpp_service
 
 }  // namespace rpcz
-#endif  // RPCZ_SERVICE_H
+#endif  // RPCZ_CPP_SERVICE_H

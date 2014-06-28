@@ -25,8 +25,8 @@
 #include "rpcz/service_factory_ptr.hpp"
 
 namespace rpcz {
-class rpc_service;
-class service;
+class cpp_service;
+class iservice;
 class server_impl;
 
 // TODO: Each connection's service always runs in the same worker thread.
@@ -39,24 +39,29 @@ class server : boost::noncopyable {
   server();
   ~server();
 
-  // Registers an rpc service with this server.
+ public:
+  // Registers cpp service with this server. Only for cpp.
   // All registrations must occur before bind() is called. TODO: allow after bind()
   // The name parameter identifies the service for external clients.
   // If you use the first form, the service name from the
-  // protocol buffer definition will be used.
-  // It does not take ownership of the provided service,
-  //   which must be valid during server's lifetime.
+  //   protocol buffer definition will be used.
+
+  // Register singleton service.
   // Singleton service means all client share the same service instance.
   // Singleton service must be thread-safe if using multi worker threads.
-  void register_singleton_service(service& svc);
-  void register_singleton_service(service& svc, const std::string& name);
+  // It does not take ownership of the provided service,
+  //   which must be valid during server's lifetime.
+  void register_singleton_service(cpp_service& svc);
+  void register_singleton_service(iservice& svc, const std::string& name);
 
+  // Register service. XXX Only for cpp service.
+  // Each connection will create it's own service instance.
   template <typename Service>
   void register_service();
-
   template <typename Service>
   void register_service(const std::string& name);
 
+ public:
   void bind(const std::string& endpoint);
 
   // TODO: unregister_service()
@@ -69,7 +74,7 @@ class server : boost::noncopyable {
 
   // TODO: delete register_rpc_service()
   // Registers a low-level rpc_service. It takes ownership of the rpc_service
-  void register_rpc_service(rpc_service* rpc_service, const std::string& name);
+  // DEL void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  public:
   // service_factory creates service for each connection.

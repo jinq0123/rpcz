@@ -5,14 +5,15 @@
 
 namespace rpcz {
 
-class service;
+class iservice;
+
 class service_factory {
  public:
   service_factory() {};
   virtual ~service_factory() {};
 
  public:
-  virtual service * create() = 0;
+  virtual iservice * create() = 0;
 };
 
 }  // namespace rpcz

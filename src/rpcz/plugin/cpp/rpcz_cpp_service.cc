@@ -55,7 +55,7 @@ void ServiceGenerator::GenerateDeclarations(io::Printer* printer) {
 
 void ServiceGenerator::GenerateInterface(io::Printer* printer) {
   printer->Print(vars_,
-    "class $dllexport$$classname$ : public rpcz::service {\n"
+    "class $dllexport$$classname$ : public rpcz::cpp_service {\n"
     " protected:\n"
     "  // This class should be treated as an abstract interface.\n"
     "  inline $classname$() {};\n"

@@ -59,7 +59,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "#define RPCZ_$filename_identifier$__INCLUDED\n"
     "\n"
     "#include <string>\n"
-    "#include <rpcz/service.hpp>\n"
+    "#include <rpcz/cpp_service.hpp>\n"
     "\n"
     "namespace google {\n"
     "namespace protobuf {\n"
