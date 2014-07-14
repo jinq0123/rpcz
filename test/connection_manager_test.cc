@@ -35,7 +35,12 @@ namespace rpcz {
 
 class connection_manager_test : public ::testing::Test {
  public:
-  connection_manager_test() : context(1) {}
+  connection_manager_test() : context(1) {
+    application::set_zmq_context(&context);
+  }
+  ~connection_manager_test() {
+    application::set_zmq_context(NULL);
+  }
 
  protected:
   zmq::context_t context;
@@ -43,7 +48,6 @@ class connection_manager_test : public ::testing::Test {
 
 TEST_F(connection_manager_test, TestStartsAndFinishes) {
   ASSERT_TRUE(connection_manager::is_destroyed());
-  application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
 }
@@ -99,7 +103,6 @@ void expect_timeout(connection_manager_status status,
 
 TEST_F(connection_manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(connection_manager::is_destroyed());
-  application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
 
   zmq::socket_t server(context, ZMQ_DEALER);
@@ -154,7 +157,6 @@ void SendManyMessages(connection connection, int thread_id) {
 
 TEST_F(connection_manager_test, ManyClientsTest) {
   ASSERT_TRUE(connection_manager::is_destroyed());
-  application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
 
   boost::thread thread(start_server(context));
@@ -199,7 +201,6 @@ void DoThis(zmq::context_t * context) {
 
 TEST_F(connection_manager_test, ProcessesSingleCallback) {
   ASSERT_TRUE(connection_manager::is_destroyed());
-  application::set_zmq_context(&context);
   application::set_connection_manager_threads(4);
   connection_manager_ptr cm = connection_manager::get();
   zmq::socket_t socket(context, ZMQ_PULL);
@@ -238,7 +239,6 @@ void add_many_closures() {
 TEST_F(connection_manager_test, ProcessesManyCallbacksFromManyThreads) {
   ASSERT_TRUE(connection_manager::is_destroyed());
   const int thread_count = 10;
-  application::set_zmq_context(&context);
   application::set_connection_manager_threads(thread_count);
   connection_manager_ptr cm = connection_manager::get();
   boost::thread_group thread_group;
