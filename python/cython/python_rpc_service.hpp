@@ -20,18 +20,20 @@
 
 #include <string>
 #include "Python.h"
-#include "rpcz/rpc_service.hpp"
+
+#include "rpcz/iservice.hpp"
+#include "rpcz/replier.hpp"
 
 namespace rpcz {
 
-class server_channel;
-
-// A subclass of RpcService that helps forwarding the requests to Python-land.
-class PythonRpcService : public rpc_service {
+// Service that helps forwarding the requests to Python-land.
+// Adaptor from Python user_service to Cpp iservice.
+// TODO: Rename to python_service like cpp_service
+class PythonRpcService : public iservice {
  public:
   typedef void(*Handler)(PyObject* user_service, std::string& method,
                          void* payload, size_t payload_len,
-                         replier replier_copy);
+                         replier replier_copy);  // rpc_handler_bridge()
 
   PythonRpcService(Handler handler, PyObject *user_service)
       : user_service_(user_service), handler_(handler) {
@@ -45,6 +47,7 @@ class PythonRpcService : public rpc_service {
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
                                 replier replier_copy) {
+    // Call rpc_handler_bridge() -> user_service._call_method(...)
     handler_(user_service_,
              *const_cast<std::string*>(&method),  // TODO: Need const_cast?
              const_cast<void*>(payload), payload_len, replier_copy);
@@ -52,7 +55,7 @@ class PythonRpcService : public rpc_service {
 
  private:
   PyObject *user_service_;  // User defined service.
-  Handler handler_;
+  Handler handler_;  // = rpc_handler_bridge()
 };
 }  // namespace rpcz
 #endif

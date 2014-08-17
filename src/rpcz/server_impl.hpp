@@ -25,8 +25,6 @@
 #include "service_factory_map.hpp"
 
 namespace rpcz {
-class rpc_service;
-class service;
 
 // A server_impl object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside a worker thread.
