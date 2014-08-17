@@ -24,9 +24,7 @@
 using namespace std;
 
 namespace examples {
-
 class SearchServiceImpl : public SearchService {
-
   virtual void Search(
       const SearchRequest& request,
       rpcz::replier replier_copy) {
@@ -37,7 +35,6 @@ class SearchServiceImpl : public SearchService {
     replier_copy.send(response);
     // TODO: simplify it. Req/Resp and sender all in context.
   }
-
 };
 }  // namespace examples
 

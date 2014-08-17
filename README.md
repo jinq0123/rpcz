@@ -20,3 +20,45 @@ VC build need to check on rpcz_build_static,
 because rpcz.dll will not produce lib file,
 which zsendrpc need.
 
+Example
+--------
+### Client
+See example_client.cc
+
+		examples::SearchService_Stub search_stub(rpcz::rpc_channel::create(
+				"tcp://localhost:5555"), true);
+		examples::SearchRequest request;
+		examples::SearchResponse response;
+		request.set_query("gold");
+		
+		search_stub.Search(request, &response, 1000);
+		cout << response.DebugString() << endl;
+
+### Server
+See example_server.cc
+
+        namespace examples {
+        class SearchServiceImpl : public SearchService {
+          virtual void Search(
+              const SearchRequest& request,
+              rpcz::replier replier_copy) {
+            cout << "Got request for '" << request.query() << "'" << endl;
+            SearchResponse response;
+            response.add_results("result1 for " + request.query());
+            response.add_results("this is result2");
+            replier_copy.send(response);
+            // TODO: simplify it. Req/Resp and sender all in context.
+          }
+        };
+        }  // namespace examples
+        
+        int main() {
+          rpcz::server server;
+          examples::SearchServiceImpl svc;
+          server.register_singleton_service(svc);
+          // Or server.register_service<examples::SearchServiceImpl>();
+          cout << "Serving requests on port 5555." << endl;
+          server.bind("tcp://*:5555");
+          rpcz::application::run();
+        }
+        
