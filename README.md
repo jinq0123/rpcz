@@ -25,13 +25,12 @@ Example
 ### Client
 See example_client.cc
 
-		examples::SearchService_Stub search_stub(rpcz::rpc_channel::create(
-				"tcp://localhost:5555"), true);
+		examples::SearchService_Stub search_stub("tcp://localhost:5555");
 		examples::SearchRequest request;
 		examples::SearchResponse response;
 		request.set_query("gold");
 		
-		search_stub.Search(request, &response, 1000);
+		search_stub.Search(request, &response, 1000);  // timeout 1000ms
 		cout << response.DebugString() << endl;
 
 ### Server
@@ -39,15 +38,12 @@ See example_server.cc
 
         namespace examples {
         class SearchServiceImpl : public SearchService {
-          virtual void Search(
-              const SearchRequest& request,
-              rpcz::replier replier_copy) {
-            cout << "Got request for '" << request.query() << "'" << endl;
+          virtual void Search(const SearchRequest& request,
+                              rpcz::replier replier_copy) {
             SearchResponse response;
             response.add_results("result1 for " + request.query());
             response.add_results("this is result2");
             replier_copy.send(response);
-            // TODO: simplify it. Req/Resp and sender all in context.
           }
         };
         }  // namespace examples
@@ -57,7 +53,6 @@ See example_server.cc
           examples::SearchServiceImpl svc;
           server.register_singleton_service(svc);
           // Or server.register_service<examples::SearchServiceImpl>();
-          cout << "Serving requests on port 5555." << endl;
           server.bind("tcp://*:5555");
           rpcz::application::run();
         }
