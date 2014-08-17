@@ -104,6 +104,7 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Print(vars_,
     "$classname$_Stub(::rpcz::rpc_channel* channel,\n"
     "                 bool owns_channel=false);\n"
+    "explicit $classname$_Stub(const ::std::string& endpoint);  // like: \"tcp://a.com:5566\"\n"
     "~$classname$_Stub();\n"
     "\n"
     "inline ::rpcz::rpc_channel* channel() { return channel_; }\n"
@@ -193,6 +194,10 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
     "                                   bool owns_channel)\n"
     "  : channel_(channel), service_name_($classname$::descriptor()->name()),\n"
     "    owns_channel_(owns_channel) {}\n"
+    "$classname$_Stub::$classname$_Stub(const ::std::string& endpoint)\n"
+    "  : channel_(::rpcz::rpc_channel::create(endpoint)),\n"
+    "    service_name_($classname$::descriptor()->name()),\n"
+    "    owns_channel_(true) {}\n"
     "$classname$_Stub::~$classname$_Stub() {\n"
     "  if (owns_channel_) delete channel_;\n"
     "}\n"
