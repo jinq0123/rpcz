@@ -33,7 +33,6 @@ class SearchServiceImpl : public SearchService {
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
     replier_copy.send(response);
-    // TODO: simplify it. Req/Resp and sender all in context.
   }
 };
 }  // namespace examples

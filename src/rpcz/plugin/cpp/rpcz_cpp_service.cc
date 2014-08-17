@@ -102,10 +102,7 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(vars_,
-    "$classname$_Stub(::rpcz::rpc_channel* channel, \n"
-    "                 bool owns_channel=false);\n"
-    "$classname$_Stub(::rpcz::rpc_channel* channel, \n"
-    "                 const ::std::string& service_name,\n"
+    "$classname$_Stub(::rpcz::rpc_channel* channel,\n"
     "                 bool owns_channel=false);\n"
     "~$classname$_Stub();\n"
     "\n"
@@ -192,11 +189,6 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
 
   // Generate stub implementation.
   printer->Print(vars_,
-    "$classname$_Stub::$classname$_Stub(::rpcz::rpc_channel* channel,\n"
-    "                                   const ::std::string& service_name,\n"
-    "                                   bool owns_channel)\n"
-    "  : channel_(channel), service_name_(service_name),\n"
-    "    owns_channel_(owns_channel) {}\n"
     "$classname$_Stub::$classname$_Stub(::rpcz::rpc_channel* channel,\n"
     "                                   bool owns_channel)\n"
     "  : channel_(channel), service_name_($classname$::descriptor()->name()),\n"
