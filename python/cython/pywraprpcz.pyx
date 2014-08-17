@@ -227,7 +227,7 @@ def set_zmq_io_threads_wrap(n):
 
 cdef extern from "rpcz/server.hpp" namespace "rpcz":
     cdef cppclass _server "rpcz::server":
-        void register_rpc_service(PythonRpcService*, string name)
+        void register_singleton_service(PythonRpcService&, string name)
         void bind(string endpoint)
 
 
@@ -237,11 +237,11 @@ cdef class Server:
         self.thisptr = new _server()
     def __dealloc__(self):
         del self.thisptr
-    def register_service(self, service, name=None):
+    def register_singleton_service(self, service, name=None):
         cdef PythonRpcService* rpc_service = new PythonRpcService(
             rpc_handler_bridge, service)
         # TODO: if name is None: name = service.DESCRIPTOR.name
-        self.thisptr.register_rpc_service(rpc_service, make_string(name))
+        self.thisptr.register_singleton_service(deref(rpc_service), make_string(name))
     def bind(self, endpoint):
         self.thisptr.bind(make_string(endpoint))
 
