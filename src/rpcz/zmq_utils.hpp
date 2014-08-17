@@ -32,13 +32,11 @@ namespace rpcz {
 class message_iterator {
  public:
   explicit message_iterator(zmq::socket_t& socket) :
-      socket_(socket), has_more_(true), more_size_(sizeof(has_more_)) { };
+      socket_(socket), has_more_(true) {};
 
   message_iterator(const message_iterator& other) :
       socket_(other.socket_),
-      has_more_(other.has_more_),
-      more_size_(other.more_size_) {
-  }
+      has_more_(other.has_more_) {}
 
   ~message_iterator() {
     while (has_more()) next();
@@ -48,15 +46,14 @@ class message_iterator {
 
   inline zmq::message_t& next() {
     socket_.recv(&message_, 0);
-    socket_.getsockopt(ZMQ_RCVMORE, &has_more_, &more_size_);
+    has_more_ = message_.more();;
     return message_;
   }
 
  private:
   zmq::socket_t& socket_;
   zmq::message_t message_;
-  int has_more_;
-  size_t more_size_;
+  bool has_more_;
 
   message_iterator& operator=(const message_iterator&);
 };
