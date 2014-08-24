@@ -175,6 +175,7 @@ void rpc_channel_impl::handle_client_response(
   }
   // We call signal() before we execute closure since the closure may delete
   // the rpc_controller object (which contains the sync_event).
+  // XXX Check sync_event is valid. signal() before closure has no use?
   response_context.rpc_controller->sync_event_->signal();
   if (response_context.user_closure) {
     response_context.user_closure->run();
