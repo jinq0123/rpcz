@@ -91,11 +91,12 @@ void worker_thread(connection_manager* connection_manager,
 
 connection_manager::connection_manager()
   : context_(NULL),
-    frontend_endpoint_("inproc://" + boost::lexical_cast<std::string>(this)
-        + ".rpcz.connection_manager.frontend"),
     is_terminating_(new sync_event)  // scoped_ptr
 {
   DLOG(INFO) << "connection_manager() ";
+  frontend_endpoint_ = "inproc://" + boost::lexical_cast<std::string>(this)
+      + ".rpcz.connection_manager.frontend";
+
   application_options options;
   context_ = options.get_zmq_context();
   if (NULL == context_)
