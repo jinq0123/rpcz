@@ -50,9 +50,7 @@ See example_server.cc
         
         int main() {
           rpcz::server server;
-          examples::SearchServiceImpl svc;
-          server.register_singleton_service(svc);
-          // Or server.register_service<examples::SearchServiceImpl>();
+          server.register_service<examples::SearchServiceImpl>();
           server.bind("tcp://*:5555");
           rpcz::application::run();
         }
