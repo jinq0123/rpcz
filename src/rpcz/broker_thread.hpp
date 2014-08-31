@@ -28,6 +28,7 @@ namespace rpcz {
 
 class sync_event;
 
+// Client and server use the same broker_thread.
 class broker_thread {
  public:
   broker_thread(
@@ -85,8 +86,8 @@ class broker_thread {
   deadline_map deadline_map_;
   detail::event_id_generator event_id_generator_;
   reactor reactor_;
-  std::vector<zmq::socket_t*> connections_;
-  std::vector<zmq::socket_t*> server_sockets_;
+  std::vector<zmq::socket_t*> client_sockets_;  // Dealer sockets of client.
+  std::vector<zmq::socket_t*> server_sockets_;  // Router sockets.of server.
   typedef std::map<std::string, zmq::socket_t*> endpoint_to_socket;
   endpoint_to_socket bind_map_;  // for unbind
   zmq::context_t & context_;

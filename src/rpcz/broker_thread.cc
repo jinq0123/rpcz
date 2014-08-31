@@ -130,7 +130,7 @@ void broker_thread::add_closure(closure* closure) {
 void broker_thread::handle_connect_command(
         const std::string& sender, const std::string& endpoint) {
     zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
-    connections_.push_back(socket);
+    client_sockets_.push_back(socket);
     int linger_ms = 0;
     socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
     socket->connect(endpoint.c_str());
@@ -140,7 +140,7 @@ void broker_thread::handle_connect_command(
 
     send_string(frontend_socket_, sender, ZMQ_SNDMORE);
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-    send_uint64(frontend_socket_, connections_.size() - 1, 0);
+    send_uint64(frontend_socket_, client_sockets_.size() - 1, 0);
 }
 
 void broker_thread::handle_bind_command(
@@ -211,7 +211,7 @@ void broker_thread::send_request(message_iterator& iter) {
               remote_response_wrapper.deadline_ms,
           new_callback(this, &broker_thread::handle_timeout, event_id));
     }
-    zmq::socket_t*& socket = connections_[connection_id];
+    zmq::socket_t*& socket = client_sockets_[connection_id];
     send_string(socket, "", ZMQ_SNDMORE);
     send_uint64(socket, event_id, ZMQ_SNDMORE);
     forward_messages(iter, *socket);
