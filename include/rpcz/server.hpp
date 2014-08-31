@@ -46,7 +46,6 @@ class server : boost::noncopyable {
 
   // Register singleton service.
   // Singleton service means all client share the same service instance.
-  // Singleton service must be thread-safe if using multi worker threads.
   // It does not take ownership of the provided service,
   //   which must be valid during server's lifetime.
   void register_singleton_service(cpp_service& svc);
