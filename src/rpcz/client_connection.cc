@@ -22,7 +22,6 @@ client_connection::client_connection(uint64 server_socket_idx,
 
 void client_connection::reply(const std::string& event_id, 
                               message_vector* v) const {
-  // TODO: Use socket as member if used in the same thread.
   zmq::socket_t& socket = manager_.get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kReply, ZMQ_SNDMORE);

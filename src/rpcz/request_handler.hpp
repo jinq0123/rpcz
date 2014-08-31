@@ -14,7 +14,7 @@ class iservice;
 
 // Each client has its request_hander.
 // Used in broker thread.
-// TODO: Run in the same worker thread.
+// Run in random worker thread.
 // Non-thread-safe.
 class request_handler {
  public:

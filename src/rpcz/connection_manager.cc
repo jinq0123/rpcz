@@ -194,7 +194,7 @@ void connection_manager::add(closure* closure) {
   send_pointer(&socket, closure, 0);
   return;
 }
- 
+
 void connection_manager::run() {
   is_terminating_->wait();
 }

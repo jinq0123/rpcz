@@ -54,9 +54,9 @@ void broker_thread::wait_for_workers_ready_reply(int nthreads) {
 void broker_thread::run(zmq::context_t & context,
         int nthreads, sync_event* ready_event,
         zmq::socket_t* frontend_socket) {
-    broker_thread cmt(
+    broker_thread bt(
         context, nthreads, ready_event, frontend_socket);
-    cmt.reactor_.loop();
+    bt.reactor_.loop();
 }
 
 void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
@@ -186,14 +186,14 @@ void broker_thread::handle_socket_deleted(const std::string sender)
 
 void broker_thread::handle_server_socket(uint64 server_socket_idx,
         const service_factory_map * factories) {
-    assert(factories);
+    assert(NULL != factories);
     message_iterator iter(*server_sockets_[server_socket_idx]);
     std::string sender(message_to_string(iter.next()));
     if (iter.next().size() != 0) return;
     request_handler * handler = request_handler_manager_
         .get_handler(sender, *factories, server_socket_idx);
     assert(NULL != handler);
-    begin_worker_command(kHandleRequest);  // TODO: change to begin_worker_command(worker_idx, kHandleRequest)
+    begin_worker_command(kHandleRequest);
     send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
 }
@@ -205,6 +205,7 @@ void broker_thread::send_request(message_iterator& iter) {
     event_id event_id = event_id_generator_.get_next();
     remote_response_map_[event_id] = remote_response_wrapper.callback;
     if (remote_response_wrapper.deadline_ms != -1) {
+      // XXX when to delete timeout handler?
       reactor_.run_closure_at(
           remote_response_wrapper.start_time +
               remote_response_wrapper.deadline_ms,

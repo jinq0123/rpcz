@@ -41,12 +41,6 @@ void server::register_singleton_service(iservice& svc, const std::string& name) 
   impl_->register_service_factory(factory, name);
 }
 
-// TODO: DEL?
-//void server::register_rpc_service(rpc_service* rpc_service,
-//                                  const std::string& name) {
-//  // impl_->register_rpc_service(rpc_service, name);
-//}
-
 void server::bind(const std::string& endpoint) {
   impl_->bind(endpoint);
 }

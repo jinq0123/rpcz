@@ -29,8 +29,6 @@ class cpp_service;
 class iservice;
 class server_impl;
 
-// TODO: Each connection's service always runs in the same worker thread.
-
 // A server object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside one of the worker threads.
 // Non-thread-safe.
@@ -71,10 +69,6 @@ class server : boost::noncopyable {
 
   // TODO: register after bind. Move register into broker thread.
   //       service_factory_map_ owned by broker thread.
-
-  // TODO: delete register_rpc_service()
-  // Registers a low-level rpc_service. It takes ownership of the rpc_service
-  // DEL void register_rpc_service(rpc_service* rpc_service, const std::string& name);
 
  public:
   // service_factory creates service for each connection.
