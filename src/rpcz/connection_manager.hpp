@@ -42,28 +42,10 @@ class connection_thread_context;
 class message_iterator;
 class sync_event;
 
-// TODO: Update it.
 // A connection_manager is a multi-threaded asynchronous system for communication
-// over ZeroMQ sockets. A connection_manager can:
-//   1. connect to a remote server and allow all threads the program to share
-//      the connection:
-//
-//          connection_manager cm(10);
-//          connection c = cm.connect("tcp://localhost:5557");
-// 
-//      Now, it is possible to send requests to this backend fron any thread:
-//
-//          c.send_request(...);
-//
-//  2. bind a socket and register a handler function. The handler function
-//     gets executed in one of the connection manager threads.
-//
-//          c.bind("tcp://*:5555", &handler_function);
-//
-//  3. Queue closures to be executed on one of the connection manager threads:
-//
-//          c.add(closure)
-//
+// over ZeroMQ sockets.
+// A connection_manager can connect to a remote server:
+//      connection_manager::get()->connect("tcp://localhost:5557");
 // connection_manager and connection are thread-safe.
 // connection_manager is singleton.
 class connection_manager : boost::noncopyable {
