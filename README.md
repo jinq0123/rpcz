@@ -25,9 +25,9 @@ Example
 ### Client
 See example_client.cc
 
-		examples::SearchService_Stub search_stub("tcp://localhost:5555");
-		examples::SearchRequest request;
-		examples::SearchResponse response;
+		SearchService_Stub search_stub("tcp://localhost:5555");
+		SearchRequest request;
+		SearchResponse response;
 		request.set_query("gold");
 		
 		search_stub.Search(request, &response, 1000);  // timeout 1000ms
@@ -36,7 +36,6 @@ See example_client.cc
 ### Server
 See example_server.cc
 
-        namespace examples {
         class SearchServiceImpl : public SearchService {
           virtual void Search(const SearchRequest& request,
                               rpcz::replier replier_copy) {
@@ -46,12 +45,11 @@ See example_server.cc
             replier_copy.send(response);
           }
         };
-        }  // namespace examples
         
         int main() {
-          rpcz::server server;
-          server.register_service<examples::SearchServiceImpl>();
-          server.bind("tcp://*:5555");
+          rpcz::server svr;
+          svr.register_service<SearchServiceImpl>();
+          svr.bind("tcp://*:5555");
           rpcz::application::run();
         }
         
