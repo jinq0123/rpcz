@@ -1,4 +1,3 @@
-project (RPCZ)
 
 # The version number.
 set (RPCZ_VERSION_MAJOR 0)
@@ -9,7 +8,7 @@ add_subdirectory(plugin)
 protobuf_generate_cpp(RPCZ_PB_SRCS RPCZ_PB_HDRS proto/rpcz.proto)
 set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
 
-include_directories(${PROJECT_BINARY_DIR})
+include_directories(${Rpcz_BINARY_DIR})
 set(RPCZ_SOURCES
     application.cc
     application_options.cc

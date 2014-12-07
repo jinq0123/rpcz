@@ -1,8 +1,8 @@
 add_subdirectory(proto)
 set(CTEST_OUTPUT_ON_FAILURE 1)
 
-include_directories(${PROJECT_BINARY_DIR}/test)
-include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${Rpcz_BINARY_DIR}/test)
+include_directories(${Rpcz_SOURCE_DIR}/src)
 add_library(rpcz_gtest_main rpcz_gtest_main.cc)
 
 include(build_deps)
@@ -42,7 +42,7 @@ endif(MSVC)
 function(rpcz_test TESTNAME)
   CMAKE_PARSE_ARGUMENTS(OPTIONS "" "" "SRCS;LIBS" ${ARGN})
   add_executable(${TESTNAME} ${OPTIONS_SRCS})
-  
+  set_property(TARGET ${TESTNAME} PROPERTY FOLDER "Tests")
   set(LIBS rpcz rpcz_gtest_main
   )
 if(NOT MSVC)

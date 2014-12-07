@@ -1,4 +1,11 @@
-set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake_modules)
+project (Rpcz)
+
+cmake_minimum_required (VERSION 2.8.3)
+
+# CMake 2.8.3 supports solution folders.
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+set(CMAKE_MODULE_PATH ${Rpcz_SOURCE_DIR}/cmake_modules)
 
 if (NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
@@ -27,10 +34,8 @@ include_directories(${ZeroMQ_INCLUDE_DIRS})
 include_directories(${CPPZMQ_DIR})
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_BINARY_DIR}/src)
-
-cmake_minimum_required (VERSION 2.8.0)
+include_directories(${Rpcz_SOURCE_DIR}/include)
+include_directories(${Rpcz_BINARY_DIR}/src)
 
 if(NOT MSVC)
 set(CMAKE_CXX_FLAGS
@@ -55,4 +60,4 @@ endif(rpcz_build_examples)
 
 message(STATUS ${RPCZ_PUBLIC_HEADERS})
 install(FILES ${RPCZ_PUBLIC_HEADERS} DESTINATION include/rpcz)
-install(FILES ${PROJECT_BINARY_DIR}/src/rpcz/rpcz.pb.h DESTINATION include/rpcz)
+install(FILES ${Rpcz_BINARY_DIR}/src/rpcz/rpcz.pb.h DESTINATION include/rpcz)
