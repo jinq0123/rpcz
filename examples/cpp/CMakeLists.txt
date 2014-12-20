@@ -9,12 +9,16 @@ target_link_libraries(example_pb optimized ${PROTOBUF_LIBRARY})
 target_link_libraries(example_pb debug ${PROTOBUF_LIBRARY_DEBUG})
 include_directories(${Rpcz_BINARY_DIR}/examples)
 
-add_executable(example_client example_client.cc)
-target_link_libraries(example_client rpcz example_pb)
+add_executable(sync_client sync_client.cc)
+target_link_libraries(sync_client rpcz example_pb)
+
+add_executable(async_client async_client.cc)
+target_link_libraries(async_client rpcz example_pb)
 
 add_executable(example_server example_server.cc)
 target_link_libraries(example_server rpcz example_pb)
 
 set_property(TARGET example_pb     PROPERTY FOLDER "Examples")
-set_property(TARGET example_client PROPERTY FOLDER "Examples")
+set_property(TARGET sync_client    PROPERTY FOLDER "Examples")
+set_property(TARGET async_client   PROPERTY FOLDER "Examples")
 set_property(TARGET example_server PROPERTY FOLDER "Examples")
