@@ -119,8 +119,8 @@ int reactor::loop() {
       rebuild_poll_items();
       is_dirty_ = false;
     }
-    long poll_timeout = process_closure_run_map();
-    int rc = zmq_poll(&pollitems_[0], pollitems_.size(), poll_timeout);
+    long poll_timeout_ms = process_closure_run_map();
+    int rc = zmq_poll(&pollitems_[0], pollitems_.size(), poll_timeout_ms);
 
     if (rc == -1) {
       int zmq_err = zmq_errno();
@@ -139,9 +139,10 @@ int reactor::loop() {
   return 0;
 }
 
+// Return the time in milliseconds before the next closure.
 long reactor::process_closure_run_map() {
-  uint64 now = zclock_ms();
-  closure_run_map::iterator ub(closure_run_map_.upper_bound(now));
+  uint64 now_ms = zclock_ms();
+  closure_run_map::iterator ub(closure_run_map_.upper_bound(now_ms));
   for (closure_run_map::const_iterator it = closure_run_map_.begin();
        it != ub;
        ++it) {
@@ -150,12 +151,12 @@ long reactor::process_closure_run_map() {
       (*vit)->run();
     }
   }
-  long poll_timeout = -1;
+  long poll_timeout_ms = -1;
   if (ub != closure_run_map_.end()) {
-    poll_timeout = 1000 * (ub->first - now);
+    poll_timeout_ms = ub->first - now_ms;
   }
   closure_run_map_.erase(closure_run_map_.begin(), ub);
-  return poll_timeout;
+  return poll_timeout_ms;
 }
 
 void reactor::set_should_quit() {
