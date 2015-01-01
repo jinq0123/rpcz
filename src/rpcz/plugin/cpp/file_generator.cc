@@ -60,6 +60,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "\n"
     "#include <string>\n"
     "#include <rpcz/cpp_service.hpp>\n"
+    "#include <rpcz/service_stub.hpp>\n"
     "\n"
     "namespace google {\n"
     "namespace protobuf {\n"
@@ -72,7 +73,8 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "class replier;\n"
     "class rpc_channel;\n"
     "class rpc_controller;\n"
-    "}  //namesacpe rpcz\n"
+    "}  // namespace rpcz\n"
+    "\n"
     ,
     "filename", file_->name(),
     "filename_identifier", filename_identifier);

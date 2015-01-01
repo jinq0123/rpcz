@@ -96,7 +96,7 @@ void ServiceGenerator::GenerateInterface(io::Printer* printer) {
 
 void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Print(vars_,
-    "class $dllexport$$classname$_Stub {\n"
+    "class $dllexport$$classname$_Stub : public rpcz::Service_Stub {\n"
     " public:\n");
 
   printer->Indent();
@@ -106,9 +106,6 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
     "                 bool owns_channel=false);\n"
     "explicit $classname$_Stub(const ::std::string& endpoint);  // like: \"tcp://a.com:5566\"\n"
     "~$classname$_Stub();\n"
-    "\n"
-    "inline ::rpcz::rpc_channel* channel() { return channel_; }\n"
-    "\n"
     "\n");
 
   GenerateMethodSignatures(NON_VIRTUAL, printer, true);
@@ -116,9 +113,6 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Outdent();
   printer->Print(vars_,
     " private:\n"
-    "  ::rpcz::rpc_channel* channel_;\n"
-    "  ::std::string service_name_;\n"
-    "  bool owns_channel_;\n"
     "  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS($classname$_Stub);\n"
     "};\n"
     "\n");
@@ -192,12 +186,13 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
   printer->Print(vars_,
     "$classname$_Stub::$classname$_Stub(::rpcz::rpc_channel* channel,\n"
     "                                   bool owns_channel)\n"
-    "  : channel_(channel), service_name_($classname$::descriptor()->name()),\n"
-    "    owns_channel_(owns_channel) {}\n"
+    "  : Service_Stub(channel,\n"
+    "                 $classname$::descriptor()->name(),\n"
+    "                 owns_channel) {}\n"
     "$classname$_Stub::$classname$_Stub(const ::std::string& endpoint)\n"
-    "  : channel_(::rpcz::rpc_channel::create(endpoint)),\n"
-    "    service_name_($classname$::descriptor()->name()),\n"
-    "    owns_channel_(true) {}\n"
+    "  : Service_Stub(::rpcz::rpc_channel::create(endpoint),\n"
+    "                 $classname$::descriptor()->name(),\n"
+    "                 true) {}\n"
     "$classname$_Stub::~$classname$_Stub() {\n"
     "  if (owns_channel_) delete channel_;\n"
     "}\n"
