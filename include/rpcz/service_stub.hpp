@@ -21,18 +21,18 @@ class Service_Stub {
       channel_(channel),
       service_name_(service_name),
       owns_channel_(owns_channel),
-      default_deadline_ms(-1) {}
+      default_deadline_ms_(-1) {}
   ~Service_Stub() {}
 
  public:
   inline ::rpcz::rpc_channel* channel() { return channel_; }
-  inline void set_default_deadline_ms(long ms) { default_deadline_ms = ms; }
+  inline void set_default_deadline_ms(long ms) { default_deadline_ms_ = ms; }
 
  protected:
   ::rpcz::rpc_channel* channel_;
   ::std::string service_name_;
   bool owns_channel_;
-  long default_deadline_ms;
+  long default_deadline_ms_;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Service_Stub);

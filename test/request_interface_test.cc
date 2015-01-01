@@ -121,6 +121,20 @@ Test all kinds of request interfaces.
 . ResponseAsParameter/ReturnResponse
 */
 
+TEST_F(server_test, SetDefaulDeadlineMs) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  SearchResponse response;
+  request.set_query("timeout");
+  stub.set_default_deadline_ms(1);
+  try {
+    stub.Search(request, &response);
+    ASSERT_TRUE(false);
+  } catch (rpc_error &error) {
+    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+  }
+}
+
 TEST_F(server_test, SimpleRequestAsync) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;

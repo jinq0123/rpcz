@@ -136,8 +136,13 @@ void ServiceGenerator::GenerateMethodSignatures(
                      "                     ::rpcz::closure* done);\n");
       printer->Print(sub_vars,
                      "$virtual$void $name$(const $input_type$& request,\n"
+                     "                     $output_type$* response) {\n"
+                     "  $name$(request, response, default_deadline_ms_);\n"
+                     "}\n");
+      printer->Print(sub_vars,
+                     "$virtual$void $name$(const $input_type$& request,\n"
                      "                     $output_type$* response,\n"
-                     "                     long deadline_ms = -1);\n");
+                     "                     long deadline_ms);\n");
     } else {
       printer->Print(
           sub_vars,
