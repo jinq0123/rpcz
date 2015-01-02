@@ -85,9 +85,9 @@ class ServiceGenerator {
                                 google::protobuf::io::Printer* printer,
                                 bool stub);
 
-  void GenerateOneMethodSignature(const VariablesMap& variables,
+  void GenerateOneMethodSignature(const VariablesMap& sub_vars,
       google::protobuf::io::Printer* printer);
-  void GenerateOneStubMethodSignature(const VariablesMap& variables,
+  void GenerateOneStubMethodSignature(const VariablesMap& sub_vars,
       google::protobuf::io::Printer* printer);
 
   // Source file stuff.
@@ -105,6 +105,9 @@ class ServiceGenerator {
 
   // Generate the stub's implementations of the service methods.
   void GenerateStubMethods(google::protobuf::io::Printer* printer);
+  // Generate the stub's implementations of one service method.
+  void GenerateOneStubMethod(const VariablesMap& sub_vars,
+      google::protobuf::io::Printer* printer);
 
   const google::protobuf::ServiceDescriptor* descriptor_;
   std::map<std::string, std::string> vars_;

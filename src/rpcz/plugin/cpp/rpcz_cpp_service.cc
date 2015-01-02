@@ -138,28 +138,32 @@ void ServiceGenerator::GenerateMethodSignatures(
 }
 
 void ServiceGenerator::GenerateOneStubMethodSignature(
-    const VariablesMap& variables, io::Printer* printer) {
-  printer->Print(variables,
+    const VariablesMap& sub_vars, io::Printer* printer) {
+  printer->Print(sub_vars,
       "$virtual$void $name$(const $input_type$& request,\n"
       "                     $output_type$* response,\n"
       "                     ::rpcz::rpc_controller* rpc_controller,\n"
       "                     ::rpcz::closure* done);\n");
-  printer->Print(variables,
+
+  printer->Print(sub_vars,
       "$virtual$void $name$(const $input_type$& request,\n"
       "                     $output_type$* response) {\n"
       "  $name$(request, response, default_deadline_ms_);\n"
       "}\n");
-  printer->Print(variables,
-      "$virtual$$output_type$ $name$(const $input_type$& request);\n");
-  printer->Print(variables,
+  printer->Print(sub_vars,
       "$virtual$void $name$(const $input_type$& request,\n"
       "                     $output_type$* response,\n"
+      "                     long deadline_ms);\n");
+  printer->Print(sub_vars,
+      "$virtual$$output_type$ $name$(const $input_type$& request);\n");
+  printer->Print(sub_vars,
+      "$virtual$$output_type$ $name$(const $input_type$& request,\n"
       "                     long deadline_ms);\n");
 }
 
 void ServiceGenerator::GenerateOneMethodSignature(
-    const VariablesMap& variables, io::Printer* printer) {
-  printer->Print(variables,
+    const VariablesMap& sub_vars, io::Printer* printer) {
+  printer->Print(sub_vars,
       "$virtual$void $name$(const $input_type$& request,\n"
       "                     ::rpcz::replier replier_copy);\n");
 }
@@ -321,37 +325,49 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
     sub_vars["index"] = SimpleItoa(i);
     sub_vars["input_type"] = ClassName(method->input_type(), true);
     sub_vars["output_type"] = ClassName(method->output_type(), true);
+    GenerateOneStubMethod(sub_vars, printer);
+  }  // for
+}
 
-    printer->Print(sub_vars,
-      "void $classname$_Stub::$name$(const $input_type$& request,\n"
-      "                              $output_type$* response,\n"
-      "                              ::rpcz::rpc_controller* rpc_controller,\n"
-      "                              ::rpcz::closure* done) {\n"
-      "  channel_->call_method(service_name_,\n"
-      "                        $classname$::descriptor()->method($index$),\n"
-      "                        request, response, rpc_controller, done);\n"
-      "}\n");
-    printer->Print(sub_vars,
-      "$output_type$ $classname$_Stub::$name$(const $input_type$& request) {\n"
-      "  $output_type$ response;\n"
-      "  $name$(request, &response);\n"
-      "  return response;\n"
-      "}\n");
-    printer->Print(sub_vars,
-      "void $classname$_Stub::$name$(const $input_type$& request,\n"
-      "                              $output_type$* response,\n"
-      "                              long deadline_ms) {\n"
-      "  ::rpcz::rpc_controller rpc_controller;\n"
-      "  rpc_controller.set_deadline_ms(deadline_ms);\n"
-      "  channel_->call_method(service_name_,\n"
-      "                        $classname$::descriptor()->method($index$),\n"
-      "                        request, response, &rpc_controller, NULL);\n"
-      "  rpc_controller.wait();\n"
-      "  if (!rpc_controller.ok()) {\n"
-      "    throw ::rpcz::rpc_error(rpc_controller);\n"
-      "  }\n"
-      "}\n");
-  }
+void ServiceGenerator::GenerateOneStubMethod(
+    const VariablesMap& sub_vars,
+    google::protobuf::io::Printer* printer) {
+  printer->Print(sub_vars,
+    "void $classname$_Stub::$name$(const $input_type$& request,\n"
+    "                              $output_type$* response,\n"
+    "                              ::rpcz::rpc_controller* rpc_controller,\n"
+    "                              ::rpcz::closure* done) {\n"
+    "  channel_->call_method(service_name_,\n"
+    "                        $classname$::descriptor()->method($index$),\n"
+    "                        request, response, rpc_controller, done);\n"
+    "}\n");
+  printer->Print(sub_vars,
+    "void $classname$_Stub::$name$(const $input_type$& request,\n"
+    "                              $output_type$* response,\n"
+    "                              long deadline_ms) {\n"
+    "  ::rpcz::rpc_controller rpc_controller;\n"
+    "  rpc_controller.set_deadline_ms(deadline_ms);\n"
+    "  channel_->call_method(service_name_,\n"
+    "                        $classname$::descriptor()->method($index$),\n"
+    "                        request, response, &rpc_controller, NULL);\n"
+    "  rpc_controller.wait();\n"
+    "  if (!rpc_controller.ok()) {\n"
+    "    throw ::rpcz::rpc_error(rpc_controller);\n"
+    "  }\n"
+    "}\n");
+  printer->Print(sub_vars,
+    "$output_type$ $classname$_Stub::$name$(const $input_type$& request) {\n"
+    "  $output_type$ response;\n"
+    "  $name$(request, &response);\n"
+    "  return response;\n"
+    "}\n");
+  printer->Print(sub_vars,
+    "$output_type$ $classname$_Stub::$name$(const $input_type$& request,\n"
+    "                              long deadline_ms) {\n"
+    "  $output_type$ response;\n"
+    "  $name$(request, &response, deadline_ms);\n"
+    "  return response;\n"
+    "}\n");
 }
 
 }  // namespace cpp
