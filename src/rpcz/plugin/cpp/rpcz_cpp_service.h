@@ -65,6 +65,9 @@ class ServiceGenerator {
   void GenerateImplementation(google::protobuf::io::Printer* printer);
 
  private:
+  typedef std::map<std::string, std::string> VariablesMap;
+
+ private:
   enum RequestOrResponse { REQUEST, RESPONSE };
   enum VirtualOrNon { VIRTUAL, NON_VIRTUAL };
 
@@ -76,10 +79,15 @@ class ServiceGenerator {
   // Generate the stub class definition.
   void GenerateStubDefinition(google::protobuf::io::Printer* printer);
 
-  // Prints signatures for all methods in the
+  // Generate signatures for all methods.
   void GenerateMethodSignatures(VirtualOrNon virtual_or_non,
                                 google::protobuf::io::Printer* printer,
                                 bool stub);
+
+  void GenerateOneMethodSignature(const VariablesMap& variables,
+      google::protobuf::io::Printer* printer);
+  void GenerateOneStubMethodSignature(const VariablesMap& variables,
+      google::protobuf::io::Printer* printer);
 
   // Source file stuff.
 

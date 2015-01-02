@@ -122,44 +122,52 @@ void ServiceGenerator::GenerateMethodSignatures(
     VirtualOrNon virtual_or_non, io::Printer* printer, bool stub) {
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
-    map<string, string> sub_vars;
+    VariablesMap sub_vars;
     sub_vars["name"] = method->name();
     sub_vars["input_type"] = ClassName(method->input_type(), true);
     sub_vars["output_type"] = ClassName(method->output_type(), true);
     sub_vars["virtual"] = virtual_or_non == VIRTUAL ? "virtual " : "";
 
-    if (!stub) {
-      printer->Print(sub_vars,
-          "$virtual$void $name$(const $input_type$& request,\n"
-          "                     ::rpcz::replier replier_copy);\n");
-      continue;
+    if (stub) {
+      GenerateOneStubMethodSignature(sub_vars, printer);
+    } else {
+      GenerateOneMethodSignature(sub_vars, printer);
     }
-
-    // stub
-    printer->Print(sub_vars,
-        "$virtual$void $name$(const $input_type$& request,\n"
-        "                     $output_type$* response,\n"
-        "                     ::rpcz::rpc_controller* rpc_controller,\n"
-        "                     ::rpcz::closure* done);\n");
-    printer->Print(sub_vars,
-        "$virtual$void $name$(const $input_type$& request,\n"
-        "                     $output_type$* response) {\n"
-        "  $name$(request, response, default_deadline_ms_);\n"
-        "}\n");
-    printer->Print(sub_vars,
-        "$virtual$$output_type$ $name$(const $input_type$& request);\n");
-    printer->Print(sub_vars,
-        "$virtual$void $name$(const $input_type$& request,\n"
-        "                     $output_type$* response,\n"
-        "                     long deadline_ms);\n");
   }  // for
+}
+
+void ServiceGenerator::GenerateOneStubMethodSignature(
+    const VariablesMap& variables, io::Printer* printer) {
+  printer->Print(variables,
+      "$virtual$void $name$(const $input_type$& request,\n"
+      "                     $output_type$* response,\n"
+      "                     ::rpcz::rpc_controller* rpc_controller,\n"
+      "                     ::rpcz::closure* done);\n");
+  printer->Print(variables,
+      "$virtual$void $name$(const $input_type$& request,\n"
+      "                     $output_type$* response) {\n"
+      "  $name$(request, response, default_deadline_ms_);\n"
+      "}\n");
+  printer->Print(variables,
+      "$virtual$$output_type$ $name$(const $input_type$& request);\n");
+  printer->Print(variables,
+      "$virtual$void $name$(const $input_type$& request,\n"
+      "                     $output_type$* response,\n"
+      "                     long deadline_ms);\n");
+}
+
+void ServiceGenerator::GenerateOneMethodSignature(
+    const VariablesMap& variables, io::Printer* printer) {
+  printer->Print(variables,
+      "$virtual$void $name$(const $input_type$& request,\n"
+      "                     ::rpcz::replier replier_copy);\n");
 }
 
 // ===================================================================
 
 void ServiceGenerator::GenerateDescriptorInitializer(
     io::Printer* printer, int index) {
-  map<string, string> vars;
+  VariablesMap vars;
   vars["classname"] = descriptor_->name();
   vars["index"] = SimpleItoa(index);
 
@@ -212,7 +220,7 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
 void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
-    map<string, string> sub_vars;
+    VariablesMap sub_vars;
     sub_vars["classname"] = descriptor_->name();
     sub_vars["name"] = method->name();
     sub_vars["index"] = SimpleItoa(i);
@@ -240,7 +248,7 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
 
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
-    map<string, string> sub_vars;
+    VariablesMap sub_vars;
     sub_vars["name"] = method->name();
     sub_vars["index"] = SimpleItoa(i);
     sub_vars["input_type"] = ClassName(method->input_type(), true);
@@ -285,7 +293,7 @@ void ServiceGenerator::GenerateGetPrototype(RequestOrResponse which,
     const Descriptor* type =
       (which == REQUEST) ? method->input_type() : method->output_type();
 
-    map<string, string> sub_vars;
+    VariablesMap sub_vars;
     sub_vars["index"] = SimpleItoa(i);
     sub_vars["type"] = ClassName(type, true);
 
@@ -306,7 +314,7 @@ void ServiceGenerator::GenerateGetPrototype(RequestOrResponse which,
 void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
   for (int i = 0; i < descriptor_->method_count(); i++) {
     const MethodDescriptor* method = descriptor_->method(i);
-    map<string, string> sub_vars;
+    VariablesMap sub_vars;
     sub_vars["classname"] = descriptor_->name();
     sub_vars["name"] = method->name();
     sub_vars["index"] = SimpleItoa(i);
