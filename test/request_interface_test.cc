@@ -116,9 +116,11 @@ protected:
 
 /*
 Test all kinds of request interfaces.
-. Sync/Async
-. Throw/Nothrow
-. ResponseAsParameter/ReturnResponse
+. Sync or async
+. Explicit deadline or implicit default deadline
+. Return response or use output parameter (only for sync)
+. Explicit error handler or implicit default error handler (only of async)
+There are 4 sync interfaces and 4 async interfaces.
 */
 
 TEST_F(server_test, SetDefaulDeadlineMs) {
