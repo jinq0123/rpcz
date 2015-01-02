@@ -128,28 +128,31 @@ void ServiceGenerator::GenerateMethodSignatures(
     sub_vars["output_type"] = ClassName(method->output_type(), true);
     sub_vars["virtual"] = virtual_or_non == VIRTUAL ? "virtual " : "";
 
-    if (stub) {
+    if (!stub) {
       printer->Print(sub_vars,
-                     "$virtual$void $name$(const $input_type$& request,\n"
-                     "                     $output_type$* response,\n"
-                     "                     ::rpcz::rpc_controller* rpc_controller,\n"
-                     "                     ::rpcz::closure* done);\n");
-      printer->Print(sub_vars,
-                     "$virtual$void $name$(const $input_type$& request,\n"
-                     "                     $output_type$* response) {\n"
-                     "  $name$(request, response, default_deadline_ms_);\n"
-                     "}\n");
-      printer->Print(sub_vars,
-                     "$virtual$void $name$(const $input_type$& request,\n"
-                     "                     $output_type$* response,\n"
-                     "                     long deadline_ms);\n");
-    } else {
-      printer->Print(
-          sub_vars,
           "$virtual$void $name$(const $input_type$& request,\n"
           "                     ::rpcz::replier replier_copy);\n");
+      continue;
     }
-  }
+
+    // stub
+    printer->Print(sub_vars,
+        "$virtual$void $name$(const $input_type$& request,\n"
+        "                     $output_type$* response,\n"
+        "                     ::rpcz::rpc_controller* rpc_controller,\n"
+        "                     ::rpcz::closure* done);\n");
+    printer->Print(sub_vars,
+        "$virtual$void $name$(const $input_type$& request,\n"
+        "                     $output_type$* response) {\n"
+        "  $name$(request, response, default_deadline_ms_);\n"
+        "}\n");
+    printer->Print(sub_vars,
+        "$virtual$$output_type$ $name$(const $input_type$& request);\n");
+    printer->Print(sub_vars,
+        "$virtual$void $name$(const $input_type$& request,\n"
+        "                     $output_type$* response,\n"
+        "                     long deadline_ms);\n");
+  }  // for
 }
 
 // ===================================================================
@@ -318,6 +321,12 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
       "  channel_->call_method(service_name_,\n"
       "                        $classname$::descriptor()->method($index$),\n"
       "                        request, response, rpc_controller, done);\n"
+      "}\n");
+    printer->Print(sub_vars,
+      "$output_type$ $classname$_Stub::$name$(const $input_type$& request) {\n"
+      "  $output_type$ response;\n"
+      "  $name$(request, &response);\n"
+      "  return response;\n"
       "}\n");
     printer->Print(sub_vars,
       "void $classname$_Stub::$name$(const $input_type$& request,\n"

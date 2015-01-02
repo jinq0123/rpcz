@@ -132,7 +132,18 @@ TEST_F(server_test, SetDefaulDeadlineMs) {
     ASSERT_TRUE(false);
   } catch (rpc_error &error) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+    return;
   }
+  ASSERT_TRUE(false);
+}
+
+TEST_F(server_test, SyncRequest) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  request.set_query("stupid");
+  SearchResponse response = stub.Search(request);
+  ASSERT_EQ(2, response.results_size());
+  ASSERT_EQ("The search for stupid", response.results(0));
 }
 
 TEST_F(server_test, SimpleRequestAsync) {
