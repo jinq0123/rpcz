@@ -141,6 +141,12 @@ void ServiceGenerator::GenerateMethodSignatures(
 void ServiceGenerator::GenerateOneStubMethodSignature(
     const VariablesMap& sub_vars, io::Printer* printer) {
   printer->Print(sub_vars,
+      "typedef boost::function<void (const $output_type$&)> $name$_Handler;\n");
+  printer->Print(sub_vars,
+      "$virtual$void $name$(\n"
+      "    const $input_type$& request,\n"
+      "    const $name$_Handler& handler);\n");
+  printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
       "    $output_type$* response,\n"
@@ -343,6 +349,14 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
 void ServiceGenerator::GenerateOneStubMethod(
     const VariablesMap& sub_vars,
     google::protobuf::io::Printer* printer) {
+  printer->Print(sub_vars,
+    "void $classname$_Stub::$name$(\n"
+    "    const $input_type$& request,\n"
+    "    const $name$_Handler& handler) {\n"
+    //"  channel_->call_method(service_name_,\n"
+    //"      $classname$::descriptor()->method($index$),\n"
+    //"      request, response, rpc_controller, done);\n"
+    "}\n");
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"

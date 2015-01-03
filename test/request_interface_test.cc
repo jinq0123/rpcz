@@ -148,6 +148,29 @@ TEST_F(server_test, SyncRequest) {
   ASSERT_EQ("The search for stupid", response.results(0));
 }
 
+TEST_F(server_test, AsyncRequest) {
+  struct Handler {
+      sync_event * sync;
+
+      void operator()(const SearchResponse & response)
+      {
+        ASSERT_EQ(2, response.results_size());
+        ASSERT_EQ("The search for stone", response.results(0));
+        BOOST_ASSERT(sync);
+        sync->signal();
+      }
+  };
+  sync_event sync;
+  Handler handler;
+  handler.sync = &sync;
+
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  request.set_query("stone");
+  stub.Search(request, handler);
+  // XXX sync.wait();
+}
+
 TEST_F(server_test, SimpleRequestAsync) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
