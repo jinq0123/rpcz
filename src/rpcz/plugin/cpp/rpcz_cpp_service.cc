@@ -97,7 +97,7 @@ void ServiceGenerator::GenerateInterface(io::Printer* printer) {
 
 void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Print(vars_,
-    "class $dllexport$$classname$_Stub : public rpcz::Service_Stub {\n"
+    "class $dllexport$$classname$_Stub : public rpcz::service_stub {\n"
     " public:\n");
 
   printer->Indent();
@@ -215,12 +215,12 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
     "$classname$_Stub::$classname$_Stub(\n"
     "    ::rpcz::rpc_channel* channel,\n"
     "    bool owns_channel)\n"
-    "  : Service_Stub(channel,\n"
+    "  : service_stub(channel,\n"
     "                 $classname$::descriptor()->name(),\n"
     "                 owns_channel) {}\n"
     "$classname$_Stub::$classname$_Stub(\n"
     "    const ::std::string& endpoint)\n"
-    "  : Service_Stub(::rpcz::rpc_channel::create(endpoint),\n"
+    "  : service_stub(::rpcz::rpc_channel::create(endpoint),\n"
     "                 $classname$::descriptor()->name(),\n"
     "                 true) {}\n"
     "$classname$_Stub::~$classname$_Stub() {\n"

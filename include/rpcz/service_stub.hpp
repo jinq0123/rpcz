@@ -7,22 +7,27 @@
 #define RPCZ_SERVICE_STUB_H
 
 #include <string>
+#include <boost/function.hpp>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
 
 namespace rpcz {
 
 class rpc_channel;
+class rpc_error;
 
-class Service_Stub {
+class service_stub {
  public:
-  Service_Stub(::rpcz::rpc_channel* channel,
+  service_stub(::rpcz::rpc_channel* channel,
                const std::string& service_name,
                bool owns_channel) :
       channel_(channel),
       service_name_(service_name),
       owns_channel_(owns_channel),
       default_deadline_ms_(-1) {}
-  ~Service_Stub() {}
+  ~service_stub() {}
+
+ public:
+  typedef boost::function<void (const rpc_error&)> error_handler;
 
  public:
   inline ::rpcz::rpc_channel* channel() { return channel_; }
@@ -35,7 +40,7 @@ class Service_Stub {
   long default_deadline_ms_;
 
  private:
-  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(Service_Stub);
+  GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(service_stub);
 };
 
 }  // namespace rpcz
