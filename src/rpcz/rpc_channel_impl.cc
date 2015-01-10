@@ -105,6 +105,8 @@ void rpc_channel_impl::call_method0(const std::string& service_name,
                  done);
 }
 
+// XXX delete response
+// XXX move closure into rpc_controller
 void rpc_channel_impl::call_method(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,

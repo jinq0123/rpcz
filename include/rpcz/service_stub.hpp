@@ -27,6 +27,8 @@ class service_stub {
   ~service_stub() {}
 
  public:
+  typedef boost::function<void (const ::google::protobuf::Message&)>
+      response_message_handler;
   typedef boost::function<void (const rpc_error&)> error_handler;
 
  public:
@@ -45,6 +47,30 @@ class service_stub {
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(service_stub);
+};
+
+// Wrap specific response handler type to message handler type.
+// Response should be subtype of protocol::Message.
+// The input handler will be copied.
+template <typename Response>
+struct handler_wrapper
+{
+public:
+  typedef boost::function<void (const Response&)> handler;
+
+public:
+  handler_wrapper(const handler& hdl) : hdl_(hdl) {
+    BOOST_ASSERT(hdl);
+  }
+
+public:
+  void operator()(const ::google::protobuf::Message& msg) {
+    BOOST_ASSERT(hdl_);
+    hdl_(*::google::protobuf::down_cast<const Response*>(&msg));
+  }
+
+private:
+  handler hdl_;
 };
 
 }  // namespace rpcz

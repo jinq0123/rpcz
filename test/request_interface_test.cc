@@ -119,8 +119,11 @@ Test all kinds of request interfaces.
 . Sync or async
 . Explicit deadline or implicit default deadline
 . Return response or use output parameter (only for sync)
-. Explicit error handler or implicit default error handler (only of async)
+. Explicit error handler or implicit default error handler (only for async)
 There are 4 sync interfaces and 4 async interfaces.
+
+XXX Add async_ prefix to async interfaces.
+XXX Add async interfaces without handler for oneway call.
 */
 
 TEST_F(server_test, SetDefaulDeadlineMs) {
@@ -151,11 +154,13 @@ TEST_F(server_test, SyncRequest) {
 TEST_F(server_test, AsyncRequest) {
   struct Handler {
       sync_event * sync;
+      volatile bool done;
 
       void operator()(const SearchResponse & response)
       {
         ASSERT_EQ(2, response.results_size());
         ASSERT_EQ("The search for stone", response.results(0));
+        done = true;
         BOOST_ASSERT(sync);
         sync->signal();
       }
@@ -163,12 +168,14 @@ TEST_F(server_test, AsyncRequest) {
   sync_event sync;
   Handler handler;
   handler.sync = &sync;
+  handler.done = false;
 
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
   request.set_query("stone");
   stub.Search(request, handler);
   // XXX sync.wait();
+  ASSERT_TRUE(handler.done);
 }
 
 TEST_F(server_test, SimpleRequestAsync) {
