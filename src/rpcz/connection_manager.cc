@@ -44,6 +44,7 @@
 #include "zmq_utils.hpp"
 
 #include "request_handler.hpp"  // TODO: extract worker_thread
+#include "rpc_context.hpp"  // for rpc_context
 
 namespace rpcz {
 
@@ -76,14 +77,14 @@ void worker_thread(connection_manager* connection_manager,
         }
         break;
       case kHandleResponse: {
-        const rpc_response_context* ctx =
-            interpret_message<const rpc_response_context*>(iter.next());
+        const rpc_context* ctx =
+            interpret_message<const rpc_context*>(iter.next());
         BOOST_ASSERT(ctx);
         connection_manager_status status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
 
         extern void handle_response(
-            const rpc_response_context & response_context,
+            const rpc_context & response_context,
             connection_manager_status status,
             message_iterator& iter);
         handle_response(*ctx, status, iter);

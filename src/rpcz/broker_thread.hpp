@@ -30,7 +30,7 @@ namespace rpcz {
 
 class message_iterator;
 class sync_event;
-struct rpc_response_context;
+struct rpc_context;
 
 // Client and server use the same broker_thread.
 class broker_thread {
@@ -83,7 +83,7 @@ class broker_thread {
   inline void send_reply(message_iterator& iter);
 
  private:
-  typedef std::map<event_id, const rpc_response_context*>
+  typedef std::map<event_id, const rpc_context*>
       remote_response_map;
   typedef std::map<uint64, event_id> deadline_map;
   remote_response_map remote_response_map_;

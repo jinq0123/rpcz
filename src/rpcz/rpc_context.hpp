@@ -3,8 +3,8 @@
 //
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_RPC_RESPONSE_CONTEXT_HPP
-#define RPCZ_RPC_RESPONSE_CONTEXT_HPP
+#ifndef RPCZ_RPC_CONTEXT_HPP
+#define RPCZ_RPC_CONTEXT_HPP
 
 #include <string>
 
@@ -19,7 +19,7 @@ namespace rpcz {
 class closure;
 class rpc_controller;
 
-struct rpc_response_context {
+struct rpc_context {
   rpc_controller* rpc_controller;
   ::google::protobuf::Message* response_msg;
   std::string* response_str;
@@ -27,4 +27,4 @@ struct rpc_response_context {
 };
 
 }  // namespace rpcz
-#endif  // RPCZ_RPC_RESPONSE_CONTEXT_HPP
+#endif  // RPCZ_RPC_CONTEXT_HPP

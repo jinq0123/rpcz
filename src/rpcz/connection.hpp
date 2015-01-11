@@ -23,7 +23,7 @@
 
 namespace rpcz {
 class message_vector;
-struct rpc_response_context;
+struct rpc_context;
 
 // Represents a connection to a server. Thread-safe.
 class connection {
@@ -38,7 +38,7 @@ class connection {
   // ctx: context to run on one of the worker threads when a response arrives
   //      or it timeouts.
   void send_request(message_vector& request,
-      const rpc_response_context* ctx);
+      const rpc_context* ctx);
 
  private:
   explicit connection(uint64 connection_id);

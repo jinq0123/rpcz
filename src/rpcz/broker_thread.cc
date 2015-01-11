@@ -21,7 +21,7 @@
 #include "connection_manager_status.hpp"  // for CMSTATUS_DONE
 #include "internal_commands.hpp"
 #include "logging.hpp"
-#include "rpc_response_context.hpp"  // for rpc_response_context
+#include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/callback.hpp"
 #include "rpcz/rpc_controller.hpp"  // for get_deadline_ms()
 #include "rpcz/sync_event.hpp"  // TODO: hide it
@@ -203,8 +203,8 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
 
 void broker_thread::send_request(message_iterator& iter) {
     uint64 connection_id = interpret_message<uint64>(iter.next());
-    const rpc_response_context* ctx =
-        interpret_message<const rpc_response_context*>(iter.next());
+    const rpc_context* ctx =
+        interpret_message<const rpc_context*>(iter.next());
     BOOST_ASSERT(ctx);
     event_id event_id = event_id_generator_.get_next();
     remote_response_map_[event_id] = ctx;
@@ -234,7 +234,7 @@ void broker_thread::handle_client_socket(zmq::socket_t* socket) {
     if (response_iter == remote_response_map_.end()) {
       return;
     }
-    const rpc_response_context* ctx = response_iter->second;
+    const rpc_context* ctx = response_iter->second;
     BOOST_ASSERT(ctx);
     begin_worker_command(kHandleResponse);
     send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
@@ -248,7 +248,7 @@ void broker_thread::handle_timeout(event_id event_id) {
     if (response_iter == remote_response_map_.end()) {
         return;
     }
-    const rpc_response_context* ctx = response_iter->second;
+    const rpc_context* ctx = response_iter->second;
     begin_worker_command(kHandleResponse);
     send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);

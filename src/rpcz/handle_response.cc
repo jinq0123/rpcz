@@ -17,7 +17,7 @@
 //
 // Response handler. Run in worker thread.
 
-#include "rpc_response_context.hpp"  // for rpc_response_context
+#include "rpc_context.hpp"  // for rpc_context
 #include "connection_manager_status.hpp"  // for connection_manager_status
 #include "zmq_utils.hpp"  // for message_iterator
 #include "rpcz/rpc_controller.hpp"  // for set_status()
@@ -27,7 +27,7 @@
 namespace rpcz {
 
 void handle_response(
-    const rpc_response_context & context,
+    const rpc_context & context,
     connection_manager_status status,
     message_iterator& iter) {
   switch (status) {

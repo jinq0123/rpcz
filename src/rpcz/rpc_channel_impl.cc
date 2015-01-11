@@ -18,7 +18,7 @@
 #include "rpc_channel_impl.hpp"
 
 #include "logging.hpp"  // for CHECK_EQ
-#include "rpc_response_context.hpp"
+#include "rpc_context.hpp"
 #include "rpcz/invalid_message_error.hpp"
 #include "rpcz/rpc_controller.hpp"  // for get_status()
 #include "zmq_utils.hpp"  // for string_to_message()
@@ -65,9 +65,9 @@ void rpc_channel_impl::call_method_full(
   msg_vector.push_back(msg_out.release());
   msg_vector.push_back(payload_out.release());
 
-  // XXX Merge rpc_response_context and rpc_controller.
+  // XXX Merge rpc_context and rpc_controller.
   // response_context will be deleted on response or timeout.
-  rpc_response_context * ctx = new rpc_response_context;
+  rpc_context * ctx = new rpc_context;
   ctx->rpc_controller = rpc_controller;
   ctx->user_closure = done;
   ctx->response_str = response_str;
@@ -142,10 +142,10 @@ void rpc_channel_impl::async_call(
   msg_vector.push_back(msg_out.release());
   msg_vector.push_back(payload_out.release());
 
-  // XXX Merge rpc_response_context and rpc_controller.
+  // XXX Merge rpc_context and rpc_controller.
   // response_context will be deleted on response or timeout.
   // XXX
-  //rpc_response_context * ctx = new rpc_response_context;
+  //rpc_context * ctx = new rpc_context;
   //ctx->rpc_controller = rpc_controller;
   //ctx->user_closure = done;
   //ctx->response_str = response_str;

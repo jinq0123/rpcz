@@ -21,7 +21,7 @@
 
 #include "connection_manager.hpp"
 #include "internal_commands.hpp"
-#include "rpc_response_context.hpp"  // for rpc_response_context
+#include "rpc_context.hpp"  // for rpc_context
 #include "zmq_utils.hpp"
 
 namespace rpcz {
@@ -38,7 +38,7 @@ connection::connection(uint64 connection_id)
 
 void connection::send_request(
     message_vector& request,
-    const rpc_response_context * ctx) {
+    const rpc_context * ctx) {
   BOOST_ASSERT(ctx);
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
