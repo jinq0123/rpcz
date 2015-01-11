@@ -65,7 +65,7 @@ void worker_thread(connection_manager* connection_manager,
       case kWorkerQuit:
         should_quit = true;
         break;
-      case krunclosure:
+      case kRunClosure:
         interpret_message<closure*>(iter.next())->run();
         break;
       case kHandleRequest: {
@@ -75,20 +75,19 @@ void worker_thread(connection_manager* connection_manager,
         handler->handle_request(iter);
         }
         break;
-      case kInvokeclient_request_callback: {
+      case kHandleResponse: {
         const rpc_response_context* ctx =
             interpret_message<const rpc_response_context*>(iter.next());
         BOOST_ASSERT(ctx);
         connection_manager_status status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
 
-        // XXX
-extern void handle_client_response(
-    const rpc_response_context & response_context,
-    connection_manager_status status,
-    message_iterator& iter);
+        extern void handle_response(
+            const rpc_response_context & response_context,
+            connection_manager_status status,
+            message_iterator& iter);
+        handle_response(*ctx, status, iter);
 
-        handle_client_response(*ctx, status, iter);
         delete ctx;
       }
     }
@@ -198,7 +197,7 @@ void connection_manager::unbind(const std::string& endpoint)
 void connection_manager::add(closure* closure) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, krunclosure, ZMQ_SNDMORE);
+  send_char(&socket, kRunClosure, ZMQ_SNDMORE);
   send_pointer(&socket, closure, 0);
   return;
 }

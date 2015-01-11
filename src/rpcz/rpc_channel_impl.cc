@@ -13,19 +13,15 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include "rpc_channel_impl.hpp"
 
-#include <google/protobuf/descriptor.h>
-#include <zmq.hpp>
-
-#include "logging.hpp"
+#include "logging.hpp"  // for CHECK_EQ
 #include "rpc_response_context.hpp"
-#include "rpcz/callback.hpp"
 #include "rpcz/invalid_message_error.hpp"
-#include "rpcz/rpc_controller.hpp"
-#include "rpcz/sync_event.hpp"
-#include "zmq_utils.hpp"
+#include "rpcz/rpc_controller.hpp"  // for get_status()
+#include "zmq_utils.hpp"  // for string_to_message()
 
 namespace rpcz {
 
@@ -115,63 +111,4 @@ void rpc_channel_impl::call_method(
                  done);
 }
 
-void handle_client_response(
-    const rpc_response_context & response_context,
-    connection_manager_status status,
-    message_iterator& iter) {
-  switch (status) {
-    case CMSTATUS_DEADLINE_EXCEEDED:
-      response_context.rpc_controller->set_status(
-          status::DEADLINE_EXCEEDED);
-      break;
-    case CMSTATUS_DONE: {
-        if (!iter.has_more()) {
-          response_context.rpc_controller->set_failed(
-              application_error::INVALID_MESSAGE, "");
-          break;
-        }
-        rpc_response_header generic_response;
-        zmq::message_t& msg_in = iter.next();
-        if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
-          response_context.rpc_controller->set_failed(
-              application_error::INVALID_MESSAGE, "");
-          break;
-        }
-        if (generic_response.status() != status::OK) {
-          response_context.rpc_controller->set_failed(
-              generic_response.application_error(),
-              generic_response.error());
-        } else {
-          response_context.rpc_controller->set_status(status::OK);
-          zmq::message_t& payload = iter.next();
-          if (response_context.response_msg) {
-            if (!response_context.response_msg->ParseFromArray(
-                    payload.data(), payload.size())) {
-              response_context.rpc_controller->set_failed(
-                  application_error::INVALID_MESSAGE, "");
-              break;
-            }
-          } else if (response_context.response_str) {
-            response_context.response_str->assign(
-                static_cast<char*>(
-                    payload.data()),
-                payload.size());
-          }
-        }
-      }
-      break;
-    case CMSTATUS_ACTIVE:
-    case CMSTATUS_INACTIVE:
-    default:
-      CHECK(false) << "Unexpected status: "
-                   << status;
-  }
-  // We call signal() before we execute closure since the closure may delete
-  // the rpc_controller object (which contains the sync_event).
-  // XXX Check sync_event is valid. signal() before closure has no use?
-  response_context.rpc_controller->signal();
-  if (response_context.user_closure) {
-    response_context.user_closure->run();
-  }
-}
 }  // namespace rpcz

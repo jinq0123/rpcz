@@ -109,7 +109,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
           reactor_.set_should_quit();
         }
         break;
-      case krunclosure:
+      case kRunClosure:
         add_closure(interpret_message<closure*>(iter.next()));
         break;
     }
@@ -126,7 +126,7 @@ void broker_thread::begin_worker_command(char command) {
 }
 
 void broker_thread::add_closure(closure* closure) {
-    begin_worker_command(krunclosure);
+    begin_worker_command(kRunClosure);
     send_pointer(frontend_socket_, closure, 0);
 }
 
@@ -236,7 +236,7 @@ void broker_thread::handle_client_socket(zmq::socket_t* socket) {
     }
     const rpc_response_context* ctx = response_iter->second;
     BOOST_ASSERT(ctx);
-    begin_worker_command(kInvokeclient_request_callback);
+    begin_worker_command(kHandleResponse);
     send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, CMSTATUS_DONE, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
@@ -249,7 +249,7 @@ void broker_thread::handle_timeout(event_id event_id) {
         return;
     }
     const rpc_response_context* ctx = response_iter->second;
-    begin_worker_command(kInvokeclient_request_callback);
+    begin_worker_command(kHandleResponse);
     send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
     remote_response_map_.erase(response_iter);
