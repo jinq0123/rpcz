@@ -21,7 +21,6 @@
 
 #include "connection_manager.hpp"
 #include "internal_commands.hpp"
-#include "remote_response_wrapper.hpp"  // DEL
 #include "rpc_response_context.hpp"  // for rpc_response_context
 #include "zmq_utils.hpp"
 

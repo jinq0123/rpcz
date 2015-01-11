@@ -120,6 +120,7 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
 }
 #endif  // XXX
 
+#if 0  // XXX
 class barrier_closure : public client_request_callback {
  public:
   barrier_closure() : count_(0) {}
@@ -142,6 +143,7 @@ class barrier_closure : public client_request_callback {
   boost::condition_variable cond_;
   int count_;
 };
+#endif  // XXX
 
 #if 0  // XXX
 void SendManyMessages(connection connection, int thread_id) {

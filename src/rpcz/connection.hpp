@@ -20,7 +20,6 @@
 
 #include "rpcz/common.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
-#include "client_request_callback.hpp"  // DEL
 
 namespace rpcz {
 class message_vector;

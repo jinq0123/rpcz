@@ -18,9 +18,9 @@
 #include "broker_thread.hpp"
 
 #include "clock.hpp"  // for zclock_ms()
+#include "connection_manager_status.hpp"  // for CMSTATUS_DONE
 #include "internal_commands.hpp"
 #include "logging.hpp"
-#include "remote_response_wrapper.hpp"
 #include "rpc_response_context.hpp"  // for rpc_response_context
 #include "rpcz/callback.hpp"
 #include "rpcz/rpc_controller.hpp"  // for get_deadline_ms()
