@@ -28,6 +28,11 @@
 
 namespace rpcz {
 
+static void handle_client_response(
+    rpc_response_context response_context,
+    connection_manager_status status,
+    message_iterator& iter);
+
 rpc_channel_impl::rpc_channel_impl(connection connection)
     : connection_(connection) {
 }
@@ -85,7 +90,7 @@ void rpc_channel_impl::call_method_full(
   connection_.send_request(
       msg_vector,
       rpc_controller->get_deadline_ms(),
-      bind(&rpc_channel_impl::handle_client_response, this,
+      bind(handle_client_response,
            response_context, _1, _2));
 }
 
@@ -124,7 +129,7 @@ void rpc_channel_impl::call_method(
                  done);
 }
 
-void rpc_channel_impl::handle_client_response(
+static void handle_client_response(
     rpc_response_context response_context,
     connection_manager_status status,
     message_iterator& iter) {
@@ -178,7 +183,7 @@ void rpc_channel_impl::handle_client_response(
   // We call signal() before we execute closure since the closure may delete
   // the rpc_controller object (which contains the sync_event).
   // XXX Check sync_event is valid. signal() before closure has no use?
-  response_context.rpc_controller->sync_event_->signal();
+  response_context.rpc_controller->signal();
   if (response_context.user_closure) {
     response_context.user_closure->run();
   }

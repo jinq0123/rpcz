@@ -68,4 +68,9 @@ std::string rpc_controller::to_string() const {
   }
   return result;
 }
+
+void rpc_controller::signal() {
+  sync_event_->signal();
+}
+
 }  // namespace rpcz

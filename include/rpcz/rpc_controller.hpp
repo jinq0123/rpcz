@@ -85,16 +85,19 @@ class rpc_controller : boost::noncopyable {
 
   std::string to_string() const;
 
- private:
+ public:
+  // XXX private ?
   void set_status(status_code status);
+  void signal();
 
+ private:
   status_code status_;
   std::string error_message_;
   int application_error_code_;
   int64 deadline_ms_;
   scoped_ptr<sync_event> sync_event_;
 
-  friend class rpc_channel_impl;
+  // DEL friend class rpc_channel_impl;
 };
 
 class rpc_error : public std::runtime_error {
