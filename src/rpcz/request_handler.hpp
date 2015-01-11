@@ -31,11 +31,6 @@ class request_handler {
  private:
   void unregister_service(const std::string& name);
 
-  // DEL
- //private:
- // const uint64 server_socket_idx_;
- // const std::string sender_;
-
  private:
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
