@@ -353,7 +353,6 @@ void ServiceGenerator::GenerateOneStubMethod(
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler) {\n"
-    "  // XXX if (!handler) oneway call...\n"
     "  channel_->call_method(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"

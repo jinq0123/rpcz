@@ -19,13 +19,12 @@ public:
 
 public:
   explicit handler_wrapper(const handler& hdl) : hdl_(hdl) {
-    BOOST_ASSERT(hdl);
   }
 
 public:
   void operator()(const ::google::protobuf::Message& msg) {
-    BOOST_ASSERT(hdl_);
-    hdl_(*::google::protobuf::down_cast<const Response*>(&msg));
+    if (hdl_)
+      hdl_(*::google::protobuf::down_cast<const Response*>(&msg));
   }
 
 private:
