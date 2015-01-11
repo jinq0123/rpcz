@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_RPC_CHANNEL_H
 #define RPCZ_RPC_CHANNEL_H
@@ -21,6 +22,9 @@
 #include <set>
 
 #include <google/protobuf/stubs/common.h>
+
+#include "error_handler.hpp"  // for error_handler
+#include "response_message_handler.hpp"  // for response_message_handler
 
 namespace google {
 namespace protobuf {
@@ -42,6 +46,12 @@ class rpc_channel {
                           google::protobuf::Message* response,
                           rpc_controller* rpc_controller,
                           closure* done) = 0;
+
+  virtual void call_method(const std::string& service_name,
+                          const google::protobuf::MethodDescriptor* method,
+                          const google::protobuf::Message& request,
+                          const response_message_handler& msg_hdlr,
+                          const error_handler& err_hdlr) = 0;
 
   // DO NOT USE: this method exists only for language bindings and may be
   // removed.

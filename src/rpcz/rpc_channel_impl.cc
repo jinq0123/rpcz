@@ -111,4 +111,14 @@ void rpc_channel_impl::call_method(
                  done);
 }
 
+void rpc_channel_impl::call_method(
+    const std::string& service_name,
+    const google::protobuf::MethodDescriptor* method,
+    const google::protobuf::Message& request,
+    const response_message_handler& msg_hdlr,
+    const error_handler& err_hdlr)
+{
+    // XXX
+}
+
 }  // namespace rpcz

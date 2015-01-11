@@ -118,6 +118,7 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     "#include \"$basename$.pb.h\"\n"
     "#include <google/protobuf/descriptor.h>\n"
     "#include <google/protobuf/stubs/once.h>\n"
+    "#include <rpcz/handler_wrapper.hpp>\n"
     "#include <rpcz/rpcz.hpp>\n"
     "\n"
     "namespace {\n",

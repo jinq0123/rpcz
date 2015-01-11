@@ -31,12 +31,20 @@ class rpc_channel_impl: public rpc_channel {
 
   virtual ~rpc_channel_impl();
 
-  virtual void call_method(const std::string& service_name,
-                          const google::protobuf::MethodDescriptor* method,
-                          const google::protobuf::Message& request,
-                          google::protobuf::Message* response,
-                          rpc_controller* rpc_controller,
-                          closure* done);
+  virtual void call_method(
+      const std::string& service_name,
+      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::Message& request,
+      google::protobuf::Message* response,
+      rpc_controller* rpc_controller,
+      closure* done);
+
+  virtual void call_method(
+      const std::string& service_name,
+      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::Message& request,
+      const response_message_handler& msg_hdlr,
+      const error_handler& err_hdlr);
 
   virtual void call_method0(
       const std::string& service_name,
@@ -48,14 +56,14 @@ class rpc_channel_impl: public rpc_channel {
 
  private:
   void call_method_full(
-    const std::string& service_name,
-    const std::string& method_name,
-    const ::google::protobuf::Message* request_msg,
-    const std::string& request,
-    ::google::protobuf::Message* response_msg,
-    std::string* response_str,
-    rpc_controller* rpc_controller,
-    closure* done);
+      const std::string& service_name,
+      const std::string& method_name,
+      const ::google::protobuf::Message* request_msg,
+      const std::string& request,
+      ::google::protobuf::Message* response_msg,
+      std::string* response_str,
+      rpc_controller* rpc_controller,
+      closure* done);
 
  private:
   connection connection_;

@@ -353,9 +353,12 @@ void ServiceGenerator::GenerateOneStubMethod(
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler) {\n"
-    //"  channel_->call_method(service_name_,\n"
-    //"      $classname$::descriptor()->method($index$),\n"
-    //"      request, response, rpc_controller, done);\n"
+    "  // XXX if (!handler) oneway call...\n"
+    "  channel_->call_method(service_name_,\n"
+    "      $classname$::descriptor()->method($index$),\n"
+    "      request,\n"
+    "      ::rpcz::handler_wrapper<$output_type$>(handler),\n"
+    "      default_error_handler_);\n"
     "}\n");
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"

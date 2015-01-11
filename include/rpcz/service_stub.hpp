@@ -3,12 +3,13 @@
 //
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_SERVICE_STUB_H
-#define RPCZ_SERVICE_STUB_H
+#ifndef RPCZ_SERVICE_STUB_HPP
+#define RPCZ_SERVICE_STUB_HPP
 
 #include <string>
-#include <boost/function.hpp>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
+
+#include "error_handler.hpp"  // for error_handler
 
 namespace rpcz {
 
@@ -25,11 +26,6 @@ class service_stub {
       owns_channel_(owns_channel),
       default_deadline_ms_(-1) {}
   ~service_stub() {}
-
- public:
-  typedef boost::function<void (const ::google::protobuf::Message&)>
-      response_message_handler;
-  typedef boost::function<void (const rpc_error&)> error_handler;
 
  public:
   inline ::rpcz::rpc_channel* channel() { return channel_; }
@@ -49,30 +45,6 @@ class service_stub {
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(service_stub);
 };
 
-// Wrap specific response handler type to message handler type.
-// Response should be subtype of protocol::Message.
-// The input handler will be copied.
-template <typename Response>
-struct handler_wrapper
-{
-public:
-  typedef boost::function<void (const Response&)> handler;
-
-public:
-  handler_wrapper(const handler& hdl) : hdl_(hdl) {
-    BOOST_ASSERT(hdl);
-  }
-
-public:
-  void operator()(const ::google::protobuf::Message& msg) {
-    BOOST_ASSERT(hdl_);
-    hdl_(*::google::protobuf::down_cast<const Response*>(&msg));
-  }
-
-private:
-  handler hdl_;
-};
-
 }  // namespace rpcz
 
-#endif  // RPCZ_SERVICE_STUB_H
+#endif  // RPCZ_SERVICE_STUB_HPP
