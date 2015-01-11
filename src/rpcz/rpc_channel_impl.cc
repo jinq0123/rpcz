@@ -94,6 +94,7 @@ void rpc_channel_impl::call_method0(const std::string& service_name,
 
 // XXX delete response
 // XXX move closure into rpc_controller
+// XXX use nethod name instead of MethodDesc
 void rpc_channel_impl::call_method(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
@@ -111,14 +112,46 @@ void rpc_channel_impl::call_method(
                  done);
 }
 
-void rpc_channel_impl::call_method(
+// XXX rename other call_method() to async_call().
+// XXX Add sync_call().
+void rpc_channel_impl::async_call(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
     const response_message_handler& msg_hdlr,
-    const error_handler& err_hdlr)
+    const error_handler& err_hdlr,
+    long deadline_ms)
 {
-    // XXX
+  // XXX CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
+  rpc_request_header generic_request;
+  generic_request.set_service(service_name);
+  generic_request.set_method(method->name());
+
+  size_t msg_size = generic_request.ByteSize();
+  scoped_ptr<zmq::message_t> msg_out(new zmq::message_t(msg_size));
+  CHECK(generic_request.SerializeToArray(msg_out->data(), msg_size));
+
+  scoped_ptr<zmq::message_t> payload_out;
+  size_t bytes = request.ByteSize();
+  payload_out.reset(new zmq::message_t(bytes));
+  if (!request.SerializeToArray(payload_out->data(), bytes)) {
+      throw invalid_message_error("Request serialization failed.");
+  }
+
+  message_vector msg_vector;
+  msg_vector.push_back(msg_out.release());
+  msg_vector.push_back(payload_out.release());
+
+  // XXX Merge rpc_response_context and rpc_controller.
+  // response_context will be deleted on response or timeout.
+  // XXX
+  //rpc_response_context * ctx = new rpc_response_context;
+  //ctx->rpc_controller = rpc_controller;
+  //ctx->user_closure = done;
+  //ctx->response_str = response_str;
+  //ctx->response_msg = response_msg;
+  //rpc_controller->set_status(status::ACTIVE);
+  //connection_.send_request(msg_vector, ctx);
 }
 
 }  // namespace rpcz

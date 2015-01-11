@@ -39,12 +39,14 @@ class rpc_channel_impl: public rpc_channel {
       rpc_controller* rpc_controller,
       closure* done);
 
-  virtual void call_method(
+  // only used in cpp?
+  virtual void async_call(
       const std::string& service_name,
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,
       const response_message_handler& msg_hdlr,
-      const error_handler& err_hdlr);
+      const error_handler& err_hdlr,
+      long deadline_ms);
 
   virtual void call_method0(
       const std::string& service_name,

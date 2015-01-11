@@ -47,11 +47,12 @@ class rpc_channel {
                           rpc_controller* rpc_controller,
                           closure* done) = 0;
 
-  virtual void call_method(const std::string& service_name,
+  virtual void async_call(const std::string& service_name,
                           const google::protobuf::MethodDescriptor* method,
                           const google::protobuf::Message& request,
                           const response_message_handler& msg_hdlr,
-                          const error_handler& err_hdlr) = 0;
+                          const error_handler& err_hdlr,
+                          long deadline_ms) = 0;
 
   // DO NOT USE: this method exists only for language bindings and may be
   // removed.
