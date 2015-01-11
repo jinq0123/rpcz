@@ -211,7 +211,7 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
   SearchResponse response;
   rpc_controller rpc_controller;
   request.set_query("timeout");
-  rpc_controller.set_deadline_ms(1);
+  // DEL rpc_controller.set_deadline_ms(1);
   stub.Search(request, &response, &rpc_controller, NULL);
   rpc_controller.wait();
   ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
@@ -224,7 +224,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   {
     rpc_controller rpc_controller;
     request.set_query("timeout");
-    rpc_controller.set_deadline_ms(1);
+    // XXX rpc_controller.set_deadline_ms(1);
     sync_event event;
     stub.Search(request, &response, &rpc_controller,
                 new_callback(&event, &sync_event::signal));

@@ -66,7 +66,7 @@ void rpc_channel_impl::call_method_full(
   msg_vector.push_back(payload_out.release());
 
   // XXX Merge rpc_context and rpc_controller.
-  // response_context will be deleted on response or timeout.
+  // rpc_context will be deleted on response or timeout.
   rpc_context * ctx = new rpc_context;
   ctx->rpc_controller = rpc_controller;
   ctx->user_closure = done;
@@ -118,8 +118,8 @@ void rpc_channel_impl::async_call(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
-    const response_message_handler& msg_hdlr,
-    const error_handler& err_hdlr,
+    const response_message_handler& msg_handler,
+    const error_handler& err_handler,
     long deadline_ms)
 {
   // XXX CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
@@ -143,15 +143,18 @@ void rpc_channel_impl::async_call(
   msg_vector.push_back(payload_out.release());
 
   // XXX Merge rpc_context and rpc_controller.
-  // response_context will be deleted on response or timeout.
+  // rpc_context will be deleted on response or timeout.
   // XXX
-  //rpc_context * ctx = new rpc_context;
+  rpc_context* ctx = new rpc_context;
+  ctx->msg_handler = msg_handler;
+  ctx->err_handler = err_handler;
+  ctx->deadline_ms = deadline_ms;  // XXX uncessary to save ms, send it separately.
   //ctx->rpc_controller = rpc_controller;
   //ctx->user_closure = done;
   //ctx->response_str = response_str;
   //ctx->response_msg = response_msg;
   //rpc_controller->set_status(status::ACTIVE);
-  //connection_.send_request(msg_vector, ctx);
+  connection_.send_request(msg_vector, ctx);
 }
 
 }  // namespace rpcz

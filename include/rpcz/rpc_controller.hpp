@@ -71,13 +71,14 @@ class rpc_controller : boost::noncopyable {
     return application_error_code_;
   }
 
-  inline int64 get_deadline_ms() const {
-    return deadline_ms_;
-  }
+  // DEL
+  //inline int64 get_deadline_ms() const {
+  //  return deadline_ms_;
+  //}
 
-  inline void set_deadline_ms(int deadline_ms) {
-    deadline_ms_ = deadline_ms;
-  }
+  //inline void set_deadline_ms(int deadline_ms) {
+  //  deadline_ms_ = deadline_ms;
+  //}
 
   void set_failed(int application_error_code, const std::string& message);
 
@@ -94,7 +95,7 @@ class rpc_controller : boost::noncopyable {
   status_code status_;
   std::string error_message_;
   int application_error_code_;
-  int64 deadline_ms_;
+  // DEL int64 deadline_ms_;
   scoped_ptr<sync_event> sync_event_;
 };
 

@@ -209,7 +209,8 @@ void broker_thread::send_request(message_iterator& iter) {
     event_id event_id = event_id_generator_.get_next();
     remote_response_map_[event_id] = ctx;
     BOOST_ASSERT(ctx->rpc_controller);
-    int64 deadline_ms = ctx->rpc_controller->get_deadline_ms();
+    // XXX deadline_ms should not be member of ctx.
+    int64 deadline_ms = ctx->deadline_ms;
     if (-1 != deadline_ms) {
       // XXX when to delete timeout handler?
       reactor_.run_closure_at(zclock_ms() + deadline_ms,

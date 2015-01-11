@@ -7,6 +7,8 @@
 #define RPCZ_RPC_CONTEXT_HPP
 
 #include <string>
+#include "rpcz/error_handler.hpp"
+#include "rpcz/response_message_handler.hpp"
 
 namespace google {
 namespace protobuf {
@@ -20,6 +22,12 @@ class closure;
 class rpc_controller;
 
 struct rpc_context {
+  response_message_handler msg_handler;
+  error_handler err_handler;
+  long deadline_ms;
+
+
+  // XXX deprecated members
   rpc_controller* rpc_controller;
   ::google::protobuf::Message* response_msg;
   std::string* response_str;

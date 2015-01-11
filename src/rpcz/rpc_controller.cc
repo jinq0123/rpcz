@@ -27,7 +27,7 @@ namespace rpcz {
 rpc_controller::rpc_controller()
     : status_(status::INACTIVE),
       application_error_code_(0),
-      deadline_ms_(-1),
+      // DEL deadline_ms_(-1),
       sync_event_(new sync_event()) /* scoped_ptr */ {
 };
 
