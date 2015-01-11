@@ -19,19 +19,15 @@
 #include <google/protobuf/descriptor.h>
 #include <zmq.hpp>
 
+#include "logging.hpp"
+#include "rpc_response_context.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/invalid_message_error.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/sync_event.hpp"
-#include "logging.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {
-
-static void handle_client_response(
-    rpc_response_context response_context,
-    connection_manager_status status,
-    message_iterator& iter);
 
 rpc_channel_impl::rpc_channel_impl(connection connection)
     : connection_(connection) {
@@ -39,13 +35,6 @@ rpc_channel_impl::rpc_channel_impl(connection connection)
 
 rpc_channel_impl::~rpc_channel_impl() {
 }
-
-struct rpc_response_context {
-  rpc_controller* rpc_controller;
-  ::google::protobuf::Message* response_msg;
-  std::string* response_str;
-  closure* user_closure;
-};
 
 void rpc_channel_impl::call_method_full(
     const std::string& service_name,
@@ -80,18 +69,15 @@ void rpc_channel_impl::call_method_full(
   msg_vector.push_back(msg_out.release());
   msg_vector.push_back(payload_out.release());
 
-  rpc_response_context response_context;
-  response_context.rpc_controller = rpc_controller;
-  response_context.user_closure = done;
-  response_context.response_str = response_str;
-  response_context.response_msg = response_msg;
+  // XXX Merge rpc_response_context and rpc_controller.
+  // response_context will be deleted on response or timeout.
+  rpc_response_context * ctx = new rpc_response_context;
+  ctx->rpc_controller = rpc_controller;
+  ctx->user_closure = done;
+  ctx->response_str = response_str;
+  ctx->response_msg = response_msg;
   rpc_controller->set_status(status::ACTIVE);
-
-  connection_.send_request(
-      msg_vector,
-      rpc_controller->get_deadline_ms(),
-      bind(handle_client_response,
-           response_context, _1, _2));
+  connection_.send_request(msg_vector, ctx);
 }
 
 void rpc_channel_impl::call_method0(const std::string& service_name,
@@ -129,8 +115,8 @@ void rpc_channel_impl::call_method(
                  done);
 }
 
-static void handle_client_response(
-    rpc_response_context response_context,
+void handle_client_response(
+    const rpc_response_context & response_context,
     connection_manager_status status,
     message_iterator& iter) {
   switch (status) {

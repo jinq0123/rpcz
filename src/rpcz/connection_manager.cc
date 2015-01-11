@@ -76,12 +76,20 @@ void worker_thread(connection_manager* connection_manager,
         }
         break;
       case kInvokeclient_request_callback: {
-        client_request_callback cb =
-            interpret_message<client_request_callback>(
-                iter.next());
+        const rpc_response_context* ctx =
+            interpret_message<const rpc_response_context*>(iter.next());
+        BOOST_ASSERT(ctx);
         connection_manager_status status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
-        cb(status, iter);
+
+        // XXX
+extern void handle_client_response(
+    const rpc_response_context & response_context,
+    connection_manager_status status,
+    message_iterator& iter);
+
+        handle_client_response(*ctx, status, iter);
+        delete ctx;
       }
     }
   }

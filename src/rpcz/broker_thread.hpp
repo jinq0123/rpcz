@@ -18,7 +18,9 @@
 #ifndef RPCZ_BROKER_THREAD_H
 #define RPCZ_BROKER_THREAD_H
 
-#include "client_request_callback.hpp"
+#include <map>
+#include <vector>
+
 #include "event_id_generator.hpp"
 #include "reactor.hpp"
 #include "request_handler_manager.hpp"
@@ -26,7 +28,9 @@
 
 namespace rpcz {
 
+class message_iterator;
 class sync_event;
+struct rpc_response_context;
 
 // Client and server use the same broker_thread.
 class broker_thread {
@@ -79,7 +83,7 @@ class broker_thread {
   inline void send_reply(message_iterator& iter);
 
  private:
-  typedef std::map<event_id, client_request_callback>
+  typedef std::map<event_id, const rpc_response_context*>
       remote_response_map;
   typedef std::map<uint64, event_id> deadline_map;
   remote_response_map remote_response_map_;

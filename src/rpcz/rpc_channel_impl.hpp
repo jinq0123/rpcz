@@ -24,8 +24,6 @@
 namespace rpcz {
 
 class closure;
-class message_iterator;
-struct rpc_response_context;
 
 class rpc_channel_impl: public rpc_channel {
  public:
@@ -49,12 +47,6 @@ class rpc_channel_impl: public rpc_channel {
       closure* done);
 
  private:
-     // DEL 
-  //virtual void handle_client_response(
-  //    rpc_response_context response_context,
-  //    connection_manager_status status,
-  //    message_iterator& iter);
-
   void call_method_full(
     const std::string& service_name,
     const std::string& method_name,

@@ -6,7 +6,8 @@
 
 namespace rpcz {
 
-struct remote_response_wrapper {
+// DEL
+struct remote_response_wrapper_DEL {
   int64 deadline_ms;
   uint64 start_time;
   client_request_callback callback;

@@ -19,10 +19,10 @@
 
 #include <zmq.hpp>
 
-#include "clock.hpp"
 #include "connection_manager.hpp"
 #include "internal_commands.hpp"
-#include "remote_response_wrapper.hpp"
+#include "remote_response_wrapper.hpp"  // DEL
+#include "rpc_response_context.hpp"  // for rpc_response_context
 #include "zmq_utils.hpp"
 
 namespace rpcz {
@@ -39,18 +39,17 @@ connection::connection(uint64 connection_id)
 
 void connection::send_request(
     message_vector& request,
-    int64 deadline_ms,
-    const client_request_callback & callback) {
-  remote_response_wrapper wrapper;
-  wrapper.start_time = zclock_ms();
-  wrapper.deadline_ms = deadline_ms;
-  wrapper.callback = callback;
+    const rpc_response_context * ctx) {
+
+  // DEL "client_request_callback.hpp"
+  // DEL remote_response_wrapper wrapper;
+  BOOST_ASSERT(ctx);
 
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kRequest, ZMQ_SNDMORE);
   send_uint64(&socket, connection_id_, ZMQ_SNDMORE);
-  send_object(&socket, wrapper, ZMQ_SNDMORE);
+  send_pointer(&socket, ctx, ZMQ_SNDMORE);
   write_vector_to_socket(&socket, request);
 }
 

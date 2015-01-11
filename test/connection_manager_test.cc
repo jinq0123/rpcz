@@ -101,6 +101,7 @@ void expect_timeout(connection_manager_status status,
   sync->signal();
 }
 
+#if 0  // XXX
 TEST_F(connection_manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_connection_manager_threads(4);
@@ -117,6 +118,7 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
                          boost::bind(&expect_timeout, _1, _2, &event));
   event.wait();
 }
+#endif  // XXX
 
 class barrier_closure : public client_request_callback {
  public:
@@ -141,6 +143,7 @@ class barrier_closure : public client_request_callback {
   int count_;
 };
 
+#if 0  // XXX
 void SendManyMessages(connection connection, int thread_id) {
   boost::ptr_vector<message_vector> requests;
   const int request_count = 100;
@@ -154,7 +157,9 @@ void SendManyMessages(connection connection, int thread_id) {
   }
   barrier.wait(request_count);
 }
+#endif  // XXX
 
+#if 0  // XXX
 TEST_F(connection_manager_test, ManyClientsTest) {
   ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_connection_manager_threads(4);
@@ -176,6 +181,7 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   event.wait();
   thread.join();
 }
+#endif  // XXX
 
 TEST_F(connection_manager_test, TestUnbind) {
   ASSERT_TRUE(connection_manager::is_destroyed());

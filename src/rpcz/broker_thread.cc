@@ -17,10 +17,13 @@
 
 #include "broker_thread.hpp"
 
+#include "clock.hpp"  // for zclock_ms()
 #include "internal_commands.hpp"
 #include "logging.hpp"
 #include "remote_response_wrapper.hpp"
+#include "rpc_response_context.hpp"  // for rpc_response_context
 #include "rpcz/callback.hpp"
+#include "rpcz/rpc_controller.hpp"  // for get_deadline_ms()
 #include "rpcz/sync_event.hpp"  // TODO: hide it
 #include "zmq_utils.hpp"
 
@@ -78,8 +81,8 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
         break;
       case kBind: {
         std::string endpoint(message_to_string(iter.next()));
-        const service_factory_map * factories
-            = interpret_message<const service_factory_map *>(iter.next());
+        const service_factory_map* factories
+            = interpret_message<const service_factory_map*>(iter.next());
         assert(factories);
         handle_bind_command(sender, endpoint, *factories);
         break;
@@ -200,15 +203,16 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
 
 void broker_thread::send_request(message_iterator& iter) {
     uint64 connection_id = interpret_message<uint64>(iter.next());
-    remote_response_wrapper remote_response_wrapper =
-        interpret_message<rpcz::remote_response_wrapper>(iter.next());
+    const rpc_response_context* ctx =
+        interpret_message<const rpc_response_context*>(iter.next());
+    BOOST_ASSERT(ctx);
     event_id event_id = event_id_generator_.get_next();
-    remote_response_map_[event_id] = remote_response_wrapper.callback;
-    if (remote_response_wrapper.deadline_ms != -1) {
+    remote_response_map_[event_id] = ctx;
+    BOOST_ASSERT(ctx->rpc_controller);
+    int64 deadline_ms = ctx->rpc_controller->get_deadline_ms();
+    if (-1 != deadline_ms) {
       // XXX when to delete timeout handler?
-      reactor_.run_closure_at(
-          remote_response_wrapper.start_time +
-              remote_response_wrapper.deadline_ms,
+      reactor_.run_closure_at(zclock_ms() + deadline_ms,
           new_callback(this, &broker_thread::handle_timeout, event_id));
     }
     zmq::socket_t*& socket = client_sockets_[connection_id];
@@ -230,9 +234,10 @@ void broker_thread::handle_client_socket(zmq::socket_t* socket) {
     if (response_iter == remote_response_map_.end()) {
       return;
     }
-    client_request_callback& callback = response_iter->second;
+    const rpc_response_context* ctx = response_iter->second;
+    BOOST_ASSERT(ctx);
     begin_worker_command(kInvokeclient_request_callback);
-    send_object(frontend_socket_, callback, ZMQ_SNDMORE);
+    send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, CMSTATUS_DONE, ZMQ_SNDMORE);
     forward_messages(iter, *frontend_socket_);
     remote_response_map_.erase(response_iter);
@@ -243,9 +248,9 @@ void broker_thread::handle_timeout(event_id event_id) {
     if (response_iter == remote_response_map_.end()) {
         return;
     }
-    client_request_callback& callback = response_iter->second;
+    const rpc_response_context* ctx = response_iter->second;
     begin_worker_command(kInvokeclient_request_callback);
-    send_object(frontend_socket_, callback, ZMQ_SNDMORE);
+    send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
     send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
     remote_response_map_.erase(response_iter);
 }
