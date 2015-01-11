@@ -31,6 +31,7 @@ set(RPCZ_SOURCES
     server_impl.cc
     singleton_service_factory.cc
     sync_event.cc
+    worker_thread_fun.cc
     zmq_utils.cc
     ${PROTO_SOURCES})
 file(GLOB RPCZ_HEADERS *.hpp)

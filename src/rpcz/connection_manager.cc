@@ -17,85 +17,28 @@
 
 #include "connection_manager.hpp"
 
-#include <algorithm>
+#include <string>
+
 #include <boost/lexical_cast.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
-#include <map>
-#include <ostream>
-#include <sstream>
-#include <stddef.h>
-#include <string>
-#include <utility>
-#include <vector>
 
 #include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>
 
 #include "application_options.hpp"
-#include "client_connection.hpp"
-#include "connection.hpp"
 #include "broker_thread.hpp"
-#include "internal_commands.hpp"
+#include "connection.hpp"
+#include "internal_commands.hpp"  // for kConnect
 #include "logging.hpp"
-#include "rpcz/callback.hpp"
 #include "rpcz/sync_event.hpp"
-#include "zmq_utils.hpp"
-
-#include "request_handler.hpp"  // TODO: extract worker_thread
-#include "rpc_context.hpp"  // for rpc_context
+#include "zmq_utils.hpp"  // for send_empty_message
 
 namespace rpcz {
 
 connection_manager::weak_ptr connection_manager::this_weak_ptr_;
 boost::mutex connection_manager::this_weak_ptr_mutex_;
-
-void worker_thread(connection_manager* connection_manager,
-                  zmq::context_t & context, std::string endpoint) {
-  zmq::socket_t socket(context, ZMQ_DEALER);
-  socket.connect(endpoint.c_str());
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kReady);
-  bool should_quit = false;
-  while (!should_quit) {
-    message_iterator iter(socket);
-    CHECK_EQ(0, iter.next().size());
-    char command(interpret_message<char>(iter.next()));
-    switch (command) {
-      case kWorkerQuit:
-        should_quit = true;
-        break;
-      case kRunClosure:
-        interpret_message<closure*>(iter.next())->run();
-        break;
-      case kHandleRequest: {
-        request_handler * handler =
-            interpret_message<request_handler*>(iter.next());
-        assert(handler);
-        handler->handle_request(iter);
-        }
-        break;
-      case kHandleResponse: {
-        const rpc_context* ctx =
-            interpret_message<const rpc_context*>(iter.next());
-        BOOST_ASSERT(ctx);
-        connection_manager_status status = connection_manager_status(
-            interpret_message<uint64>(iter.next()));
-
-        extern void handle_response(
-            const rpc_context & response_context,
-            connection_manager_status status,
-            message_iterator& iter);
-        handle_response(*ctx, status, iter);
-
-        delete ctx;
-      }
-    }
-  }
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kWorkerDone);
-}
+extern void worker_thread_fun(zmq::context_t& context, const std::string& endpoint);
 
 connection_manager::connection_manager()
   : context_(NULL),
@@ -122,8 +65,8 @@ connection_manager::connection_manager()
   int nthreads = options.get_connection_manager_threads();
   assert(nthreads > 0);
   for (int i = 0; i < nthreads; ++i) {
-    worker_threads_.add_thread(
-        new boost::thread(&worker_thread, this, boost::ref(*context_), frontend_endpoint_));
+    worker_threads_.add_thread(new boost::thread(worker_thread_fun,
+        boost::ref(*context_), frontend_endpoint_));
   }
   sync_event event;
   broker_thread_ = boost::thread(&broker_thread::run,
