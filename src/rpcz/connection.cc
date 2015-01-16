@@ -45,7 +45,6 @@ void connection::send_request(
   send_char(&socket, kRequest, ZMQ_SNDMORE);
   send_uint64(&socket, connection_id_, ZMQ_SNDMORE);
   send_pointer(&socket, ctx, ZMQ_SNDMORE);
-  // XXX Send deadline ms.
   write_vector_to_socket(&socket, request);
 }
 

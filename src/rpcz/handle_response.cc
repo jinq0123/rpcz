@@ -17,15 +17,14 @@
 //
 // Response handler. Run in worker thread.
 
-#include "connection_manager_status.hpp"  // for connection_manager_status
+#include "handle_response.hpp"
+
 #include "logging.hpp"  // for CHECK()
 #include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/application_error_code.hpp"  // for application_error
 #include "rpcz/callback.hpp"  // for run()
 #include "rpcz/rpc_controller.hpp"  // for set_status()
 #include "zmq_utils.hpp"  // for message_iterator
-
-// XXX DEL extern handle_response(), use .h file.
 
 namespace rpcz {
 

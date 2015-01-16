@@ -32,13 +32,13 @@
 #include "internal_commands.hpp"  // for kConnect
 #include "logging.hpp"
 #include "rpcz/sync_event.hpp"
+#include "worker_thread_fun.hpp"  // for worker_thread_fun
 #include "zmq_utils.hpp"  // for send_empty_message
 
 namespace rpcz {
 
 connection_manager::weak_ptr connection_manager::this_weak_ptr_;
 boost::mutex connection_manager::this_weak_ptr_mutex_;
-extern void worker_thread_fun(zmq::context_t& context, const std::string& endpoint);
 
 connection_manager::connection_manager()
   : context_(NULL),

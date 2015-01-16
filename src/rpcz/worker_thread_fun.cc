@@ -15,11 +15,12 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <string>
+#include "worker_thread_fun.hpp"
 
 #include <zmq.hpp>
 
 #include "connection_manager_status.hpp"  // for connection_manager_status
+#include "handle_response.hpp"  // for handle_response()
 #include "internal_commands.hpp"  // for kReady
 #include "logging.hpp"  // for CHECK_EQ()
 #include "request_handler.hpp"
@@ -60,13 +61,7 @@ void worker_thread_fun(zmq::context_t& context,
         BOOST_ASSERT(ctx);
         connection_manager_status status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
-
-        extern void handle_response(
-            rpc_context & context,
-            connection_manager_status status,
-            message_iterator& iter);
         handle_response(*ctx, status, iter);
-
         delete ctx;
       }
     }
