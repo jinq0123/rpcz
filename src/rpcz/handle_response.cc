@@ -17,48 +17,51 @@
 //
 // Response handler. Run in worker thread.
 
-#include "rpc_context.hpp"  // for rpc_context
 #include "connection_manager_status.hpp"  // for connection_manager_status
-#include "zmq_utils.hpp"  // for message_iterator
-#include "rpcz/rpc_controller.hpp"  // for set_status()
 #include "logging.hpp"  // for CHECK()
+#include "rpc_context.hpp"  // for rpc_context
+#include "rpcz/application_error_code.hpp"  // for application_error
 #include "rpcz/callback.hpp"  // for run()
+#include "rpcz/rpc_controller.hpp"  // for set_status()
+#include "zmq_utils.hpp"  // for message_iterator
+
+// XXX DEL extern handle_response(), use .h file.
 
 namespace rpcz {
 
 void handle_response(
-    const rpc_context & context,
+    rpc_context & context,
     connection_manager_status status,
     message_iterator& iter) {
   switch (status) {
     case CMSTATUS_DEADLINE_EXCEEDED:
-      context.rpc_controller->set_status(
+      context.set_status(
           status::DEADLINE_EXCEEDED);
       break;
     case CMSTATUS_DONE: {
         if (!iter.has_more()) {
-          context.rpc_controller->set_failed(
+          context.set_failed(
               application_error::INVALID_MESSAGE, "");
           break;
         }
         rpc_response_header generic_response;
         zmq::message_t& msg_in = iter.next();
         if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
-          context.rpc_controller->set_failed(
+          context.set_failed(
               application_error::INVALID_MESSAGE, "");
           break;
         }
         if (generic_response.status() != status::OK) {
-          context.rpc_controller->set_failed(
+          context.set_failed(
               generic_response.application_error(),
               generic_response.error());
         } else {
-          context.rpc_controller->set_status(status::OK);
+          context.set_status(status::OK);
           zmq::message_t& payload = iter.next();
           if (context.response_msg) {
             if (!context.response_msg->ParseFromArray(
                     payload.data(), payload.size())) {
-              context.rpc_controller->set_failed(
+              context.set_failed(
                   application_error::INVALID_MESSAGE, "");
               break;
             }
@@ -80,7 +83,7 @@ void handle_response(
   // We call signal() before we execute closure since the closure may delete
   // the rpc_controller object (which contains the sync_event).
   // XXX Check sync_event is valid. signal() before closure has no use?
-  context.rpc_controller->signal();
+  // XXX context.rpc_controller->signal();
   if (context.user_closure) {
     context.user_closure->run();
   }

@@ -5,6 +5,7 @@
 #include <boost/foreach.hpp>
 
 #include "logging.hpp"
+#include "rpcz/application_error_code.hpp"  // for application_error
 #include "rpcz/iservice.hpp"  // for dispatch_request()
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_controller.hpp"  // for application_error

@@ -376,7 +376,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    $output_type$* response,\n"
     "    long deadline_ms) {\n"
     "  ::rpcz::rpc_controller rpc_controller;\n"
-    "  rpc_controller.set_deadline_ms(deadline_ms);\n"
+    "  // XXX rpc_controller.set_deadline_ms(deadline_ms);\n"
     "  channel_->call_method(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request, response, &rpc_controller, NULL);\n"

@@ -29,8 +29,8 @@
 namespace rpcz {
 
 class message_iterator;
+class rpc_context;
 class sync_event;
-struct rpc_context;
 
 // Client and server use the same broker_thread.
 class broker_thread {

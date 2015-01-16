@@ -15,28 +15,26 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_RPC_H
-#define RPCZ_RPC_H
+#ifndef RPCZ_RPC_ERROR_HPP
+#define RPCZ_RPC_ERROR_HPP
 
+#include <stdexcept>
 #include <string>
-#include <boost/noncopyable.hpp>
 
-#include "rpcz/common.hpp"  // for scoped_ptr
 #include "status_code.hpp"  // for status_code
+#include "rpc_controller.hpp"  // XXX
 
 namespace rpcz {
 
-class sync_event;
-
-class rpc_controller : boost::noncopyable {
+class rpc_error : public std::runtime_error {
  public:
-  rpc_controller();
+  explicit rpc_error(const rpc_controller& rpc_controller) 
+      : std::runtime_error(rpc_controller.to_string()),
+        status_(rpc_controller.get_status()),
+        error_message_(rpc_controller.get_error_message()),
+        application_error_code_(rpc_controller.get_application_error_code()) {}
 
-  ~rpc_controller();
-
-  inline bool ok() const {
-    return get_status() == status::OK;
-  }
+  virtual ~rpc_error() throw() {}
 
   status_code get_status() const {
     return status_;
@@ -50,32 +48,10 @@ class rpc_controller : boost::noncopyable {
     return application_error_code_;
   }
 
-  // DEL
-  //inline int64 get_deadline_ms() const {
-  //  return deadline_ms_;
-  //}
-
-  //inline void set_deadline_ms(int deadline_ms) {
-  //  deadline_ms_ = deadline_ms;
-  //}
-
-  void set_failed(int application_error_code, const std::string& message);
-
-  int wait();
-
-  std::string to_string() const;
-
- public:
-  // XXX private ?
-  void set_status(status_code status);
-  void signal();
-
  private:
   status_code status_;
   std::string error_message_;
   int application_error_code_;
-  // DEL int64 deadline_ms_;
-  scoped_ptr<sync_event> sync_event_;
 };
 
 }  // namespace

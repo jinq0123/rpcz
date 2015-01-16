@@ -55,14 +55,14 @@ void worker_thread_fun(zmq::context_t& context,
         }
         break;
       case kHandleResponse: {
-        const rpc_context* ctx =
-            interpret_message<const rpc_context*>(iter.next());
+        rpc_context* ctx =
+            interpret_message<rpc_context*>(iter.next());
         BOOST_ASSERT(ctx);
         connection_manager_status status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
 
         extern void handle_response(
-            const rpc_context & response_context,
+            rpc_context & context,
             connection_manager_status status,
             message_iterator& iter);
         handle_response(*ctx, status, iter);

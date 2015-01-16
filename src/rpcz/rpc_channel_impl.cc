@@ -67,7 +67,8 @@ void rpc_channel_impl::call_method_full(
 
   // XXX Merge rpc_context and rpc_controller.
   // rpc_context will be deleted on response or timeout.
-  rpc_context * ctx = new rpc_context;
+  rpc_context * ctx = new rpc_context(
+      response_message_handler(), error_handler(), -1);  // XXX
   ctx->rpc_controller = rpc_controller;
   ctx->user_closure = done;
   ctx->response_str = response_str;
@@ -145,10 +146,7 @@ void rpc_channel_impl::async_call(
   // XXX Merge rpc_context and rpc_controller.
   // rpc_context will be deleted on response or timeout.
   // XXX
-  rpc_context* ctx = new rpc_context;
-  ctx->msg_handler = msg_handler;
-  ctx->err_handler = err_handler;
-  ctx->deadline_ms = deadline_ms;  // XXX uncessary to save ms, send it separately.
+  rpc_context* ctx = new rpc_context(msg_handler, err_handler, deadline_ms);
   //ctx->rpc_controller = rpc_controller;
   //ctx->user_closure = done;
   //ctx->response_str = response_str;

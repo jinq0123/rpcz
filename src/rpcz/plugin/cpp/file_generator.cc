@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include "file_generator.h"
 
@@ -60,6 +61,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "\n"
     "#include <string>\n"
     "#include <rpcz/cpp_service.hpp>\n"
+    "#include <rpcz/rpc_error.hpp>\n"
     "#include <rpcz/service_stub.hpp>\n"
     "\n"
     "namespace google {\n"
@@ -118,8 +120,10 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     "#include \"$basename$.pb.h\"\n"
     "#include <google/protobuf/descriptor.h>\n"
     "#include <google/protobuf/stubs/once.h>\n"
+    "#include <rpcz/application_error_code.hpp>  // for application_error\n"
     "#include <rpcz/handler_wrapper.hpp>\n"
     "#include <rpcz/rpcz.hpp>\n"
+    "#include <rpcz/rpc_controller.hpp>  // DEL\n"
     "\n"
     "namespace {\n",
     "basename", StripProto(file_->name()));

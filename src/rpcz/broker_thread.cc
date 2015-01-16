@@ -208,15 +208,15 @@ void broker_thread::send_request(message_iterator& iter) {
     BOOST_ASSERT(ctx);
     event_id event_id = event_id_generator_.get_next();
     remote_response_map_[event_id] = ctx;
-    BOOST_ASSERT(ctx->rpc_controller);
+    // XXX BOOST_ASSERT(ctx->rpc_controller);
     // XXX deadline_ms should not be member of ctx.
-    int64 deadline_ms = ctx->deadline_ms;
+    int64 deadline_ms = ctx->get_deadline_ms();
     if (-1 != deadline_ms) {
       // XXX when to delete timeout handler?
       reactor_.run_closure_at(zclock_ms() + deadline_ms,
           new_callback(this, &broker_thread::handle_timeout, event_id));
     }
-    zmq::socket_t*& socket = client_sockets_[connection_id];
+    zmq::socket_t* socket = client_sockets_[connection_id];
     send_string(socket, "", ZMQ_SNDMORE);
     send_uint64(socket, event_id, ZMQ_SNDMORE);
     forward_messages(iter, *socket);
