@@ -6,6 +6,7 @@
 #include "rpc_context.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include "rpcz/application_error_code.hpp"  // for application_error
 
 namespace rpcz {
 
@@ -17,17 +18,20 @@ void rpc_context::set_failed(int application_error, const std::string& error_mes
 
 std::string rpc_context::to_string() const {
   std::string result =
-      "status: " + rpc_response_header_status_code_Name(get_status());
-  if (get_status() == status::APPLICATION_ERROR) {
-    result += "(" + boost::lexical_cast<std::string>(
-            get_application_error_code())
-           + ")";
+      "status: " + rpc_response_header_status_code_Name(status_);
+  if (status_ == status::APPLICATION_ERROR) {
+    result += " (" + boost::lexical_cast<std::string>(
+            application_error_code_) + ")";
   }
-  std::string error_message = get_error_message();
-  if (!error_message.empty()) {
-    result += ": " + error_message;
+  if (!error_message_.empty()) {
+    result += ": " + error_message_;
   }
   return result;
+}
+
+void rpc_context::set_handler_failed() {
+  // Only for one reason.
+  set_failed(application_error::INVALID_MESSAGE, "");
 }
 
 }  // namespace rpcz

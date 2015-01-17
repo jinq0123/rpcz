@@ -9,7 +9,6 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
-#include "rpcz/application_error_code.hpp"  // for application_error
 #include "rpcz/error_handler.hpp"
 #include "rpcz/response_message_handler.hpp"
 #include "rpcz/status_code.hpp"
@@ -43,27 +42,18 @@ class rpc_context : boost::noncopyable {
  public:
   inline void handle_response_message(const void* data, size_t size);
 
-  bool ok() const {
-    return status::OK == status_;
-  }
-  status_code get_status() const {
-    return status_;
-  }
   void set_status(status_code status) {
     status_ = status; 
-  }
-  std::string get_error_message() const {
-    return error_message_;
-  }
-  int get_application_error_code() const {
-    return application_error_code_;
   }
   long get_deadline_ms() const {
     return deadline_ms_;
   }
 
   void set_failed(int application_error_code, const std::string& message);
+
+ private:
   std::string to_string() const;
+  void set_handler_failed();
 
  private:
   response_message_handler msg_handler_;
@@ -89,7 +79,8 @@ inline void rpc_context::handle_response_message(
   if (msg_handler_) {
     if (msg_handler_(data, size))
       return;
-    set_failed(application_error::INVALID_MESSAGE, "");
+
+    set_handler_failed();
   }
 }  // handle_response_message
 
