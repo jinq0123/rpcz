@@ -25,27 +25,28 @@ inline void handle_done_response(
     rpc_context & context,
     message_iterator& iter) {
   if (!iter.has_more()) {
-    context.set_failed(application_error::INVALID_MESSAGE, "");
-    return;  // XXX false;
+    context.handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
   }
   rpc_response_header generic_response;
   zmq::message_t& msg_in = iter.next();
   if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
-    context.set_failed(application_error::INVALID_MESSAGE, "");
-    return;  // XXX false;
+    context.handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
   }
   if (generic_response.status() != status::OK) {
-    context.set_failed(generic_response.application_error(),
-                       generic_response.error());
-    return;  // XXX false;
+    context.handle_application_error(
+        generic_response.application_error(),
+        generic_response.error());
+    return;
   }
 
   if (!iter.has_more()) {
-    context.set_failed(application_error::INVALID_MESSAGE, "");
-    return;  // XXX false;
+    context.handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
   }
 
-  context.set_status(status::OK);  // XXX No need to set OK? DEL set_status()?
+  // XXX context.set_status(status::OK);  // XXX No need to set OK? DEL set_status()?
   zmq::message_t& payload = iter.next();
   context.handle_response_message(payload.data(), payload.size());
 }  // hanele_done_response()
@@ -60,9 +61,12 @@ inline void handle_response(
     detail::handle_done_response(context, iter);  // inlined
     return;
   }
-  CHECK(CMSTATUS_DEADLINE_EXCEEDED == cm_status)
-      << "Unexpected status: " << cm_status;
-  context.set_status(status::DEADLINE_EXCEEDED);  // XXX set_failed?
+  if (CMSTATUS_DEADLINE_EXCEEDED == cm_status)
+  {
+    context.handle_deadline_exceed();
+    return;
+  }
+  CHECK(false) << "Unexpected status: " << cm_status;
 
   // DEL
   //BOOST_ASSERT(!context.ok());

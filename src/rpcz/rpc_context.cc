@@ -5,33 +5,33 @@
 
 #include "rpc_context.hpp"
 
-#include <boost/lexical_cast.hpp>
 #include "rpcz/application_error_code.hpp"  // for application_error
+#include "rpcz/rpc_error.hpp"
 
 namespace rpcz {
 
-void rpc_context::set_failed(int application_error, const std::string& error_message) {
-  set_status(status::APPLICATION_ERROR);
-  error_message_ = error_message;
-  application_error_code_ = application_error;
+void rpc_context::handle_deadline_exceed() {
+  handle_error(status::DEADLINE_EXCEEDED, 0, "");
 }
 
-std::string rpc_context::to_string() const {
-  std::string result =
-      "status: " + rpc_response_header_status_code_Name(status_);
-  if (status_ == status::APPLICATION_ERROR) {
-    result += " (" + boost::lexical_cast<std::string>(
-            application_error_code_) + ")";
-  }
-  if (!error_message_.empty()) {
-    result += ": " + error_message_;
-  }
-  return result;
+void rpc_context::handler_invalid_message() {
+  handle_application_error(application_error::INVALID_MESSAGE, "");
 }
 
-void rpc_context::set_handler_failed() {
-  // Only for one reason.
-  set_failed(application_error::INVALID_MESSAGE, "");
+void rpc_context::handle_application_error(
+  int application_error_code,
+  const std::string & error_message)
+{
+  handle_error(status::APPLICATION_ERROR,
+      application_error_code, error_message);
+}
+
+void rpc_context::handle_error(status_code status,
+  int application_error_code,
+  const std::string & error_message)
+{
+  if (err_handler_)
+    err_handler_(rpc_error(status, application_error_code, error_message));
 }
 
 }  // namespace rpcz

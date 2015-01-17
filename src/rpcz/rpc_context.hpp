@@ -13,12 +13,6 @@
 #include "rpcz/response_message_handler.hpp"
 #include "rpcz/status_code.hpp"
 
-namespace google {
-namespace protobuf {
-class Message;
-}  // namespace protobuf
-}  // namespace google
-
 namespace rpcz {
 
 class closure;
@@ -32,45 +26,39 @@ class rpc_context : boost::noncopyable {
     long deadline_ms)
       : msg_handler_(msg_handler),
         err_handler_(err_handler),
-        deadline_ms_(deadline_ms),
-        status_(status::INACTIVE),
-        application_error_code_(0) {
+        deadline_ms_(deadline_ms) {
   }
 
   ~rpc_context() {}
 
  public:
   inline void handle_response_message(const void* data, size_t size);
+  void handle_deadline_exceed();
+  void handle_application_error(
+      int application_error_code,
+      const std::string & error_message);
 
-  void set_status(status_code status) {
-    status_ = status; 
-  }
+ public:
   long get_deadline_ms() const {
     return deadline_ms_;
   }
 
-  void set_failed(int application_error_code, const std::string& message);
+ private:
+  void handler_invalid_message();
 
  private:
-  std::string to_string() const;
-  void set_handler_failed();
+  void handle_error(status_code status,
+      int application_error_code,
+      const std::string & error_message);
 
  private:
   response_message_handler msg_handler_;
   error_handler err_handler_;
   long deadline_ms_;
 
- private:
-  status_code status_;
-  std::string error_message_;
-  int application_error_code_;
-
   // XXX deprecated members
 public:
   rpc_controller* rpc_controller;
-  // DEL ::google::protobuf::Message* response_msg;
-  // DEL std::string* response_str;
-  // XXX closure* user_closure;
 };
 
 inline void rpc_context::handle_response_message(
@@ -80,7 +68,8 @@ inline void rpc_context::handle_response_message(
     if (msg_handler_(data, size))
       return;
 
-    set_handler_failed();
+    // msg_handler_() failed because of invalid message.
+    handler_invalid_message();
   }
 }  // handle_response_message
 

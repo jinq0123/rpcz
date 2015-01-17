@@ -27,6 +27,7 @@ set(RPCZ_SOURCES
     rpc_controller.cc
     rpc_channel.cc
     rpc_channel_impl.cc
+    rpc_error.cc
     server.cc
     server_impl.cc
     singleton_service_factory.cc

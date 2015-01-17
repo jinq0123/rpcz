@@ -9,7 +9,7 @@
 namespace rpcz {
 
 // Wrap specific response handler type to response_message_handler.
-// Only for C++?
+// Only for C++.
 // Response should be subtype of protocol::Message.
 // The input handler will be copied.
 template <typename Response>

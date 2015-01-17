@@ -28,13 +28,14 @@ namespace rpcz {
 
 class rpc_error : public std::runtime_error {
  public:
-  explicit rpc_error(const rpc_controller& rpc_controller) 
-      : std::runtime_error(rpc_controller.to_string()),
-        status_(rpc_controller.get_status()),
-        error_message_(rpc_controller.get_error_message()),
-        application_error_code_(rpc_controller.get_application_error_code()) {}
+  // DEL
+  explicit rpc_error(const rpc_controller& rpc_controller)
+      : std::runtime_error("XXX") {}
+  rpc_error(status_code status,
+            int application_error_code,
+            const std::string& error_message);
 
-  virtual ~rpc_error() throw() {}
+  virtual ~rpc_error() throw();
 
   status_code get_status() const {
     return status_;
@@ -50,8 +51,8 @@ class rpc_error : public std::runtime_error {
 
  private:
   status_code status_;
-  std::string error_message_;
   int application_error_code_;
+  std::string error_message_;
 };
 
 }  // namespace
