@@ -157,19 +157,6 @@ class server_test : public ::testing::Test {
     *frontend_connection_ = cm->connect("inproc://myserver.frontend");
   }
 
-  SearchResponse send_blocking_request(connection connection,
-                                       const std::string& query) {
-    SearchService_Stub stub(rpc_channel::create(connection), true);
-    SearchRequest request;
-    SearchResponse response;
-    request.set_query(query);
-    rpc_controller rpc_controller;
-    stub.Search(request, &response, &rpc_controller, NULL);
-    rpc_controller.wait();
-    EXPECT_TRUE(rpc_controller.ok());
-    return response;
-  }
-
 protected:
   // destruct in reversed order
   scoped_ptr<zmq::context_t> context_;  // destruct last
@@ -183,8 +170,10 @@ protected:
 };
 
 TEST_F(server_test, SimpleRequest) {
-  SearchResponse response =
-      send_blocking_request(*frontend_connection_, "happiness");
+  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchRequest request;
+  request.set_query("happiness");
+  SearchResponse response = stub.Search(request);
   ASSERT_EQ(2, response.results_size());
   ASSERT_EQ("The search for happiness", response.results(0));
 }
@@ -219,13 +208,15 @@ TEST_F(server_test, SimpleRequestWithError) {
 TEST_F(server_test, SimpleRequestWithTimeout) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
-  SearchResponse response;
-  rpc_controller rpc_controller;
   request.set_query("timeout");
-  // XXX rpc_controller.set_deadline_ms(1);
-  stub.Search(request, &response, &rpc_controller, NULL);
-  rpc_controller.wait();
-  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
+  try {
+    (void)stub.Search(request, 1);
+    ASSERT_TRUE(false);
+  } catch (rpc_error & err) {
+    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, err.get_status());
+    return;
+  }
+  ASSERT_TRUE(false);
 }
 
 TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
