@@ -58,7 +58,7 @@ class rpc_channel {
                          const google::protobuf::MethodDescriptor* method,
                          const google::protobuf::Message& request,
                          long deadline_ms,
-                         google::protobuf::Message& response  // out
+                         google::protobuf::Message* response  // out
                          ) = 0;
 
   // DO NOT USE: this method exists only for language bindings and may be

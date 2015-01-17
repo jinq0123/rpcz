@@ -285,7 +285,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
   SearchResponse response;
   request.set_query("timeout");
   try {
-    stub.Search(request, &response, 1);
+    stub.Search(request, 1, &response);
     ASSERT_TRUE(false);
   } catch (rpc_error &error) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
@@ -303,7 +303,7 @@ TEST_F(server_test, ConnectionManagerTermination) {
   request.set_query("terminate");
   SearchResponse response;
   try {
-    stub.Search(request, &response, 1);
+    stub.Search(request, 1, &response);
   } catch (rpc_error &error) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
   }

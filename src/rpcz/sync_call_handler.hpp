@@ -23,7 +23,7 @@ class sync_call_handler
 {
 public:
     inline explicit sync_call_handler(
-        google::protobuf::Message& response);
+        google::protobuf::Message* response);
     ~sync_call_handler(void) {}
 
 public:
@@ -50,15 +50,20 @@ private:
 };
 
 inline sync_call_handler::sync_call_handler(
-    google::protobuf::Message& response)
+    google::protobuf::Message* response)
     : state_(new state)  // shared_ptr
 {
-    state_->response = &response;
+    state_->response = response;
 }
 
 inline void sync_call_handler::operator()(const void * data, size_t size)
 {
     BOOST_ASSERT(data);
+    if (NULL == state_->response)
+    {
+        signal();
+        return;
+    }
     if (state_->response->ParseFromArray(data, size))
     {
         BOOST_ASSERT(NULL == state_->error.get());

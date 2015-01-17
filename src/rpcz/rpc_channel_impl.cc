@@ -162,7 +162,7 @@ void rpc_channel_impl::sync_call(
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
     long deadline_ms,
-    google::protobuf::Message& response)
+    google::protobuf::Message* response)
 {
   sync_call_handler handler(response);
   async_call(service_name, method, request,

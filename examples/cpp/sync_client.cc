@@ -29,7 +29,7 @@ int main() {
 
   cout << "Sending request." << endl;
   try {
-    search_stub.Search(request, &response, 1000);
+    search_stub.Search(request, 1000, &response);
     cout << response.DebugString() << endl;
   } catch (rpcz::rpc_error &e) {
     cout << "Error: " << e.what() << endl;;

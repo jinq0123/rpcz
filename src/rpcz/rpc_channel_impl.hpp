@@ -53,7 +53,7 @@ class rpc_channel_impl: public rpc_channel {
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,
       long deadline_ms,
-      google::protobuf::Message& response);
+      google::protobuf::Message* response);
 
   virtual void call_method0(
       const std::string& service_name,

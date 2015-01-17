@@ -157,13 +157,13 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
       "    $output_type$* response) {\n"
-      "  $name$(request, response, default_deadline_ms_);\n"
+      "  $name$(request, default_deadline_ms_, response);\n"
       "}\n");
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
-      "    $output_type$* response,\n"
-      "    long deadline_ms);\n");
+      "    long deadline_ms,\n"
+      "    $output_type$* response);\n");
   printer->Print(sub_vars,
       "$virtual$$output_type$ $name$(\n"
       "    const $input_type$& request);\n");
@@ -374,17 +374,17 @@ void ServiceGenerator::GenerateOneStubMethod(
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
-    "    $output_type$* response,\n"
-    "    long deadline_ms) {\n"
-    "  ::rpcz::rpc_controller rpc_controller;\n"
+    "    long deadline_ms,\n"
+    "    $output_type$* response) {\n"
+    "  // DEL ::rpcz::rpc_controller rpc_controller;\n"
     "  // XXX rpc_controller.set_deadline_ms(deadline_ms);\n"
-    "  channel_->call_method(service_name_,\n"
+    "  channel_->sync_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
-    "      request, response, &rpc_controller, NULL);\n"
-    "  rpc_controller.wait();\n"
-    "  if (!rpc_controller.ok()) {\n"
-    "    throw ::rpcz::rpc_error(rpc_controller);\n"
-    "  }\n"
+    "      request, deadline_ms, response);\n"
+    "  // DEL rpc_controller.wait();\n"
+    "  // DEL if (!rpc_controller.ok()) {\n"
+    "  // DEL  throw ::rpcz::rpc_error(rpc_controller);\n"
+    "  // DEL }\n"
     "}\n");
   printer->Print(sub_vars,
     "$output_type$ $classname$_Stub::$name$(\n"
@@ -398,7 +398,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    long deadline_ms) {\n"
     "  $output_type$ response;\n"
-    "  $name$(request, &response, deadline_ms);\n"
+    "  $name$(request, deadline_ms, &response);\n"
     "  return response;\n"
     "}\n");
 }
