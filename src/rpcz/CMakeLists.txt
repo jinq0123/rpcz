@@ -19,7 +19,6 @@ set(RPCZ_SOURCES
     connection_manager.cc
     cpp_service.cc
     event_id_generator.cc
-    handle_response.cc
     reactor.cc
     replier.cc
     request_handler.cc

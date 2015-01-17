@@ -59,9 +59,9 @@ void worker_thread_fun(zmq::context_t& context,
         rpc_context* ctx =
             interpret_message<rpc_context*>(iter.next());
         BOOST_ASSERT(ctx);
-        connection_manager_status status = connection_manager_status(
+        connection_manager_status cm_status = connection_manager_status(
             interpret_message<uint64>(iter.next()));
-        handle_response(*ctx, status, iter);
+        handle_response(*ctx, cm_status, iter);  // inlined
         delete ctx;
       }
     }
