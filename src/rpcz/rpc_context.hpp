@@ -77,7 +77,7 @@ public:
   rpc_controller* rpc_controller;
   ::google::protobuf::Message* response_msg;
   std::string* response_str;
-  closure* user_closure;
+  // XXX closure* user_closure;
 };
 
 }  // namespace rpcz

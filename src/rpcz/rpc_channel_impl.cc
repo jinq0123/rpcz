@@ -70,7 +70,7 @@ void rpc_channel_impl::call_method_full(
   rpc_context * ctx = new rpc_context(
       response_message_handler(), error_handler(), -1);  // XXX
   ctx->rpc_controller = rpc_controller;
-  ctx->user_closure = done;
+  // XXX ctx->user_closure = done;
   ctx->response_str = response_str;
   ctx->response_msg = response_msg;
   rpc_controller->set_status(status::ACTIVE);

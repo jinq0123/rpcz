@@ -79,13 +79,16 @@ void handle_response(
       CHECK(false) << "Unexpected status: "
                    << status;
   }
+
+  // XXX run handler...
+
   // We call signal() before we execute closure since the closure may delete
   // the rpc_controller object (which contains the sync_event).
   // XXX Check sync_event is valid. signal() before closure has no use?
   // XXX context.rpc_controller->signal();
-  if (context.user_closure) {
-    context.user_closure->run();
-  }
+  //if (context.user_closure) {
+  //  context.user_closure->run();
+  //}
 }  // handle_response()
 
 }  // namespace rpcz
