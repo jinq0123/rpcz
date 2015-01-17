@@ -40,6 +40,9 @@ class rpc_context : boost::noncopyable {
   ~rpc_context() {}
 
  public:
+  response_message_handler & get_msg_handler() { return msg_handler_; }
+  error_handler & get_err_handler() {return err_handler_; }
+
   bool ok() const {
     return status::OK == status_;
   }
@@ -75,7 +78,7 @@ class rpc_context : boost::noncopyable {
   // XXX deprecated members
 public:
   rpc_controller* rpc_controller;
-  ::google::protobuf::Message* response_msg;
+  // DEL ::google::protobuf::Message* response_msg;
   std::string* response_str;
   // XXX closure* user_closure;
 };

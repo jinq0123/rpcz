@@ -9,6 +9,7 @@
 namespace rpcz {
 
 // Wrap specific response handler type to response_message_handler.
+// Only for C++?
 // Response should be subtype of protocol::Message.
 // The input handler will be copied.
 template <typename Response>
@@ -18,18 +19,32 @@ public:
   typedef boost::function<void (const Response&)> handler;
 
 public:
-  explicit handler_wrapper(const handler& hdl) : hdl_(hdl) {
+  explicit handler_wrapper(const handler& hdl) : handler_(hdl) {
   }
 
 public:
-  void operator()(const ::google::protobuf::Message& msg) {
-    if (hdl_)
-      hdl_(*::google::protobuf::down_cast<const Response*>(&msg));
-  }
+  // Returns false if message is illegal.
+  inline bool operator()(const void * data, size_t size);
 
 private:
-  handler hdl_;
+  handler handler_;
 };
+
+// Returns false if message is illegal.
+template <typename Response>
+inline bool handler_wrapper<Response>::operator()(
+    const void * data, size_t size) {
+  BOOST_ASSERT(data);
+  if (!handler_)
+    return true;  // ignore message
+
+  Response resp;
+  if (!resp.ParseFromArray(data, size))
+    return false;  // illegal message
+
+  handler_(resp);
+  return true;
+}  // operator()()
 
 }  // namespace rpcz
 

@@ -4,7 +4,8 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 //
-// Response handler. Run in worker thread.
+// Handle rpc response. Call response handler or error handler.
+// Run in worker thread.
 
 #ifndef RPCZ_HANDLE_RESPONSE_HPP
 #define RPCZ_HANDLE_RESPONSE_HPP
@@ -39,20 +40,21 @@ inline bool handle_done_response(
                        generic_response.error());
     return false;
   }
-  
+
+  if (!iter.has_more()) {
+    context.set_failed(application_error::INVALID_MESSAGE, "");
+    return false;
+  }
+
   context.set_status(status::OK);  // XXX No need to set OK?
   zmq::message_t& payload = iter.next();
-  if (context.response_msg) {
-    if (!context.response_msg->ParseFromArray(payload.data(), payload.size())) {
-      context.set_failed(application_error::INVALID_MESSAGE, "");
-      return false;
-    }
-  } else if (context.response_str) {
-    context.response_str->assign(static_cast<char*>(
-        payload.data()), payload.size());
-  }  // if-else
-  BOOST_ASSERT(context.ok());
-  return true;
+  response_message_handler & msg_handler = context.get_msg_handler();
+  if (msg_handler.empty())
+    return true;  // ignore response
+  if (msg_handler(payload.data(), payload.size()))
+    return true;
+  context.set_failed(application_error::INVALID_MESSAGE, "");
+    return false;
 }  // hanele_done_response()
 
 }  // namespace detail
