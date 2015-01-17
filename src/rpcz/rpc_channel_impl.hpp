@@ -39,7 +39,7 @@ class rpc_channel_impl: public rpc_channel {
       rpc_controller* rpc_controller,
       closure* done);
 
-  // only used in cpp?
+  // only used in cpp? Other language use string request.
   virtual void async_call(
       const std::string& service_name,
       const google::protobuf::MethodDescriptor* method,
@@ -47,6 +47,13 @@ class rpc_channel_impl: public rpc_channel {
       const response_message_handler& msg_handler,
       const error_handler& err_handler,
       long deadline_ms);
+
+  virtual void sync_call(
+      const std::string& service_name,
+      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::Message& request,
+      long deadline_ms,
+      google::protobuf::Message& response);
 
   virtual void call_method0(
       const std::string& service_name,

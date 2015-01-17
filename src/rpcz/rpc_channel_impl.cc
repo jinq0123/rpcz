@@ -21,6 +21,8 @@
 #include "rpc_context.hpp"
 #include "rpcz/invalid_message_error.hpp"
 #include "rpcz/rpc_controller.hpp"  // for get_status()
+#include "rpcz/rpc_error.hpp"
+#include "sync_call_handler.hpp"
 #include "zmq_utils.hpp"  // for string_to_message()
 
 namespace rpcz {
@@ -153,6 +155,22 @@ void rpc_channel_impl::async_call(
   //ctx->response_msg = response_msg;
   //rpc_controller->set_status(status::ACTIVE);
   connection_.send_request(msg_vector, ctx);
+}
+
+void rpc_channel_impl::sync_call(
+    const std::string& service_name,
+    const google::protobuf::MethodDescriptor* method,
+    const google::protobuf::Message& request,
+    long deadline_ms,
+    google::protobuf::Message& response)
+{
+  sync_call_handler handler(response);
+  async_call(service_name, method, request,
+      handler, handler.get_error_handler(), deadline_ms);
+  handler.wait();
+  rpc_error* err = handler.get_rpc_error();
+  if (err)
+      throw *err;
 }
 
 }  // namespace rpcz

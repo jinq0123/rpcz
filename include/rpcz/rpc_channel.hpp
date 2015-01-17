@@ -54,6 +54,13 @@ class rpc_channel {
                           const error_handler& err_handler,
                           long deadline_ms) = 0;
 
+  virtual void sync_call(const std::string& service_name,
+                         const google::protobuf::MethodDescriptor* method,
+                         const google::protobuf::Message& request,
+                         long deadline_ms,
+                         google::protobuf::Message& response  // out
+                         ) = 0;
+
   // DO NOT USE: this method exists only for language bindings and may be
   // removed.
   virtual void call_method0(const std::string& service_name,

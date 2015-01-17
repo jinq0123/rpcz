@@ -32,6 +32,7 @@ set(RPCZ_SOURCES
     server.cc
     server_impl.cc
     singleton_service_factory.cc
+    sync_call_handler.cc
     sync_event.cc
     worker_thread_fun.cc
     zmq_utils.cc
