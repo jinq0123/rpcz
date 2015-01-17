@@ -21,40 +21,33 @@ namespace rpcz {
 
 namespace detail {
 
-// Returns true if OK.
-inline bool handle_done_response(
+inline void handle_done_response(
     rpc_context & context,
     message_iterator& iter) {
   if (!iter.has_more()) {
     context.set_failed(application_error::INVALID_MESSAGE, "");
-    return false;
+    return;  // XXX false;
   }
   rpc_response_header generic_response;
   zmq::message_t& msg_in = iter.next();
   if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
     context.set_failed(application_error::INVALID_MESSAGE, "");
-    return false;
+    return;  // XXX false;
   }
   if (generic_response.status() != status::OK) {
     context.set_failed(generic_response.application_error(),
                        generic_response.error());
-    return false;
+    return;  // XXX false;
   }
 
   if (!iter.has_more()) {
     context.set_failed(application_error::INVALID_MESSAGE, "");
-    return false;
+    return;  // XXX false;
   }
 
-  context.set_status(status::OK);  // XXX No need to set OK?
+  context.set_status(status::OK);  // XXX No need to set OK? DEL set_status()?
   zmq::message_t& payload = iter.next();
-  response_message_handler & msg_handler = context.get_msg_handler();
-  if (msg_handler.empty())
-    return true;  // ignore response
-  if (msg_handler(payload.data(), payload.size()))
-    return true;
-  context.set_failed(application_error::INVALID_MESSAGE, "");
-    return false;
+  context.handle_response_message(payload.data(), payload.size());
 }  // hanele_done_response()
 
 }  // namespace detail
@@ -64,16 +57,19 @@ inline void handle_response(
     connection_manager_status cm_status,
     message_iterator& iter) {
   if (CMSTATUS_DONE == cm_status) {  // in most case
-    if (detail::handle_done_response(context, iter))  // inlined
-      return;  // OK
-  } else {
-    CHECK(CMSTATUS_DEADLINE_EXCEEDED == cm_status)
-        << "Unexpected status: " << cm_status;
-    context.set_status(status::DEADLINE_EXCEEDED);
-  }  // if-else
+    detail::handle_done_response(context, iter);  // inlined
+    return;
+  }
+  CHECK(CMSTATUS_DEADLINE_EXCEEDED == cm_status)
+      << "Unexpected status: " << cm_status;
+  context.set_status(status::DEADLINE_EXCEEDED);  // XXX set_failed?
 
-  BOOST_ASSERT(!context.ok());
-  // XXX run error handler...
+  // DEL
+  //BOOST_ASSERT(!context.ok());
+  //error_handler & err_handler = context.get_err_handler();
+  //if (!err_handler.empty())
+  //  err_handler(rpc_error(XXX))
+  // error handler already run
 
   // We call signal() before we execute closure since the closure may delete
   // the rpc_controller object (which contains the sync_event).

@@ -353,6 +353,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler) {\n"
+    "  // XXX optimize empty handler...\n"
     "  channel_->async_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"

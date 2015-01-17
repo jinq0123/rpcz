@@ -14,7 +14,7 @@ namespace rpcz {
 // Used by C++ and all language bindings.
 // Input response message data and size.
 // Return false if message is illegal.
-typedef boost::function<bool (const void * data, size_t size)>
+typedef boost::function<bool (const void* data, size_t size)>
   response_message_handler;
 
 }  // namespace rpcz

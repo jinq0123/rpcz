@@ -71,7 +71,7 @@ void rpc_channel_impl::call_method_full(
       response_message_handler(), error_handler(), -1);  // XXX
   ctx->rpc_controller = rpc_controller;
   // XXX ctx->user_closure = done;
-  ctx->response_str = response_str;
+  // DEL ctx->response_str = response_str;
   // DEL ctx->response_msg = response_msg;
   rpc_controller->set_status(status::ACTIVE);
   connection_.send_request(msg_vector, ctx);

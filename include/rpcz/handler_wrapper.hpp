@@ -24,7 +24,7 @@ public:
 
 public:
   // Returns false if message is illegal.
-  inline bool operator()(const void * data, size_t size);
+  inline bool operator()(const void* data, size_t size);
 
 private:
   handler handler_;
@@ -33,7 +33,7 @@ private:
 // Returns false if message is illegal.
 template <typename Response>
 inline bool handler_wrapper<Response>::operator()(
-    const void * data, size_t size) {
+    const void* data, size_t size) {
   BOOST_ASSERT(data);
   if (!handler_)
     return true;  // ignore message
