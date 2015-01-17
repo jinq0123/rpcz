@@ -30,7 +30,7 @@ class service_stub {
  public:
   inline ::rpcz::rpc_channel* channel() { return channel_; }
   inline void set_default_deadline_ms(long ms) { default_deadline_ms_ = ms; }
-  inline void set_default_error_handler(const error_handler & handler) {
+  inline void set_default_error_handler(const error_handler& handler) {
     default_error_handler_ = handler;
   }
 

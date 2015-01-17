@@ -14,10 +14,6 @@ void rpc_context::handle_deadline_exceed() {
   handle_error(status::DEADLINE_EXCEEDED, 0, "");
 }
 
-void rpc_context::handler_invalid_message() {
-  handle_application_error(application_error::INVALID_MESSAGE, "");
-}
-
 void rpc_context::handle_application_error(
   int application_error_code,
   const std::string & error_message)

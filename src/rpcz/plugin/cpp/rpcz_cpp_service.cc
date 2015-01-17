@@ -357,7 +357,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "  channel_->async_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"
-    "      ::rpcz::handler_wrapper<$output_type$>(handler),\n"
+    "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler, default_error_handler_),\n"
     "      default_error_handler_,\n"
     "      default_deadline_ms_);\n"  // XXX input ms
     "}\n");

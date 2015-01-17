@@ -44,9 +44,6 @@ class rpc_context : boost::noncopyable {
   }
 
  private:
-  void handler_invalid_message();
-
- private:
   void handle_error(status_code status,
       int application_error_code,
       const std::string & error_message);
@@ -65,11 +62,7 @@ inline void rpc_context::handle_response_message(
     const void* data, size_t size) {
   BOOST_ASSERT(data);
   if (msg_handler_) {
-    if (msg_handler_(data, size))
-      return;
-
-    // msg_handler_() failed because of invalid message.
-    handler_invalid_message();
+    msg_handler_(data, size);
   }
 }  // handle_response_message
 
