@@ -37,7 +37,7 @@ class client_connection {
   client_connection(uint64 server_socket_idx, const std::string& sender);
 
  private:
-  connection_manager & manager_;
+  connection_manager& manager_;
   const uint64 server_socket_idx_;
   const std::string sender_;
 };

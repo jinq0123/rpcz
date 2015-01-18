@@ -18,9 +18,9 @@ class rpc_error;
 
 class service_stub {
  public:
-  service_stub(::rpcz::rpc_channel* channel,
-               const std::string& service_name,
-               bool owns_channel) :
+  inline service_stub(::rpcz::rpc_channel* channel,
+                      const std::string& service_name,
+                      bool owns_channel) :
       channel_(channel),
       service_name_(service_name),
       owns_channel_(owns_channel),

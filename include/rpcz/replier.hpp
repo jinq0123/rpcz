@@ -45,7 +45,7 @@ struct reply_context;
 // XXX More comments...
 class replier {
  public:
-  replier(client_connection & connection, const std::string & event_id);
+  replier(client_connection& connection, const std::string& event_id);
   ~replier();
 
  public:

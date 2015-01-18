@@ -1,6 +1,4 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 //
@@ -21,7 +19,7 @@ namespace rpcz {
 namespace detail {
 
 inline void handle_done_response(
-    rpc_context & context,
+    rpc_context& context,
     message_iterator& iter) {
   if (!iter.has_more()) {
     context.handle_application_error(application_error::INVALID_MESSAGE, "");
@@ -52,15 +50,14 @@ inline void handle_done_response(
 }  // namespace detail
 
 inline void handle_response(
-    rpc_context & context,
+    rpc_context& context,
     connection_manager_status cm_status,
     message_iterator& iter) {
   if (CMSTATUS_DONE == cm_status) {  // in most case
     detail::handle_done_response(context, iter);  // inlined
     return;
   }
-  if (CMSTATUS_DEADLINE_EXCEEDED == cm_status)
-  {
+  if (CMSTATUS_DEADLINE_EXCEEDED == cm_status) {
     context.handle_deadline_exceed();
     return;
   }

@@ -49,7 +49,7 @@ void worker_thread_fun(zmq::context_t& context,
         interpret_message<closure*>(iter.next())->run();
         break;
       case kHandleRequest: {
-        request_handler * handler =
+        request_handler* handler =
             interpret_message<request_handler*>(iter.next());
         assert(handler);
         handler->handle_request(iter);

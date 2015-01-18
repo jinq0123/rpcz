@@ -33,7 +33,7 @@ class rpc_error : public std::runtime_error {
 
   virtual ~rpc_error() throw();
 
-  status_code get_status() const {
+  inline status_code get_status() const {
     return status_;
   }
 

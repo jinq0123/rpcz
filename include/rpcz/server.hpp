@@ -71,7 +71,7 @@ class server : boost::noncopyable {
 
  public:
   // service_factory creates service for each connection.
-  void register_service_factory(service_factory_ptr factory, const std::string & name);
+  void register_service_factory(service_factory_ptr factory, const std::string& name);
 
  private:
   scoped_ptr<server_impl> impl_;

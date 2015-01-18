@@ -69,7 +69,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 //
 //  // XXX Merge rpc_context and rpc_controller.
 //  // rpc_context will be deleted on response or timeout.
-//  rpc_context * ctx = new rpc_context(
+//  rpc_context* ctx = new rpc_context(
 //      response_message_handler(), error_handler(), -1);  // XXX
 //  // XXX ctx->rpc_controller = rpc_controller;
 //  // XXX ctx->user_closure = done;
@@ -122,8 +122,7 @@ void rpc_channel_impl::async_call(
     const google::protobuf::Message& request,
     const response_message_handler& msg_handler,
     const error_handler& err_handler,
-    long deadline_ms)
-{
+    long deadline_ms) {
   // XXX CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
   rpc_request_header generic_request;
   generic_request.set_service(service_name);
@@ -137,7 +136,7 @@ void rpc_channel_impl::async_call(
   size_t bytes = request.ByteSize();
   payload_out.reset(new zmq::message_t(bytes));
   if (!request.SerializeToArray(payload_out->data(), bytes)) {
-      throw invalid_message_error("Request serialization failed.");  // XXX
+    throw invalid_message_error("Request serialization failed.");  // XXX
   }
 
   message_vector msg_vector;
@@ -156,15 +155,14 @@ void rpc_channel_impl::sync_call(
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
     long deadline_ms,
-    google::protobuf::Message* response)
-{
+    google::protobuf::Message* response) {
   sync_call_handler handler(response);
   async_call(service_name, method, request,
       handler, handler.get_error_handler(), deadline_ms);
   handler.wait();
   rpc_error* err = handler.get_rpc_error();
   if (err)
-      throw *err;
+    throw *err;
 }
 
 }  // namespace rpcz

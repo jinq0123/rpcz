@@ -11,8 +11,8 @@ namespace rpcz {
 template <typename Service>
 class default_service_factory : public service_factory {
  public:
-  virtual iservice * create() {
-      return new Service;
+  inline virtual iservice* create() {
+    return new Service;
   }
 };
 

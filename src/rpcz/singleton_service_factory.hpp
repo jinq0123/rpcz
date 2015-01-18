@@ -10,14 +10,14 @@ namespace rpcz {
 // Factory to create singleton cpp_service.
 // Only for cpp_service.
 class singleton_service_factory : public service_factory {
-public:
-    singleton_service_factory(iservice & svc);
+ public:
+  singleton_service_factory(iservice& svc);
 
-public:
-    virtual iservice * create();
+ public:
+  virtual iservice* create();
 
-private:
-    iservice & service_;
+ private:
+  iservice& service_;
 };
 
 }  // namespace rpcz

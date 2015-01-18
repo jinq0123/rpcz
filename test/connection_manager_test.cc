@@ -52,7 +52,7 @@ TEST_F(connection_manager_test, TestStartsAndFinishes) {
   connection_manager_ptr cm = connection_manager::get();
 }
 
-void echo_server(zmq::context_t & context) {
+void echo_server(zmq::context_t& context) {
   scoped_ptr<zmq::socket_t> socket(new zmq::socket_t(context, ZMQ_DEALER));
   socket->bind("inproc://server.test");
 
@@ -74,7 +74,7 @@ void echo_server(zmq::context_t & context) {
   }
 }
 
-boost::thread start_server(zmq::context_t & context) {
+boost::thread start_server(zmq::context_t& context) {
   return boost::thread(boost::bind(echo_server, boost::ref(context)));
 }
 
@@ -197,7 +197,7 @@ TEST_F(connection_manager_test, TestUnbind) {
 const static char* kEndpoint = "inproc://test";
 const static char* kReply = "gotit";
 
-void DoThis(zmq::context_t * context) {
+void DoThis(zmq::context_t* context) {
   assert(context);
   LOG(INFO)<<"Creating socket. Context="<<context;
   zmq::socket_t socket(*context, ZMQ_PUSH);

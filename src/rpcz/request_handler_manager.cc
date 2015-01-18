@@ -9,33 +9,29 @@
 
 namespace rpcz {
 
-request_handler_manager::request_handler_manager(void)
-{
+request_handler_manager::request_handler_manager(void) {
 }
 
-request_handler_manager::~request_handler_manager(void)
-{
+request_handler_manager::~request_handler_manager(void) {
 }
 
-request_handler * request_handler_manager::create_handler(
-    const std::string & sender,
-    const service_factory_map & factories,
-    uint64 server_socket_idx)
-{
-    assert(handler_map_.find(sender) == handler_map_.end());
-    // New request_handler. TODO: delete request_handler on disconnection
-    request_handler_ptr handler_ptr(new request_handler(  // shared_ptr
-        server_socket_idx, sender));
-    // Create services for this handler...
-    BOOST_FOREACH(const service_factory_map::value_type & v, factories)
-    {
-        iservice * svc = v.second->create();
-        assert(svc);
-        handler_ptr->register_service(svc, v.first);
-    }
-    handler_map_.insert(std::make_pair(sender, handler_ptr));
-    // TODO: request_handler.set_client_connection(sender)
-    return handler_ptr.get();
+request_handler* request_handler_manager::create_handler(
+    const std::string& sender,
+    const service_factory_map& factories,
+    uint64 server_socket_idx) {
+  assert(handler_map_.find(sender) == handler_map_.end());
+  // New request_handler. TODO: delete request_handler on disconnection
+  request_handler_ptr handler_ptr(new request_handler(  // shared_ptr
+      server_socket_idx, sender));
+  // Create services for this handler...
+  BOOST_FOREACH(const service_factory_map::value_type& v, factories) {
+    iservice* svc = v.second->create();
+    assert(svc);
+    handler_ptr->register_service(svc, v.first);
+  }
+  handler_map_.insert(std::make_pair(sender, handler_ptr));
+  // TODO: request_handler.set_client_connection(sender)
+  return handler_ptr.get();
 }
 
 }  // namespace rpcz

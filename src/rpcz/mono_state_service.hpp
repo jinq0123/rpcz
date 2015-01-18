@@ -11,19 +11,17 @@ namespace rpcz {
 // All mono_state_service instances share a same internal service.
 class mono_state_service : public iservice {
  public:
-  mono_state_service(iservice & svc) : service_(svc) {}
-  virtual ~mono_state_service() {}
+  inline mono_state_service(iservice& svc) : service_(svc) {}
+  inline virtual ~mono_state_service() {}
 
  public:
-  virtual void dispatch_request(const std::string& method,
-                                const void* payload, size_t payload_len,
-                                replier replier_copy)
-  {
+  inline virtual void dispatch_request(const std::string& method,
+      const void* payload, size_t payload_len, replier replier_copy) {
     service_.dispatch_request(method, payload, payload_len, replier_copy);
   }
 
  private:
-  iservice & service_;
+  iservice& service_;
 };  // class mono_state_service
 }  // namespace rpcz
 #endif  // RPCZ_MONO_STATE_SERVICE_HPP

@@ -13,34 +13,32 @@ namespace rpcz {
 // Managers all senders' request_handlers.
 // Run in broker thread.
 // Non-thread-safe.
-class request_handler_manager
-{
+class request_handler_manager {
 public:
-    request_handler_manager(void);
-    virtual ~request_handler_manager(void);
+  request_handler_manager(void);
+  virtual ~request_handler_manager(void);
 
 public:
-    inline request_handler * get_handler(const std::string & sender,
-        const service_factory_map & factories, uint64 server_socket_idx);
+  inline request_handler* get_handler(const std::string& sender,
+      const service_factory_map& factories, uint64 server_socket_idx);
 
 private:
-    request_handler * create_handler(const std::string & sender,
-        const service_factory_map & factories, uint64 server_socket_idx);
+  request_handler* create_handler(const std::string& sender,
+      const service_factory_map& factories, uint64 server_socket_idx);
 
 private:
-    typedef boost::unordered_map<std::string, request_handler_ptr> handler_map;
-    handler_map handler_map_;
+  typedef boost::unordered_map<std::string, request_handler_ptr> handler_map;
+  handler_map handler_map_;
 };
 
-request_handler * request_handler_manager::get_handler(
-    const std::string & sender,
-    const service_factory_map & factories,
-    uint64 server_socket_idx)
-{
-    handler_map::const_iterator iter = handler_map_.find(sender);
-    if (iter != handler_map_.end())
-        return (*iter).second.get();
-    return create_handler(sender, factories, server_socket_idx);
+request_handler* request_handler_manager::get_handler(
+    const std::string& sender,
+    const service_factory_map& factories,
+    uint64 server_socket_idx) {
+  handler_map::const_iterator iter = handler_map_.find(sender);
+  if (iter != handler_map_.end())
+    return (*iter).second.get();
+  return create_handler(sender, factories, server_socket_idx);
 }
 
 }  // namespace rpcz

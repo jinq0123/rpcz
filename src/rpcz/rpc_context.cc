@@ -16,16 +16,14 @@ void rpc_context::handle_deadline_exceed() {
 
 void rpc_context::handle_application_error(
   int application_error_code,
-  const std::string & error_message)
-{
+  const std::string& error_message) {
   handle_error(status::APPLICATION_ERROR,
       application_error_code, error_message);
 }
 
 void rpc_context::handle_error(status_code status,
   int application_error_code,
-  const std::string & error_message)
-{
+  const std::string& error_message) {
   if (err_handler_)
     err_handler_(rpc_error(status, application_error_code, error_message));
 }

@@ -31,14 +31,14 @@ namespace rpcz {
 
 class message_iterator {
  public:
-  explicit message_iterator(zmq::socket_t& socket) :
+  inline explicit message_iterator(zmq::socket_t& socket) :
       socket_(socket), has_more_(true) {};
 
-  message_iterator(const message_iterator& other) :
+  inline message_iterator(const message_iterator& other) :
       socket_(other.socket_),
       has_more_(other.has_more_) {}
 
-  ~message_iterator() {
+  inline ~message_iterator() {
     while (has_more()) next();
   }
 
@@ -60,15 +60,15 @@ class message_iterator {
 
 class message_vector {
  public:
-  zmq::message_t& operator[](int index) {
+  inline zmq::message_t& operator[](int index) {
     return data_[index];
   }
 
-  size_t size() const { return data_.size(); }
+  inline size_t size() const { return data_.size(); }
 
   // transfers points in the the range [from, to) from the other
   // message_vector to the beginning of this messsage vector.
-  void transfer(size_t from, size_t to, message_vector& other) {
+  inline void transfer(size_t from, size_t to, message_vector& other) {
     data_.transfer(data_.begin(),
                    other.data_.begin() + from, other.data_.begin() + to,
                    other.data_);
@@ -79,12 +79,13 @@ class message_vector {
     return data_.begin();
   }
 
-  void push_back(zmq::message_t* msg) { data_.push_back(msg); }
+  inline void push_back(zmq::message_t* msg) { data_.push_back(msg); }
 
-  void erase_first() { data_.erase(data_.begin()); }
+  inline void erase_first() { data_.erase(data_.begin()); }
 
-  zmq::message_t* release(int index) {
-    return data_.replace(index, NULL).release(); }
+  inline zmq::message_t* release(int index) {
+    return data_.replace(index, NULL).release();
+  }
 
  private:
   typedef boost::ptr_vector<boost::nullable<zmq::message_t> > DataType;
@@ -93,11 +94,11 @@ class message_vector {
 };
 
 bool read_message_to_vector(zmq::socket_t* socket,
-                         message_vector* data);
+                            message_vector* data);
 
 void write_vector_to_socket(zmq::socket_t* socket,
-                         message_vector& data,
-                         int flags=0);
+                            message_vector& data,
+                            int flags=0);
 
 std::string message_to_string(zmq::message_t& msg);
 

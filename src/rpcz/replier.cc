@@ -32,13 +32,13 @@
 namespace rpcz {
 
 // TODO: Do not use client_connection pointer, because connection may be deleted.
-replier::replier(client_connection & connection,  // TODO: rename to reply_broker
-                 const std::string & event_id)
-    : reply_context_(new reply_context(&connection, event_id))  // shared_ptr
-{};
+replier::replier(client_connection& connection,  // TODO: rename to reply_broker
+                 const std::string& event_id)
+    : reply_context_(new reply_context(&connection, event_id)) { // shared_ptr
+};
 
-replier::~replier()
-{}
+replier::~replier() {
+}
 
 void replier::send(const google::protobuf::Message& response) const {
     assert(reply_context_->clt_connection);
@@ -85,7 +85,7 @@ void replier::send_generic_response(
     message_vector v;
     v.push_back(zmq_response_message);
     v.push_back(payload);
-    reply_context & rCtx = *reply_context_;
+    reply_context& rCtx = *reply_context_;
     assert(rCtx.clt_connection);
     assert(!rCtx.replied);  // Should reply only once.
     rCtx.clt_connection->reply(rCtx.event_id, &v);

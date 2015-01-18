@@ -118,13 +118,11 @@ struct handler {
   }
 
  private:
-  void on_response(const SearchResponse& resp)
-  {
+  void on_response(const SearchResponse& resp) {
     response = resp;
     sync.signal();
   }
-  void on_error(const rpc_error& err)
-  {
+  void on_error(const rpc_error& err) {
     error.reset(err);
     sync.signal();
   }

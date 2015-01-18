@@ -1,6 +1,5 @@
 // Licensed under the Apache License, Version 2.0 (the "License");
 //     http://www.apache.org/licenses/LICENSE-2.0
-//
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
 #ifndef RPCZ_CPP_HANDLER_WRAPPER_HPP
@@ -15,13 +14,12 @@ namespace rpcz {
 // The 2 input handlers will be copied.
 // Error handler is used when message is invalid.
 template <typename Response>
-struct cpp_handler_wrapper
-{
+struct cpp_handler_wrapper {
 public:
   typedef boost::function<void (const Response&)> handler;
 
 public:
-  explicit cpp_handler_wrapper(const handler& hdl,
+  inline explicit cpp_handler_wrapper(const handler& hdl,
       const error_handler& err_hdl) :
       handler_(hdl),
       error_handler_(err_hdl) {
@@ -45,8 +43,7 @@ inline void cpp_handler_wrapper<Response>::operator()(
     return;  // ignore message
 
   Response resp;
-  if (resp.ParseFromArray(data, size))
-  {
+  if (resp.ParseFromArray(data, size)) {
     handler_(resp);
     return;
   }

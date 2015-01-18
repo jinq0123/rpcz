@@ -36,13 +36,13 @@ class sync_event;
 class broker_thread {
  public:
   broker_thread(
-      zmq::context_t & context,
+      zmq::context_t& context,
       int nthreads,
       sync_event* ready_event,
       zmq::socket_t* frontend_socket);
 
  public:
-  static void run(zmq::context_t & context,
+  static void run(zmq::context_t& context,
                   int nthreads,
                   sync_event* ready_event,
                   zmq::socket_t* frontend_socket);
@@ -57,7 +57,7 @@ class broker_thread {
   inline void add_closure(closure* closure);
 
   void handle_connect_command(const std::string& sender,
-                                   const std::string& endpoint);
+                              const std::string& endpoint);
 
   void handle_bind_command(
       const std::string& sender,
@@ -72,7 +72,7 @@ class broker_thread {
   void handle_socket_deleted(const std::string sender);
 
   void handle_server_socket(uint64 server_socket_idx,
-      const service_factory_map * factories);  // TODO: use reference instead of pointer
+      const service_factory_map* factories);  // TODO: use reference instead of pointer
 
   inline void send_request(message_iterator& iter);
 
@@ -94,7 +94,7 @@ class broker_thread {
   std::vector<zmq::socket_t*> server_sockets_;  // Router sockets.of server.
   typedef std::map<std::string, zmq::socket_t*> endpoint_to_socket;
   endpoint_to_socket bind_map_;  // for unbind
-  zmq::context_t & context_;
+  zmq::context_t& context_;
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;
   int current_worker_;

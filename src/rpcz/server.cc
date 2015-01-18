@@ -46,7 +46,7 @@ void server::bind(const std::string& endpoint) {
 }
 
 void server::register_service_factory(service_factory_ptr factory,
-                                      const std::string & name) {
+                                      const std::string& name) {
   impl_->register_service_factory(factory, name);
 }
 

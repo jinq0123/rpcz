@@ -61,8 +61,7 @@ void reactor::add_socket(zmq::socket_t* socket, closure* closure) {
   is_dirty_ = true;
 }
 
-void reactor::del_socket(zmq::socket_t* socket, closure* callback)
-{
+void reactor::del_socket(zmq::socket_t* socket, closure* callback) {
   assert(callback);
   del_sockets_.insert(std::make_pair(socket, callback));
   is_dirty_ = true;
@@ -81,8 +80,7 @@ void reactor::rebuild_poll_items() {
   }
 }
 
-void reactor::process_del_sockets()
-{
+void reactor::process_del_sockets() {
   if (del_sockets_.empty()) return;
   if (sockets_.empty()) return;
 

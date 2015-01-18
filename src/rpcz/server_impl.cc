@@ -31,7 +31,7 @@ server_impl::server_impl()
 
 server_impl::~server_impl() {
   // unbind first
-  BOOST_FOREACH(const bind_endpoint_set::value_type & v, endpoints_)
+  BOOST_FOREACH(const bind_endpoint_set::value_type& v, endpoints_)
     connection_manager_ptr_->unbind(v);
   endpoints_.clear();
 }

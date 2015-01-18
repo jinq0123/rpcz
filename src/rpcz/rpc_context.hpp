@@ -17,33 +17,33 @@ namespace rpcz {
 
 class rpc_context : boost::noncopyable {
  public:
-  rpc_context(
-    const response_message_handler& msg_handler,
-    const error_handler& err_handler,
-    long deadline_ms)
+  inline rpc_context(
+      const response_message_handler& msg_handler,
+      const error_handler& err_handler,
+      long deadline_ms)
       : msg_handler_(msg_handler),
         err_handler_(err_handler),
         deadline_ms_(deadline_ms) {
   }
 
-  ~rpc_context() {}
+  inline ~rpc_context() {}
 
  public:
   inline void handle_response_message(const void* data, size_t size);
   void handle_deadline_exceed();
   void handle_application_error(
       int application_error_code,
-      const std::string & error_message);
+      const std::string& error_message);
 
  public:
-  long get_deadline_ms() const {
+  inline long get_deadline_ms() const {
     return deadline_ms_;
   }
 
  private:
   void handle_error(status_code status,
       int application_error_code,
-      const std::string & error_message);
+      const std::string& error_message);
 
  private:
   response_message_handler msg_handler_;

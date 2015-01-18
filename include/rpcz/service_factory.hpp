@@ -13,7 +13,7 @@ class service_factory {
   virtual ~service_factory() {};
 
  public:
-  virtual iservice * create() = 0;
+  virtual iservice* create() = 0;
 };
 
 }  // namespace rpcz

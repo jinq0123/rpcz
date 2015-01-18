@@ -14,14 +14,14 @@
 namespace rpcz {
 
 request_handler::request_handler(uint64 server_socket_idx,
-                                 const std::string & sender)
+                                 const std::string& sender)
     : client_connection_(server_socket_idx, sender) {
 }
 
 request_handler::~request_handler() {
   // Delete proto_rpc_service pointers.
   service_map map_copy = service_map_;
-  BOOST_FOREACH(const service_map::value_type & v, map_copy)
+  BOOST_FOREACH(const service_map::value_type& v, map_copy)
       unregister_service(v.first);
   assert(service_map_.empty());
 }

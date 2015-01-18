@@ -172,7 +172,7 @@ TEST_F(server_test, SimpleRequestAsync) {
 
   struct hander {
     ::sync_event sync;
-    void operator()(const SearchResponse & resp) {
+    void operator()(const SearchResponse& resp) {
       ASSERT_EQ(2, resp.results_size());
       ASSERT_EQ("The search for happiness", resp.results(0));
       sync.signal();

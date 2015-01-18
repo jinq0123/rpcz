@@ -49,7 +49,6 @@ class sync_event;
 // connection_manager and connection are thread-safe.
 // connection_manager is singleton.
 class connection_manager : boost::noncopyable {
-
  private:
   connection_manager();
 
@@ -68,7 +67,7 @@ class connection_manager : boost::noncopyable {
   connection connect(const std::string& endpoint);
 
   // binds a socket to the given endpoint. 
-  void bind(const std::string& endpoint, const service_factory_map & factories);
+  void bind(const std::string& endpoint, const service_factory_map& factories);
   // Unbind socket of the given endpoint.
   void unbind(const std::string& endpoint);
 
@@ -108,18 +107,17 @@ class connection_manager : boost::noncopyable {
   scoped_ptr<sync_event> is_terminating_;
 };  // class connection_manager
 
-connection_manager_ptr connection_manager::get()
-{
-    connection_manager_ptr p = this_weak_ptr_.lock();
-    if (p) return p;
-    return get_new();
+connection_manager_ptr connection_manager::get() {
+  connection_manager_ptr p = this_weak_ptr_.lock();
+  if (p) return p;
+  return get_new();
 }
 
 zmq::socket_t& connection_manager::get_frontend_socket() {
-    zmq::socket_t* socket = socket_.get();
-    if (socket)
-        return *socket;
-    return new_frontend_socket();
+  zmq::socket_t* socket = socket_.get();
+  if (socket)
+      return *socket;
+  return new_frontend_socket();
 }
 
 }  // namespace rpcz

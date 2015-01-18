@@ -37,18 +37,15 @@ void terminate() {
   connection_manager::get()->terminate();
 }
 
-void set_zmq_context(zmq::context_t* context)
-{
+void set_zmq_context(zmq::context_t* context) {
   application_options::set_zmq_context(context);
 }
 
-void set_zmq_io_threads(int n)
-{
+void set_zmq_io_threads(int n) {
   application_options::set_zmq_io_threads(n);
 }
 
-void set_connection_manager_threads(int n)
-{
+void set_connection_manager_threads(int n) {
   application_options::set_connection_manager_threads(n);
 }
 

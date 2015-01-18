@@ -34,7 +34,7 @@ class event_id_generator : boost::noncopyable {
  public:
   event_id_generator();
 
-  event_id get_next() {
+  inline event_id get_next() {
     state_ = (state_ * kGenerator) % kLargePrime;
     return state_;
   }
