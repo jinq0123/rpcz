@@ -16,6 +16,7 @@
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include <iostream>
+#include <boost/optional/optional.hpp>
 #include <boost/thread/thread.hpp>
 #include <glog/logging.h>
 #include <gtest/gtest.h>
@@ -38,14 +39,6 @@
 using namespace std;
 
 namespace rpcz {
-
-void super_done(SearchResponse *response,
-               rpc_controller* newrpc,
-               replier replier_copy) {
-  delete newrpc;
-  replier_copy.send(*response);
-  delete response;
-}
 
 class SearchServiceImpl : public SearchService {
  public:
@@ -114,6 +107,31 @@ protected:
   scoped_ptr<server> server_;
 };
 
+struct handler {
+  sync_event sync;
+  SearchResponse response;
+  boost::optional<rpc_error> error;
+
+  SearchService_Stub::Search_Handler get_search_handler() {
+    return boost::bind(&handler::on_response, this, _1);
+  }
+  error_handler get_error_handler() {
+    return boost::bind(&handler::on_error, this, _1);
+  }
+
+ private:
+  void on_response(const SearchResponse& resp)
+  {
+    response = resp;
+    sync.signal();
+  }
+  void on_error(const rpc_error& err)
+  {
+    error.reset(err);
+    sync.signal();
+  }
+};
+
 /*
 Test all kinds of request interfaces.
 . Sync or async
@@ -135,7 +153,7 @@ TEST_F(server_test, SetDefaulDeadlineMs) {
   try {
     stub.Search(request, &response);
     ASSERT_TRUE(false);
-  } catch (rpc_error &error) {
+  } catch (const rpc_error& error) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
     return;
   }
@@ -152,96 +170,65 @@ TEST_F(server_test, SyncRequest) {
 }
 
 TEST_F(server_test, AsyncRequest) {
-  struct Handler {
-      sync_event * sync;
-      volatile bool done;
-
-      void operator()(const SearchResponse & response)
-      {
-        ASSERT_EQ(2, response.results_size());
-        ASSERT_EQ("The search for stone", response.results(0));
-        done = true;
-        BOOST_ASSERT(sync);
-        sync->signal();
-      }
-  };
-  sync_event sync;
-  Handler handler;
-  handler.sync = &sync;
-  handler.done = false;
-
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
   request.set_query("stone");
-  stub.Search(request, handler);
-  sync.wait();
-  ASSERT_TRUE(handler.done);
+  handler hdl;
+  (void)stub.Search(request, hdl.get_search_handler());
+  hdl.sync.wait();
+
+  ASSERT_FALSE(hdl.error);
+  ASSERT_EQ(2, hdl.response.results_size());
+  ASSERT_EQ("The search for stone", hdl.response.results(0));
 }
 
-TEST_F(server_test, SimpleRequestAsync) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
-  SearchRequest request;
-  SearchResponse response;
-  rpc_controller rpc_controller;
-  request.set_query("happiness");
-  sync_event sync;
-  stub.Search(request, &response, &rpc_controller, new_callback(
-          &sync, &sync_event::signal));
-  sync.wait();
-  ASSERT_TRUE(rpc_controller.ok());
-  ASSERT_EQ(2, response.results_size());
-  ASSERT_EQ("The search for happiness", response.results(0));
-}
-
-TEST_F(server_test, SimpleRequestWithError) {
+TEST_F(server_test, RequestWithError) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
   request.set_query("foo");
-  SearchResponse response;
-  rpc_controller rpc_controller;
-  stub.Search(request, &response, &rpc_controller, NULL);
-  rpc_controller.wait();
-  ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, rpc_controller.get_status());
-  ASSERT_EQ("I don't like foo.", rpc_controller.get_error_message());
-}
-
-TEST_F(server_test, SimpleRequestWithTimeout) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
-  SearchRequest request;
-  SearchResponse response;
-  rpc_controller rpc_controller;
-  request.set_query("timeout");
-  // DEL rpc_controller.set_deadline_ms(1);
-  stub.Search(request, &response, &rpc_controller, NULL);
-  rpc_controller.wait();
-  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
-}
-
-TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
-  SearchRequest request;
-  SearchResponse response;
-  {
-    rpc_controller rpc_controller;
-    request.set_query("timeout");
-    // XXX rpc_controller.set_deadline_ms(1);
-    sync_event event;
-    stub.Search(request, &response, &rpc_controller,
-                new_callback(&event, &sync_event::signal));
-    event.wait();
-    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
+  try {
+    (void)stub.Search(request);
+    ASSERT_TRUE(false);
+  } catch (const rpc_error& error) {
+    ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, error.get_status());
+    ASSERT_EQ("I don't like foo.", error.get_error_message());
   }
 }
 
-TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
+TEST_F(server_test, RequestWithTimeout) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
-  SearchResponse response;
+  request.set_query("timeout");
+  try {
+    (void)stub.Search(request, 1/*ms*/);
+    ASSERT_TRUE(false);
+  } catch (const rpc_error& error) {
+    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
+  }
+}
+
+TEST_F(server_test, RequestWithTimeoutAsync) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  request.set_query("timeout");
+  handler hdl;
+  stub.Search(request,
+      hdl.get_search_handler(),  // XXX ignore
+      hdl.get_error_handler(),
+      1/*ms*/);
+  hdl.sync.wait();
+  ASSERT_TRUE(hdl.error);
+  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, hdl.error->get_status());
+}
+
+TEST_F(server_test, RequestRaisesExceptions) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
   request.set_query("foo");
   try {
-    stub.Search(request, &response);
+    (void)stub.Search(request);
     ASSERT_TRUE(false);
-  } catch (rpc_error &error) {
+  } catch (const rpc_error& error) {
     ASSERT_EQ(status::APPLICATION_ERROR, error.get_status());
     ASSERT_EQ(-4, error.get_application_error_code());
   }

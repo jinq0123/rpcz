@@ -31,7 +31,7 @@ int main() {
     examples::SearchResponse response
         = search_stub.Search(request, 1000);
     cout << response.DebugString() << endl;
-  } catch (rpcz::rpc_error &e) {
+  } catch (rpcz::rpc_error& e) {
     cout << "Error: " << e.what() << endl;;
   }
 }
