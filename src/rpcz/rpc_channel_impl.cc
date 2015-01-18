@@ -71,7 +71,7 @@ void rpc_channel_impl::call_method_full(
   // rpc_context will be deleted on response or timeout.
   rpc_context * ctx = new rpc_context(
       response_message_handler(), error_handler(), -1);  // XXX
-  ctx->rpc_controller = rpc_controller;
+  // XXX ctx->rpc_controller = rpc_controller;
   // XXX ctx->user_closure = done;
   // DEL ctx->response_str = response_str;
   // DEL ctx->response_msg = response_msg;
@@ -145,15 +145,10 @@ void rpc_channel_impl::async_call(
   msg_vector.push_back(msg_out.release());
   msg_vector.push_back(payload_out.release());
 
-  // XXX Merge rpc_context and rpc_controller.
   // rpc_context will be deleted on response or timeout.
-  // XXX
+  // rpc_context deleted in worker_thread_fun().
+  // XXX delete on timeout.
   rpc_context* ctx = new rpc_context(msg_handler, err_handler, deadline_ms);
-  //ctx->rpc_controller = rpc_controller;
-  //ctx->user_closure = done;
-  //ctx->response_str = response_str;
-  //ctx->response_msg = response_msg;
-  //rpc_controller->set_status(status::ACTIVE);
   connection_.send_request(msg_vector, ctx);
 }
 

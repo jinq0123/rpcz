@@ -14,7 +14,6 @@
 #include "logging.hpp"  // for CHECK()
 #include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/application_error_code.hpp"  // for application_error
-#include "rpcz/rpc_controller.hpp"  // for set_status()
 #include "zmq_utils.hpp"  // for message_iterator
 
 namespace rpcz {
@@ -46,7 +45,6 @@ inline void handle_done_response(
     return;
   }
 
-  // XXX context.set_status(status::OK);  // XXX No need to set OK? DEL set_status()?
   zmq::message_t& payload = iter.next();
   context.handle_response_message(payload.data(), payload.size());
 }  // hanele_done_response()
@@ -67,21 +65,6 @@ inline void handle_response(
     return;
   }
   CHECK(false) << "Unexpected status: " << cm_status;
-
-  // DEL
-  //BOOST_ASSERT(!context.ok());
-  //error_handler & err_handler = context.get_err_handler();
-  //if (!err_handler.empty())
-  //  err_handler(rpc_error(XXX))
-  // error handler already run
-
-  // We call signal() before we execute closure since the closure may delete
-  // the rpc_controller object (which contains the sync_event).
-  // XXX Check sync_event is valid. signal() before closure has no use?
-  // XXX context.rpc_controller->signal();
-  //if (context.user_closure) {
-  //  context.user_closure->run();
-  //}
 }  // handle_response()
 
 }  // namespace rpcz

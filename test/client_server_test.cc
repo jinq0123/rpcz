@@ -27,7 +27,6 @@
 #include "rpcz/connection_manager_ptr.hpp"
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
-#include "rpcz/rpc_controller.hpp"
 #include "rpcz/server.hpp"
 #include "rpcz/sync_event.hpp"
 

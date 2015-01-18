@@ -15,9 +15,6 @@
 
 namespace rpcz {
 
-class closure;
-class rpc_controller;
-
 class rpc_context : boost::noncopyable {
  public:
   rpc_context(
@@ -52,10 +49,6 @@ class rpc_context : boost::noncopyable {
   response_message_handler msg_handler_;
   error_handler err_handler_;
   long deadline_ms_;
-
-  // XXX deprecated members
-public:
-  rpc_controller* rpc_controller;
 };
 
 inline void rpc_context::handle_response_message(

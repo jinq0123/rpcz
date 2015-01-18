@@ -27,7 +27,6 @@
 #include "rpcz/application_error_code.hpp"  // for application_error
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/replier.hpp"
-#include "rpcz/rpc_controller.hpp"  // for application_error
 
 namespace rpcz {
 

@@ -8,7 +8,6 @@
 #include "rpcz/application_error_code.hpp"  // for application_error
 #include "rpcz/iservice.hpp"  // for dispatch_request()
 #include "rpcz/replier.hpp"
-#include "rpcz/rpc_controller.hpp"  // for application_error
 #include "rpcz/rpcz.pb.h"  // for rpc_request_header
 #include "zmq_utils.hpp"  // for message_iterator
 

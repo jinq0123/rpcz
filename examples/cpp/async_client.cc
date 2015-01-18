@@ -8,14 +8,12 @@
 
 #include "cpp/search.pb.h"
 #include "cpp/search.rpcz.h"
-#include "rpcz/callback.hpp"  // for new_callback
-#include "rpcz/rpc_controller.hpp"  // for rpc_controller
 #include "rpcz/rpcz.hpp"
 
 using namespace std;
 
-void done(examples::SearchResponse *response) {
-  cout << response->DebugString() << endl;
+void done(const examples::SearchResponse& response) {
+  cout << response.DebugString() << endl;
 }
 
 int main() {
@@ -25,9 +23,7 @@ int main() {
   request.set_query("gold");
 
   cout << "Sending request." << endl;
-  rpcz::rpc_controller ctrl;
-  search_stub.Search(request, &response, &ctrl,
-      rpcz::new_callback(&done, &response));
+  search_stub.Search(request, done);
 
   // Do other works...
   std::cin.get();

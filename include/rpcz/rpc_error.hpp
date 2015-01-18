@@ -22,15 +22,11 @@
 #include <string>
 
 #include "status_code.hpp"  // for status_code
-#include "rpc_controller.hpp"  // XXX
 
 namespace rpcz {
 
 class rpc_error : public std::runtime_error {
  public:
-  // DEL
-  explicit rpc_error(const rpc_controller& rpc_controller)
-      : std::runtime_error("XXX") {}
   rpc_error(status_code status,
             int application_error_code,
             const std::string& error_message);

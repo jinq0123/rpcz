@@ -23,7 +23,8 @@
 #include "logging.hpp"  // for CHECK()
 #include "reply_context.hpp"
 #include "rpcz/invalid_message_error.hpp"
-#include "rpcz/rpc_controller.hpp"  // for status::APPLICATION_ERROR
+#include "rpcz/rpcz.pb.h"  // for rpc_response_header
+#include "rpcz/status_code.hpp"  // for status
 #include "zmq_utils.hpp"  // for string_to_message()
 
 // TODO: Use requester/responser instead of client/server

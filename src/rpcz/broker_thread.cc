@@ -23,8 +23,7 @@
 #include "logging.hpp"
 #include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/callback.hpp"
-#include "rpcz/rpc_controller.hpp"  // for get_deadline_ms()
-#include "rpcz/sync_event.hpp"  // TODO: hide it
+#include "rpcz/sync_event.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {
@@ -208,7 +207,6 @@ void broker_thread::send_request(message_iterator& iter) {
     BOOST_ASSERT(ctx);
     event_id event_id = event_id_generator_.get_next();
     remote_response_map_[event_id] = ctx;
-    // XXX BOOST_ASSERT(ctx->rpc_controller);
     int64 deadline_ms = ctx->get_deadline_ms();
     if (-1 != deadline_ms) {
       // XXX when to delete timeout handler?
