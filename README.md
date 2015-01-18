@@ -27,10 +27,10 @@ See example_client.cc
 
 		SearchService_Stub search_stub("tcp://localhost:5555");
 		SearchRequest request;
-		SearchResponse response;
 		request.set_query("gold");
 		
-		search_stub.Search(request, &response, 1000);  // timeout 1000ms
+		SearchResponse response
+			= search_stub.Search(request, 1000);  // timeout 1000ms
 		cout << response.DebugString() << endl;
 
 ### Server

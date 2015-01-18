@@ -24,12 +24,12 @@ using namespace std;
 int main() {
   examples::SearchService_Stub search_stub("tcp://localhost:5555");
   examples::SearchRequest request;
-  examples::SearchResponse response;
   request.set_query("gold");
 
   cout << "Sending request." << endl;
   try {
-    search_stub.Search(request, 1000, &response);
+    examples::SearchResponse response;
+        = search_stub.Search(request, 1000);
     cout << response.DebugString() << endl;
   } catch (rpcz::rpc_error &e) {
     cout << "Error: " << e.what() << endl;;
