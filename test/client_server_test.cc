@@ -22,7 +22,6 @@
 #include <zmq.hpp>
 
 #include "rpcz/application.hpp"
-#include "rpcz/callback.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
 #include "rpcz/connection_manager_ptr.hpp"
@@ -204,8 +203,8 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
   try {
     (void)stub.Search(request, 1);
     ASSERT_TRUE(false);
-  } catch (rpc_error & err) {
-    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, err.get_status());
+  } catch (const rpc_error& error) {
+    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
     return;
   }
   ASSERT_TRUE(false);
@@ -219,12 +218,13 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   struct error_handler {
     sync_event sync;
 
-    void operator()(const rpc_error & err) {
-      ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, err.get_status());
+    void operator()(const rpc_error& error) {
+      ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
       sync.signal();
     }
   } err_hdl;
 
+  // XXX
   stub.Search(request,
       0,  // No response handler
       boost::ref(err_hdl),  // error handler
@@ -240,15 +240,6 @@ TEST_F(server_test, DelegatedRequest) {
   ASSERT_EQ("42!", response.results(0));
 }
 
-TEST_F(server_test, EasyBlockingRequestUsingDelegate) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
-  SearchRequest request;
-  SearchResponse response;
-  request.set_query("delegate");
-  stub.Search(request, &response);
-  ASSERT_EQ("42!", response.results(0));
-}
-
 TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
@@ -257,7 +248,7 @@ TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
   try {
     stub.Search(request, &response);
     ASSERT_TRUE(false);
-  } catch (rpc_error &error) {
+  } catch (const rpc_error& error) {
     ASSERT_EQ(status::APPLICATION_ERROR, error.get_status());
     ASSERT_EQ(-4, error.get_application_error_code());
   }
@@ -271,7 +262,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
   try {
     stub.Search(request, 1, &response);
     ASSERT_TRUE(false);
-  } catch (rpc_error &error) {
+  } catch (const rpc_error& error) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
   }
   // We may get here before the timing out request was processed, and if we
@@ -285,10 +276,9 @@ TEST_F(server_test, ConnectionManagerTermination) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   request.set_query("terminate");
-  SearchResponse response;
   try {
-    stub.Search(request, 1, &response);
-  } catch (rpc_error &error) {
+    stub.Search(request, 1/*ms*/);
+  } catch (const rpc_error& error) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
   }
   LOG(INFO)<<"I'm here";
