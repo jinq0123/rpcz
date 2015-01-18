@@ -71,10 +71,8 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "}  // namespace protobuf\n"
     "}  // namespace google\n"
     "namespace rpcz {\n"
-    "class closure;\n"
     "class replier;\n"
     "class rpc_channel;\n"
-    "class rpc_controller;\n"
     "}  // namespace rpcz\n"
     "\n"
     ,
@@ -124,7 +122,6 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     "#include <rpcz/cpp_handler_wrapper.hpp>\n"
     "#include <rpcz/error_handler.hpp>\n"
     "#include <rpcz/rpcz.hpp>\n"
-    "#include <rpcz/rpc_controller.hpp>  // DEL\n"
     "\n"
     "namespace {\n",
     "basename", StripProto(file_->name()));

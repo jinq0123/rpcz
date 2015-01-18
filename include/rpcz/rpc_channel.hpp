@@ -36,16 +36,16 @@ class MethodDescriptor;
 namespace rpcz {
 class closure;
 class connection;
-class rpc_controller;
 
 class rpc_channel {
  public:
-  virtual void call_method(const std::string& service_name,
-                          const google::protobuf::MethodDescriptor* method,
-                          const google::protobuf::Message& request,
-                          google::protobuf::Message* response,
-                          rpc_controller* rpc_controller,
-                          closure* done) = 0;
+  // DEL
+  //virtual void call_method(const std::string& service_name,
+  //                        const google::protobuf::MethodDescriptor* method,
+  //                        const google::protobuf::Message& request,
+  //                        google::protobuf::Message* response,
+  //                        rpc_controller* rpc_controller,
+  //                        closure* done) = 0;
 
   virtual void async_call(const std::string& service_name,
                           const google::protobuf::MethodDescriptor* method,
@@ -63,12 +63,13 @@ class rpc_channel {
 
   // DO NOT USE: this method exists only for language bindings and may be
   // removed.
-  virtual void call_method0(const std::string& service_name,
-                           const std::string& method_name,
-                           const std::string& request,
-                           std::string* response,
-                           rpc_controller* rpc_controller,
-                           closure* done) = 0;
+  // XXX change it...
+  //virtual void call_method0(const std::string& service_name,
+  //                         const std::string& method_name,
+  //                         const std::string& request,
+  //                         std::string* response,
+  //                         rpc_controller* rpc_controller,
+  //                         closure* done) = 0;
 
   static rpc_channel* create(connection connection);
 

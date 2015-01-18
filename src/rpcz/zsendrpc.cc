@@ -21,9 +21,11 @@
 #include <google/protobuf/compiler/importer.h>
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/text_format.h>
+
 #include "rpcz/application.hpp"
+#include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/rpc_channel.hpp"
-#include "rpcz/rpc_controller.hpp"
+#include "rpcz/rpc_error.hpp"
 
 using google::protobuf::DynamicMessageFactory;
 using google::protobuf::FileDescriptor;
@@ -108,23 +110,19 @@ int run_call(const std::string& endpoint,
   }
 
   scoped_ptr<rpc_channel> channel(rpc_channel::create(endpoint));
-  rpc_controller rpc_controller;
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
-  channel->call_method(
-      FLAGS_service_name.empty() ? service_name : FLAGS_service_name,
-      method_desc, *request, reply, &rpc_controller, NULL);
-  rpc_controller.wait();
-
-  if (rpc_controller.get_status() != status::OK) {
-    cerr << "status: " << rpc_controller.get_status() << endl;
-    cerr << "Error " << rpc_controller.get_application_error_code() << ": "
-        << rpc_controller.get_error_message() << endl;
-  } else {
+  try {
+    channel->sync_call(
+        FLAGS_service_name.empty() ? service_name : FLAGS_service_name,
+        method_desc, *request, -1, reply);
     std::string out;
     ::TextFormat::PrintToString(*reply, &out);
     cout << out << endl;
+  } catch (const rpc_error& error) {
+    cerr << error.what() << endl;
   }
+
   delete request;
   delete reply;
   return 0;

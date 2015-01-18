@@ -140,6 +140,7 @@ void ServiceGenerator::GenerateMethodSignatures(
 
 void ServiceGenerator::GenerateOneStubMethodSignature(
     const VariablesMap& sub_vars, io::Printer* printer) {
+  // async interfaces
   printer->Print(sub_vars,
       "typedef boost::function<void (const $output_type$&)> $name$_Handler;\n");
   printer->Print(sub_vars,
@@ -152,14 +153,8 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler);\n");
-  printer->Print(sub_vars,
-      "// DEL\n"
-      "$virtual$void $name$(\n"
-      "    const $input_type$& request,\n"
-      "    $output_type$* response,\n"
-      "    ::rpcz::rpc_controller* rpc_controller,\n"
-      "    ::rpcz::closure* done);\n");
 
+  // sync interfaces
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
@@ -385,27 +380,11 @@ void ServiceGenerator::GenerateOneStubMethod(
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
-    "    $output_type$* response,\n"
-    "    ::rpcz::rpc_controller* rpc_controller,\n"
-    "    ::rpcz::closure* done) {\n"
-    "  channel_->call_method(service_name_,\n"
-    "      $classname$::descriptor()->method($index$),\n"
-    "      request, response, rpc_controller, done);\n"
-    "}\n");
-  printer->Print(sub_vars,
-    "void $classname$_Stub::$name$(\n"
-    "    const $input_type$& request,\n"
     "    long deadline_ms,\n"
     "    $output_type$* response) {\n"
-    "  // DEL ::rpcz::rpc_controller rpc_controller;\n"
-    "  // XXX rpc_controller.set_deadline_ms(deadline_ms);\n"
     "  channel_->sync_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request, deadline_ms, response);\n"
-    "  // DEL rpc_controller.wait();\n"
-    "  // DEL if (!rpc_controller.ok()) {\n"
-    "  // DEL  throw ::rpcz::rpc_error(rpc_controller);\n"
-    "  // DEL }\n"
     "}\n");
   printer->Print(sub_vars,
     "$output_type$ $classname$_Stub::$name$(\n"

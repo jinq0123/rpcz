@@ -31,13 +31,14 @@ class rpc_channel_impl: public rpc_channel {
 
   virtual ~rpc_channel_impl();
 
-  virtual void call_method(
-      const std::string& service_name,
-      const google::protobuf::MethodDescriptor* method,
-      const google::protobuf::Message& request,
-      google::protobuf::Message* response,
-      rpc_controller* rpc_controller,
-      closure* done);
+  // XXX
+  //virtual void call_method(
+  //    const std::string& service_name,
+  //    const google::protobuf::MethodDescriptor* method,
+  //    const google::protobuf::Message& request,
+  //    google::protobuf::Message* response,
+  //    rpc_controller* rpc_controller,
+  //    closure* done);
 
   // only used in cpp? Other language use string request.
   virtual void async_call(
@@ -55,24 +56,26 @@ class rpc_channel_impl: public rpc_channel {
       long deadline_ms,
       google::protobuf::Message* response);
 
-  virtual void call_method0(
-      const std::string& service_name,
-      const std::string& method_name,
-      const std::string& request,
-      std::string* response,
-      rpc_controller* rpc_controller,
-      closure* done);
+  // XXX
+  //virtual void call_method0(
+  //    const std::string& service_name,
+  //    const std::string& method_name,
+  //    const std::string& request,
+  //    std::string* response,
+  //    rpc_controller* rpc_controller,
+  //    closure* done);
 
  private:
-  void call_method_full(
-      const std::string& service_name,
-      const std::string& method_name,
-      const ::google::protobuf::Message* request_msg,
-      const std::string& request,
-      ::google::protobuf::Message* response_msg,
-      std::string* response_str,
-      rpc_controller* rpc_controller,
-      closure* done);
+  // XXX
+  //void call_method_full(
+  //    const std::string& service_name,
+  //    const std::string& method_name,
+  //    const ::google::protobuf::Message* request_msg,
+  //    const std::string& request,
+  //    ::google::protobuf::Message* response_msg,
+  //    std::string* response_str,
+  //    rpc_controller* rpc_controller,
+  //    closure* done);
 
  private:
   connection connection_;
