@@ -144,13 +144,13 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
   printer->Print(sub_vars,
       "typedef boost::function<void (const $output_type$&)> $name$_Handler;\n");
   printer->Print(sub_vars,
-      "$virtual$void $name$(\n"
+      "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler,\n"
       "    const ::rpcz::error_handler& err_handler,\n"
       "    long deadline_ms);\n");
   printer->Print(sub_vars,
-      "$virtual$void $name$(\n"
+      "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler);\n");
 
@@ -351,8 +351,9 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
 void ServiceGenerator::GenerateOneStubMethod(
     const VariablesMap& sub_vars,
     google::protobuf::io::Printer* printer) {
+  // async methods
   printer->Print(sub_vars,
-    "void $classname$_Stub::$name$(\n"
+    "void $classname$_Stub::async_$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler,\n"
     "    const ::rpcz::error_handler& err_handler,\n"
@@ -366,7 +367,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "      deadline_ms);\n"
     "}\n");
   printer->Print(sub_vars,
-    "void $classname$_Stub::$name$(\n"
+    "void $classname$_Stub::async_$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler) {\n"
     "  // XXX optimize empty handler...\n"
@@ -377,6 +378,8 @@ void ServiceGenerator::GenerateOneStubMethod(
     "      default_error_handler_,\n"
     "      default_deadline_ms_);\n"  // XXX input ms
     "}\n");
+
+  // sync methods
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"

@@ -56,7 +56,7 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "bar") {
       replier_copy.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      backend_->Search(request, boost::bind(&replier::send, replier_copy, _1));
+      backend_->async_Search(request, boost::bind(&replier::send, replier_copy, _1));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
@@ -178,7 +178,7 @@ TEST_F(server_test, SimpleRequestAsync) {
       sync.signal();
     }
   } hdl;
-  stub.Search(request, boost::ref(hdl));
+  stub.async_Search(request, boost::ref(hdl));
   hdl.sync.wait();
 }
 
@@ -224,7 +224,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   } err_hdl;
 
   // XXX
-  stub.Search(request,
+  stub.async_Search(request,
       0,  // No response handler
       boost::ref(err_hdl),  // error handler
       1/*timeout ms*/);

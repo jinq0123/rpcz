@@ -23,7 +23,7 @@ int main() {
   request.set_query("gold");
 
   cout << "Sending request." << endl;
-  search_stub.Search(request, done);
+  search_stub.async_Search(request, done);
 
   // Do other works...
   std::cin.get();

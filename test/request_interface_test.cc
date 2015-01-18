@@ -172,7 +172,7 @@ TEST_F(server_test, AsyncRequest) {
   SearchRequest request;
   request.set_query("stone");
   handler hdl;
-  (void)stub.Search(request, hdl.get_search_handler());
+  (void)stub.async_Search(request, hdl.get_search_handler());
   hdl.sync.wait();
 
   ASSERT_FALSE(hdl.error);
@@ -210,7 +210,7 @@ TEST_F(server_test, RequestWithTimeoutAsync) {
   SearchRequest request;
   request.set_query("timeout");
   handler hdl;
-  stub.Search(request,
+  stub.async_Search(request,
       hdl.get_search_handler(),  // XXX ignore
       hdl.get_error_handler(),
       1/*ms*/);
