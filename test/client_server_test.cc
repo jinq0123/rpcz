@@ -28,7 +28,7 @@
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
-#include "rpcz/sync_event.hpp"
+#include "sync_event.hpp"
 
 #include "proto/search.pb.h"
 #include "proto/search.rpcz.h"
@@ -81,7 +81,7 @@ class SearchServiceImpl : public SearchService {
     }
   }
 
-  sync_event timeout_request_received;
+  ::sync_event timeout_request_received;
 
  private:
   scoped_ptr<SearchService_Stub> backend_;
@@ -171,7 +171,7 @@ TEST_F(server_test, SimpleRequestAsync) {
   request.set_query("happiness");
 
   struct hander {
-    sync_event sync;
+    ::sync_event sync;
     void operator()(const SearchResponse & resp) {
       ASSERT_EQ(2, resp.results_size());
       ASSERT_EQ("The search for happiness", resp.results(0));
@@ -215,7 +215,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   request.set_query("timeout");
 
   struct error_handler {
-    sync_event sync;
+    ::sync_event sync;
 
     void operator()(const rpc_error& error) {
       ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());

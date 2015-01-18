@@ -29,7 +29,7 @@
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
-#include "rpcz/sync_event.hpp"
+#include "sync_event.hpp"
 
 #include "proto/search.pb.h"
 #include "proto/search.rpcz.h"
@@ -106,7 +106,7 @@ protected:
 };
 
 struct handler {
-  sync_event sync;
+  ::sync_event sync;
   SearchResponse response;
   boost::optional<rpc_error> error;
 

@@ -28,8 +28,8 @@
 #include "rpcz/client_connection.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
-#include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
+#include "sync_event.hpp"
 
 namespace rpcz {
 
@@ -95,7 +95,7 @@ message_vector* create_quit_request() {
 }
 
 void expect_timeout(connection_manager_status status,
-    message_iterator& iter, sync_event* sync) {
+    message_iterator& iter, ::sync_event* sync) {
   ASSERT_EQ(CMSTATUS_DEADLINE_EXCEEDED, status);
   ASSERT_FALSE(iter.has_more());
   sync->signal();
@@ -113,7 +113,7 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
   connection connection(cm->connect("inproc://server.test"));
   scoped_ptr<message_vector> request(create_simple_request());
 
-  sync_event event;
+  ::sync_event event;
   connection.send_request(*request, 0,
                          boost::bind(&expect_timeout, _1, _2, &event));
   event.wait();
@@ -177,9 +177,9 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   }
   group.join_all();
   scoped_ptr<message_vector> request(create_quit_request());
-  sync_event event;
+  ::sync_event event;
   connection.send_request(*request, -1,
-                         boost::bind(&sync_event::signal, &event));
+                         boost::bind(&::sync_event::signal, &event));
   event.wait();
   thread.join();
 }

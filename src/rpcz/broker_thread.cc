@@ -23,7 +23,7 @@
 #include "logging.hpp"
 #include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/callback.hpp"
-#include "rpcz/sync_event.hpp"
+#include "sync_event.hpp"
 #include "zmq_utils.hpp"
 
 namespace rpcz {

@@ -11,8 +11,8 @@
 #include <google/protobuf/message.h>
 
 #include "rpcz/error_handler.hpp"
-#include "rpcz/sync_event.hpp"  // XXX move to src/
 #include "rpcz/common.hpp"  // for scoped_ptr
+#include "sync_event.hpp"
 
 namespace rpcz {
 

@@ -14,23 +14,47 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "sync_event.hpp"
+#ifndef SYNC_EVENT_H
+#define SYNC_EVENT_H
 
-namespace rpcz {
+#include <boost/noncopyable.hpp>
+#include <boost/thread/thread.hpp>
 
-sync_event::sync_event() : ready_(false) {
+namespace {
+
+// sync_event provides a mechanism for threads to wait for an event.
+class sync_event {
+ public:
+  inline sync_event();
+
+  // Blocks the current thread until another thread calls signal().
+  inline void wait();
+
+  // Signals that the event has occured. All threads that called wait() are
+  // released.
+  inline void signal();
+
+ private:
+  bool ready_;
+  boost::mutex mu_;
+  boost::condition_variable cond_;
+};
+
+inline sync_event::sync_event() : ready_(false) {
 }
 
-void sync_event::wait() {
+inline void sync_event::wait() {
   boost::unique_lock<boost::mutex> lock(mu_);
   while (!ready_) {
     cond_.wait(lock);
   }
 }
 
-void sync_event::signal() {
+inline void sync_event::signal() {
   boost::unique_lock<boost::mutex> lock(mu_);
   ready_ = true;
   cond_.notify_all();
 }
-}  // namespace rpcz
+
+}  // namespace
+#endif

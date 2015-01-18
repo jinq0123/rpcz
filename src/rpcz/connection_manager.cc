@@ -31,7 +31,7 @@
 #include "connection.hpp"
 #include "internal_commands.hpp"  // for kConnect
 #include "logging.hpp"
-#include "rpcz/sync_event.hpp"
+#include "sync_event.hpp"
 #include "worker_thread_fun.hpp"  // for worker_thread_fun
 #include "zmq_utils.hpp"  // for send_empty_message
 
