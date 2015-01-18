@@ -39,14 +39,6 @@ using namespace std;
 
 namespace rpcz {
 
-void super_done(SearchResponse *response,
-               rpc_controller* newrpc,
-               replier replier_copy) {
-  delete newrpc;
-  replier_copy.send(*response);
-  delete response;
-}
-
 class SearchServiceImpl : public SearchService {
  public:
   // Will take ownership of backend.
@@ -66,10 +58,7 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "bar") {
       replier_copy.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      rpc_controller* newrpc = new rpc_controller;
-      SearchResponse* response = new SearchResponse;
-      backend_->Search(request, response, newrpc,
-          new_callback(super_done, response, newrpc, replier_copy));
+      backend_->Search(request, boost::bind(&replier::send, &replier_copy, _1));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
@@ -181,28 +170,31 @@ TEST_F(server_test, SimpleRequest) {
 TEST_F(server_test, SimpleRequestAsync) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
-  SearchResponse response;
-  rpc_controller rpc_controller;
   request.set_query("happiness");
-  sync_event sync;
-  stub.Search(request, &response, &rpc_controller, new_callback(
-          &sync, &sync_event::signal));
-  sync.wait();
-  ASSERT_TRUE(rpc_controller.ok());
-  ASSERT_EQ(2, response.results_size());
-  ASSERT_EQ("The search for happiness", response.results(0));
+
+  struct hander {
+    sync_event sync;
+    void operator()(const SearchResponse & resp) {
+      ASSERT_EQ(2, resp.results_size());
+      ASSERT_EQ("The search for happiness", resp.results(0));
+      sync.signal();
+    }
+  } hdl;
+  stub.Search(request, boost::ref(hdl));
+  hdl.sync.wait();
 }
 
 TEST_F(server_test, SimpleRequestWithError) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
   request.set_query("foo");
-  SearchResponse response;
-  rpc_controller rpc_controller;
-  stub.Search(request, &response, &rpc_controller, NULL);
-  rpc_controller.wait();
-  ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, rpc_controller.get_status());
-  ASSERT_EQ("I don't like foo.", rpc_controller.get_error_message());
+  try {
+    (void)stub.Search(request);
+    ASSERT_TRUE(false);
+  } catch (const rpc_error& e) {
+    ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, e.get_status());
+    ASSERT_EQ("I don't like foo.", e.get_error_message());
+  }
 }
 
 TEST_F(server_test, SimpleRequestWithTimeout) {
@@ -222,28 +214,29 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
 TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
-  SearchResponse response;
-  {
-    rpc_controller rpc_controller;
-    request.set_query("timeout");
-    // XXX rpc_controller.set_deadline_ms(1);
-    sync_event event;
-    stub.Search(request, &response, &rpc_controller,
-                new_callback(&event, &sync_event::signal));
-    event.wait();
-    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, rpc_controller.get_status());
-  }
+  request.set_query("timeout");
+
+  struct error_handler {
+    sync_event sync;
+
+    void operator()(const rpc_error & err) {
+      ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, err.get_status());
+      sync.signal();
+    }
+  } err_hdl;
+
+  stub.Search(request,
+      0,  // No response handler
+      boost::ref(err_hdl),  // error handler
+      1/*timeout ms*/);
+  err_hdl.sync.wait();
 }
 
 TEST_F(server_test, DelegatedRequest) {
   SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
   SearchRequest request;
-  SearchResponse response;
-  rpc_controller rpc_controller;
   request.set_query("delegate");
-  stub.Search(request, &response, &rpc_controller, NULL);
-  rpc_controller.wait();
-  ASSERT_EQ(rpc_response_header::OK, rpc_controller.get_status());
+  SearchResponse response = stub.Search(request);
   ASSERT_EQ("42!", response.results(0));
 }
 

@@ -145,8 +145,15 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
+      "    const $name$_Handler& handler,\n"
+      "    const ::rpcz::error_handler& err_handler,\n"
+      "    long deadline_ms);\n");
+  printer->Print(sub_vars,
+      "$virtual$void $name$(\n"
+      "    const $input_type$& request,\n"
       "    const $name$_Handler& handler);\n");
   printer->Print(sub_vars,
+      "// DEL\n"
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
       "    $output_type$* response,\n"
@@ -349,6 +356,20 @@ void ServiceGenerator::GenerateStubMethods(io::Printer* printer) {
 void ServiceGenerator::GenerateOneStubMethod(
     const VariablesMap& sub_vars,
     google::protobuf::io::Printer* printer) {
+  printer->Print(sub_vars,
+    "void $classname$_Stub::$name$(\n"
+    "    const $input_type$& request,\n"
+    "    const $name$_Handler& handler,\n"
+    "    const ::rpcz::error_handler& err_handler,\n"
+    "    long deadline_ms) {\n"
+    "  // XXX optimize empty handler...\n"
+    "  channel_->async_call(service_name_,\n"
+    "      $classname$::descriptor()->method($index$),\n"
+    "      request,\n"
+    "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler, err_handler),\n"
+    "      err_handler,\n"
+    "      deadline_ms);\n"
+    "}\n");
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
