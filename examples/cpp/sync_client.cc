@@ -28,7 +28,7 @@ int main() {
 
   cout << "Sending request." << endl;
   try {
-    examples::SearchResponse response;
+    examples::SearchResponse response
         = search_stub.Search(request, 1000);
     cout << response.DebugString() << endl;
   } catch (rpcz::rpc_error &e) {
