@@ -58,7 +58,7 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "bar") {
       replier_copy.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      backend_->Search(request, boost::bind(&replier::send, &replier_copy, _1));
+      backend_->Search(request, boost::bind(&replier::send, replier_copy, _1));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
@@ -295,4 +295,5 @@ TEST_F(server_test, ConnectionManagerTermination) {
   connection_manager::get()->run();
   LOG(INFO)<<"I'm there";
 }
+
 }  // namespace
