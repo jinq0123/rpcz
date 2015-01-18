@@ -138,25 +138,43 @@ Test all kinds of request interfaces.
 . Explicit error handler or implicit default error handler (only for async)
 There are 4 sync interfaces and 4 async interfaces.
 
-XXX Add async_ prefix to async interfaces.
+Ordered as the declaration in search.rpcz.h.
+
 XXX Add async interfaces without handler for oneway call.
 */
 
-TEST_F(server_test, SetDefaulDeadlineMs) {
+// Async interfaces:
+
+TEST_F(server_test, AsyncRequestWithTimeout) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
-  SearchResponse response;
   request.set_query("timeout");
-  stub.set_default_deadline_ms(1);
-  try {
-    stub.Search(request, &response);
-    ASSERT_TRUE(false);
-  } catch (const rpc_error& error) {
-    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
-    return;
-  }
-  ASSERT_TRUE(false);
+  handler hdl;
+  stub.async_Search(request,
+      hdl.get_search_handler(),
+      hdl.get_error_handler(),
+      1/*ms*/);
+  hdl.sync.wait();
+  ASSERT_TRUE(hdl.error);
+  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, hdl.error->get_status());
 }
+
+TEST_F(server_test, AsyncRequest) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  request.set_query("stone");
+  handler hdl;
+  stub.async_Search(request,
+      hdl.get_search_handler(),
+      hdl.get_error_handler());
+  hdl.sync.wait();
+
+  ASSERT_FALSE(hdl.error);
+  ASSERT_EQ(2, hdl.response.results_size());
+  ASSERT_EQ("The search for stone", hdl.response.results(0));
+}
+
+// Sync interfaces:
 
 TEST_F(server_test, SyncRequest) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
@@ -165,19 +183,6 @@ TEST_F(server_test, SyncRequest) {
   SearchResponse response = stub.Search(request);
   ASSERT_EQ(2, response.results_size());
   ASSERT_EQ("The search for stupid", response.results(0));
-}
-
-TEST_F(server_test, AsyncRequest) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
-  SearchRequest request;
-  request.set_query("stone");
-  handler hdl;
-  (void)stub.async_Search(request, hdl.get_search_handler());
-  hdl.sync.wait();
-
-  ASSERT_FALSE(hdl.error);
-  ASSERT_EQ(2, hdl.response.results_size());
-  ASSERT_EQ("The search for stone", hdl.response.results(0));
 }
 
 TEST_F(server_test, RequestWithError) {
@@ -205,20 +210,6 @@ TEST_F(server_test, RequestWithTimeout) {
   }
 }
 
-TEST_F(server_test, RequestWithTimeoutAsync) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
-  SearchRequest request;
-  request.set_query("timeout");
-  handler hdl;
-  stub.async_Search(request,
-      hdl.get_search_handler(),  // XXX ignore
-      hdl.get_error_handler(),
-      1/*ms*/);
-  hdl.sync.wait();
-  ASSERT_TRUE(hdl.error);
-  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, hdl.error->get_status());
-}
-
 TEST_F(server_test, RequestRaisesExceptions) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
@@ -230,6 +221,24 @@ TEST_F(server_test, RequestRaisesExceptions) {
     ASSERT_EQ(status::APPLICATION_ERROR, error.get_status());
     ASSERT_EQ(-4, error.get_application_error_code());
   }
+}
+
+// Other interfaces:
+
+TEST_F(server_test, SetDefaulDeadlineMs) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  SearchResponse response;
+  request.set_query("timeout");
+  stub.set_default_deadline_ms(1);
+  try {
+    stub.Search(request, &response);
+    ASSERT_TRUE(false);
+  } catch (const rpc_error& error) {
+    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+    return;
+  }
+  ASSERT_TRUE(false);
 }
 
 }  // namespace

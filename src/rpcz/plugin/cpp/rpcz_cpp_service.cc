@@ -150,6 +150,13 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
       "    const ::rpcz::error_handler& err_handler,\n"
       "    long deadline_ms);\n");
   printer->Print(sub_vars,
+      "inline $virtual$void async_$name$(\n"
+      "    const $input_type$& request,\n"
+      "    const $name$_Handler& handler,\n"
+      "    const ::rpcz::error_handler& err_handler) {\n"
+      "  async_$name$(request, handler, err_handler, default_deadline_ms_);\n"
+      "}\n");
+  printer->Print(sub_vars,
       "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler);\n");
