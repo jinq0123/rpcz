@@ -19,6 +19,7 @@
 #define RPCZ_CPP_SERVICE_H
 
 #include "rpcz/iservice.hpp"
+#include "rpcz/rpcz_api.hpp"
 
 namespace google {
 namespace protobuf {
@@ -31,7 +32,7 @@ class ServiceDescriptor;
 namespace rpcz {
 
 // Service for cpp.
-class cpp_service : public iservice {
+class RPCZ_API cpp_service : public iservice {
  public:
   virtual const google::protobuf::ServiceDescriptor* GetDescriptor() = 0;
 

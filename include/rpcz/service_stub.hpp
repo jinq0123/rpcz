@@ -9,14 +9,15 @@
 #include <string>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
 
-#include "error_handler.hpp"  // for error_handler
+#include "rpcz/error_handler.hpp"  // for error_handler
+#include "rpcz/rpcz_api.hpp"
 
 namespace rpcz {
 
 class rpc_channel;
 class rpc_error;
 
-class service_stub {
+class RPCZ_API service_stub {
  public:
   inline service_stub(::rpcz::rpc_channel* channel,
                       const std::string& service_name,

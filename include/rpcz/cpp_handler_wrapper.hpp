@@ -5,7 +5,7 @@
 #ifndef RPCZ_CPP_HANDLER_WRAPPER_HPP
 #define RPCZ_CPP_HANDLER_WRAPPER_HPP
 
-#include "error_handler.hpp"
+#include "rpcz/error_handler.hpp"
 
 namespace rpcz {
 

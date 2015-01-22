@@ -21,11 +21,12 @@
 #include <stdexcept>
 #include <string>
 
-#include "status_code.hpp"  // for status_code
+#include "rpcz/rpcz_api.hpp"
+#include "rpcz/status_code.hpp"  // for status_code
 
 namespace rpcz {
 
-class rpc_error : public std::runtime_error {
+class RPCZ_API rpc_error : public std::runtime_error {
  public:
   rpc_error(status_code status,
             int application_error_code,

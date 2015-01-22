@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,6 +20,7 @@
 #define RPCZ_APPLICATION_H
 
 #include <string>
+#include "rpcz/rpcz_api.hpp"
 
 namespace zmq {
 class context_t; 
@@ -32,10 +34,10 @@ class rpc_channel;
 namespace application {
 
   // Blocks the current thread until another thread calls terminate.
-  void run();
+  RPCZ_API void run();
 
   // Releases all the threads that are blocked inside run()
-  void terminate();
+  RPCZ_API void terminate();
 
   // You can change the default options BEFORE any client or server.
   // These options are:
@@ -48,9 +50,9 @@ namespace application {
   //   context must outlive the rpcz application. Default NULL.
   // * Number of ZeroMQ I/O threads, to be passed to zmq_init(). This value is
   //   ignored when you provide your own ZeroMQ context. Default 1.
-  void set_connection_manager_threads(int n);  // default 1
-  void set_zmq_context(zmq::context_t* context);  // default NULL
-  void set_zmq_io_threads(int n);  // default 1
+  RPCZ_API void set_connection_manager_threads(int n);  // default 1
+  RPCZ_API void set_zmq_context(zmq::context_t* context);  // default NULL
+  RPCZ_API void set_zmq_io_threads(int n);  // default 1
 }  // namespace application
 
 }  // namespace rpcz

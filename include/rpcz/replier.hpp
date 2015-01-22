@@ -19,8 +19,8 @@
 #define RPCZ_REPLY_SENDER_H
 
 #include <string>
-
 #include <boost/shared_ptr.hpp>
+#include "rpcz/rpcz_api.hpp"
 
 namespace google {
 namespace protobuf {
@@ -43,7 +43,7 @@ struct reply_context;
 // replier can used in callback by copy.  // XXX Need example.
 // replier's copy operator is quick, which only copies a shared_ptr.
 // XXX More comments...
-class replier {
+class RPCZ_API replier {
  public:
   replier(client_connection& connection, const std::string& event_id);
   ~replier();

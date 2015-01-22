@@ -3,11 +3,13 @@
 #ifndef RPCZ_SERVICE_FACTORY_HPP
 #define RPCZ_SERVICE_FACTORY_HPP
 
+#include "rpcz/rpcz_api.hpp"
+
 namespace rpcz {
 
 class iservice;
 
-class service_factory {
+class RPCZ_API service_factory {
  public:
   service_factory() {};
   virtual ~service_factory() {};

@@ -22,6 +22,7 @@
 #include <boost/noncopyable.hpp>
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "rpcz/default_service_factory.hpp"
+#include "rpcz/rpcz_api.hpp"
 #include "rpcz/service_factory_ptr.hpp"
 
 namespace rpcz {
@@ -32,7 +33,7 @@ class server_impl;
 // A server object maps incoming RPC requests to a provided service interface.
 // The service interface methods are executed inside one of the worker threads.
 // Non-thread-safe.
-class server : boost::noncopyable {
+class RPCZ_API server : boost::noncopyable {
  public:
   server();
   ~server();

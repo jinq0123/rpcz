@@ -21,11 +21,12 @@
 #include <string>
 
 #include "rpcz/replier.hpp"
+#include "rpcz/rpcz_api.hpp"
 
 namespace rpcz {
 
 // Service interface.
-class iservice {
+class RPCZ_API iservice {
  public:
   // dispatch_request() is low-level request handler: requests are void*.
   // It is exposed for all language bindings.

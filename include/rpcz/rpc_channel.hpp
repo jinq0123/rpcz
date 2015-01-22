@@ -23,8 +23,9 @@
 
 #include <google/protobuf/stubs/common.h>
 
-#include "error_handler.hpp"  // for error_handler
-#include "response_message_handler.hpp"  // for response_message_handler
+#include "rpcz/error_handler.hpp"  // for error_handler
+#include "rpcz/response_message_handler.hpp"  // for response_message_handler
+#include "rpcz/rpcz_api.hpp"
 
 namespace google {
 namespace protobuf {
@@ -37,7 +38,7 @@ namespace rpcz {
 class closure;
 class connection;
 
-class rpc_channel {
+class RPCZ_API rpc_channel {
  public:
   // DEL
   //virtual void call_method(const std::string& service_name,

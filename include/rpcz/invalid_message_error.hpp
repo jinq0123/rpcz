@@ -5,10 +5,11 @@
 
 #include <stdexcept>
 #include <string>
+#include "rpcz/rpcz_api.hpp"
 
 namespace rpcz {
 
-class invalid_message_error : public std::runtime_error {
+class RPCZ_API invalid_message_error : public std::runtime_error {
  public:
   explicit invalid_message_error(const std::string& message)
       : std::runtime_error(message) {}
