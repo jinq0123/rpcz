@@ -1,7 +1,7 @@
 #ifndef RPCZ_API_HPP
 #define RPCZ_API_HPP
 
-#if defined(_MSC_VER) && !defined(RPCZ_STATIC)
+#if defined(_WIN32)
   #ifdef rpcz_EXPORTS
     #define RPCZ_API __declspec(dllexport)
   #else
