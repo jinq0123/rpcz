@@ -43,7 +43,8 @@ function(rpcz_test TESTNAME)
   CMAKE_PARSE_ARGUMENTS(OPTIONS "" "" "SRCS;LIBS" ${ARGN})
   add_executable(${TESTNAME} ${OPTIONS_SRCS})
   set_property(TARGET ${TESTNAME} PROPERTY FOLDER "Tests")
-  set(LIBS rpcz rpcz_gtest_main
+  set_target_properties(${TESTNAME} PROPERTIES COMPILE_DEFINITIONS "RPCZ_STATIC")
+  set(LIBS rpcz_static rpcz_gtest_main
   )
 if(NOT MSVC)
   list(APPEND LIBS pthread
