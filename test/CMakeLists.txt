@@ -1,3 +1,6 @@
+# Unit tests use rpcz_static lib.
+add_definitions(-DRPCZ_STATIC)
+
 add_subdirectory(proto)
 set(CTEST_OUTPUT_ON_FAILURE 1)
 
@@ -43,7 +46,6 @@ function(rpcz_test TESTNAME)
   CMAKE_PARSE_ARGUMENTS(OPTIONS "" "" "SRCS;LIBS" ${ARGN})
   add_executable(${TESTNAME} ${OPTIONS_SRCS})
   set_property(TARGET ${TESTNAME} PROPERTY FOLDER "Tests")
-  set_target_properties(${TESTNAME} PROPERTIES COMPILE_DEFINITIONS "RPCZ_STATIC")
   set(LIBS rpcz_static rpcz_gtest_main
   )
 if(NOT MSVC)
