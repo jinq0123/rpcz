@@ -6,6 +6,7 @@
 #define RPCZ_CPP_HANDLER_WRAPPER_HPP
 
 #include "rpcz/error_handler.hpp"
+#include "rpcz/rpcz_api.hpp"
 
 namespace rpcz {
 
@@ -33,7 +34,7 @@ private:
   error_handler error_handler_;  // to handle invalid message
 };
 
-void handle_invalid_message(error_handler& err_handler);
+RPCZ_API void handle_invalid_message(error_handler& err_handler);
 
 template <typename Response>
 inline void cpp_handler_wrapper<Response>::operator()(

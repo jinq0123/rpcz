@@ -36,7 +36,7 @@ class server_impl;
 class RPCZ_API server : boost::noncopyable {
  public:
   server();
-  ~server();
+  virtual ~server();
 
  public:
   // Registers cpp service with this server. Only for cpp.

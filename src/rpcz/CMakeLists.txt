@@ -52,6 +52,7 @@ set(RPCZ_TARGET_LIBS rpcz)
 
 add_library(rpcz_static STATIC ${RPCZ_SOURCES})
 target_link_libraries(rpcz_static ${RPCZ_LIB_DEPS})
+set_target_properties(rpcz_static PROPERTIES COMPILE_DEFINITIONS "RPCZ_STATIC")
 list(APPEND RPCZ_TARGET_LIBS rpcz_static)
 
 add_executable(zsendrpc zsendrpc.cc)

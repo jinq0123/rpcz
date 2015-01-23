@@ -10,14 +10,14 @@
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
 
 #include "rpcz/error_handler.hpp"  // for error_handler
-#include "rpcz/rpcz_api.hpp"
+// DEL #include "rpcz/rpcz_api.hpp"
 
 namespace rpcz {
 
 class rpc_channel;
 class rpc_error;
 
-class RPCZ_API service_stub {
+class service_stub {
  public:
   inline service_stub(::rpcz::rpc_channel* channel,
                       const std::string& service_name,
@@ -26,7 +26,7 @@ class RPCZ_API service_stub {
       service_name_(service_name),
       owns_channel_(owns_channel),
       default_deadline_ms_(-1) {}
-  ~service_stub() {}
+  inline virtual ~service_stub() {}
 
  public:
   inline ::rpcz::rpc_channel* channel() { return channel_; }

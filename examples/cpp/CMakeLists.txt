@@ -5,6 +5,7 @@ PROTOBUF_GENERATE_RPCZ(SEARCH_RPCZ_SRCS SEARCH_RPCZ_HDRS ../common/search.proto)
 
 add_library(example_pb ${SEARCH_PB_SRCS} ${SEARCH_PB_HDRS} ${SEARCH_RPCZ_SRCS}
                       ${SEARCH_RPCZ_HDRS})
+target_link_libraries(example_pb rpcz)					  
 target_link_libraries(example_pb optimized ${PROTOBUF_LIBRARY})
 target_link_libraries(example_pb debug ${PROTOBUF_LIBRARY_DEBUG})
 include_directories(${Rpcz_BINARY_DIR}/examples)
