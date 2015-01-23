@@ -8,7 +8,6 @@
 #include <boost/shared_ptr.hpp>
 #include <google/protobuf/message.h>
 
-#include "rpcz/error_handler.hpp"
 #include "rpcz/common.hpp"  // for scoped_ptr
 #include "sync_event.hpp"
 
@@ -24,9 +23,9 @@ class sync_call_handler {
   inline ~sync_call_handler(void) {}
 
  public:
-  inline void operator()(const void* data, size_t size);
+  inline void operator()(const rpc_error* error,
+	  const void* data, size_t size);
   inline void wait() { state_->sync.wait(); }
-  inline error_handler get_error_handler();
   inline rpc_error* get_rpc_error() const { return state_->error.get(); }
 
  private:
@@ -49,7 +48,14 @@ inline sync_call_handler::sync_call_handler(
   state_->response = response;
 }
 
-inline void sync_call_handler::operator()(const void* data, size_t size) {
+inline void sync_call_handler::operator()(
+	const rpc_error* error,
+	const void* data, size_t size) {
+  if (error) {
+	handle_error(*error);
+	signal();
+	return;
+  }
   BOOST_ASSERT(data);
   if (NULL == state_->response) {
     signal();
@@ -63,10 +69,7 @@ inline void sync_call_handler::operator()(const void* data, size_t size) {
 
   // invalid message
   handle_invalid_message();
-}
-
-inline error_handler sync_call_handler::get_error_handler() {
-  return boost::bind(&sync_call_handler::handle_error, this, _1);
+  signal();
 }
 
 }  // namespace rpcz

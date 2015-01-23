@@ -9,7 +9,6 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
-#include "rpcz/error_handler.hpp"
 #include "rpcz/response_message_handler.hpp"
 #include "rpcz/status_code.hpp"
 
@@ -18,11 +17,9 @@ namespace rpcz {
 class rpc_context : boost::noncopyable {
  public:
   inline rpc_context(
-      const response_message_handler& msg_handler,
-      const error_handler& err_handler,
+      const response_message_handler& handler,
       long deadline_ms)
-      : msg_handler_(msg_handler),
-        err_handler_(err_handler),
+      : handler_(handler),
         deadline_ms_(deadline_ms) {
   }
 
@@ -46,16 +43,15 @@ class rpc_context : boost::noncopyable {
       const std::string& error_message);
 
  private:
-  response_message_handler msg_handler_;
-  error_handler err_handler_;
+  response_message_handler handler_;
   long deadline_ms_;
 };
 
 inline void rpc_context::handle_response_message(
     const void* data, size_t size) {
   BOOST_ASSERT(data);
-  if (msg_handler_) {
-    msg_handler_(data, size);
+  if (handler_) {
+    handler_(NULL, data, size);
   }
 }  // handle_response_message
 

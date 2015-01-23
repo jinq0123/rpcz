@@ -10,10 +10,14 @@
 
 namespace rpcz {
 
+class rpc_error;
+
 // Low-level handler for rpc response.
 // Used by C++ and all language bindings.
-// Input response message data and size.
-typedef boost::function<void (const void* data, size_t size)>
+// Input error pointer, response message data and size.
+// If no error, then error == NULL, data != NULL.
+typedef boost::function<void (const rpc_error* error,
+	const void* data, size_t size)>
   response_message_handler;
 
 }  // namespace rpcz

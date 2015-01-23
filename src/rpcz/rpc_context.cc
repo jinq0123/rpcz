@@ -24,8 +24,10 @@ void rpc_context::handle_application_error(
 void rpc_context::handle_error(status_code status,
   int application_error_code,
   const std::string& error_message) {
-  if (err_handler_)
-    err_handler_(rpc_error(status, application_error_code, error_message));
+  if (handler_.empty())
+	  return;
+  rpc_error e(status, application_error_code, error_message);
+  handler_(&e, NULL, 0);
 }
 
 }  // namespace rpcz

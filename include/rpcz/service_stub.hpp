@@ -9,9 +9,6 @@
 #include <string>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
 
-#include "rpcz/error_handler.hpp"  // for error_handler
-// DEL #include "rpcz/rpcz_api.hpp"
-
 namespace rpcz {
 
 class rpc_channel;
@@ -31,16 +28,12 @@ class service_stub {
  public:
   inline ::rpcz::rpc_channel* channel() { return channel_; }
   inline void set_default_deadline_ms(long ms) { default_deadline_ms_ = ms; }
-  inline void set_default_error_handler(const error_handler& handler) {
-    default_error_handler_ = handler;
-  }
 
  protected:
   ::rpcz::rpc_channel* channel_;
   ::std::string service_name_;
   bool owns_channel_;
   long default_deadline_ms_;
-  error_handler default_error_handler_;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(service_stub);

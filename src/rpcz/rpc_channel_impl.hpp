@@ -46,7 +46,6 @@ class rpc_channel_impl: public rpc_channel {
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,
       const response_message_handler& msg_handler,
-      const error_handler& err_handler,
       long deadline_ms);
 
   virtual void sync_call(

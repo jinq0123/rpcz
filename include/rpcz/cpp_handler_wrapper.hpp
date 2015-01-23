@@ -5,10 +5,12 @@
 #ifndef RPCZ_CPP_HANDLER_WRAPPER_HPP
 #define RPCZ_CPP_HANDLER_WRAPPER_HPP
 
-#include "rpcz/error_handler.hpp"
+#include <boost/function.hpp>
 #include "rpcz/rpcz_api.hpp"
 
 namespace rpcz {
+
+class rpc_error;
 
 // Wrap C++ response handler type to response_message_handler.
 // Response should be subtype of protocol::Message.
@@ -17,40 +19,42 @@ namespace rpcz {
 template <typename Response>
 struct cpp_handler_wrapper {
 public:
-  typedef boost::function<void (const Response&)> handler;
+  typedef boost::function<void (const rpc_error*, const Response&)> handler;
 
 public:
-  inline explicit cpp_handler_wrapper(const handler& hdl,
-      const error_handler& err_hdl) :
-      handler_(hdl),
-      error_handler_(err_hdl) {
+  inline explicit cpp_handler_wrapper(const handler& hdl) :
+      handler_(hdl) {
   }
 
 public:
-  inline void operator()(const void* data, size_t size);
+  inline void operator()(const rpc_error* error,
+	  const void* data, size_t size);
 
 private:
   handler handler_;
-  error_handler error_handler_;  // to handle invalid message
 };
 
-RPCZ_API void handle_invalid_message(error_handler& err_handler);
+// XXX RPCZ_API void handle_invalid_message(error_handler& err_handler);
 
 template <typename Response>
 inline void cpp_handler_wrapper<Response>::operator()(
-    const void* data, size_t size) {
+    const rpc_error* error, const void* data, size_t size) {
   BOOST_ASSERT(data);
   if (handler_.empty())
-    return;  // ignore message
+    return;  // ignore error and message
 
   Response resp;
+  if (error) {
+	handler_(error, resp);
+	return;
+  }
   if (resp.ParseFromArray(data, size)) {
-    handler_(resp);
+    handler_(NULL, resp);
     return;
   }
 
-  // invalid message
-  handle_invalid_message(error_handler_);
+  // invalid message, XXX post to dispose...
+  // XXX handle_invalid_message(error_handler_);
 }  // operator()()
 
 }  // namespace rpcz

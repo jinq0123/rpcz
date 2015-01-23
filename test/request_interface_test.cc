@@ -110,20 +110,13 @@ struct handler {
   SearchResponse response;
   boost::optional<rpc_error> error;
 
-  SearchService_Stub::Search_Handler get_search_handler() {
-    return boost::bind(&handler::on_response, this, _1);
-  }
-  error_handler get_error_handler() {
-    return boost::bind(&handler::on_error, this, _1);
-  }
-
- private:
-  void on_response(const SearchResponse& resp) {
-    response = resp;
-    sync.signal();
-  }
-  void on_error(const rpc_error& err) {
-    error.reset(err);
+  void operator()(const rpc_error* e, const SearchResponse& resp)
+  {
+    if (e) {
+      error.reset(*e);
+	} else {
+      response = resp;
+	}
     sync.signal();
   }
 };
@@ -149,8 +142,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
   request.set_query("timeout");
   handler hdl;
   stub.async_Search(request,
-      hdl.get_search_handler(),
-      hdl.get_error_handler(),
+	  boost::ref(hdl), 
       1/*ms*/);
   hdl.sync.wait();
   ASSERT_TRUE(hdl.error);
@@ -162,9 +154,7 @@ TEST_F(server_test, AsyncRequest) {
   SearchRequest request;
   request.set_query("stone");
   handler hdl;
-  stub.async_Search(request,
-      hdl.get_search_handler(),
-      hdl.get_error_handler());
+  stub.async_Search(request, boost::ref(hdl));
   hdl.sync.wait();
 
   ASSERT_FALSE(hdl.error);

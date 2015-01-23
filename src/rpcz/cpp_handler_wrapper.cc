@@ -11,13 +11,14 @@
 
 namespace rpcz {
 
-void handle_invalid_message(error_handler& err_handler) {
-  if (err_handler.empty())
-    return;
-  err_handler(rpc_error(
-      status::APPLICATION_ERROR,
-      application_error::INVALID_MESSAGE,
-      ""));
-}
+// XXX
+//void handle_invalid_message(error_handler& err_handler) {
+//  if (err_handler.empty())
+//    return;
+//  err_handler(rpc_error(
+//      status::APPLICATION_ERROR,
+//      application_error::INVALID_MESSAGE,
+//      ""));
+//}
 
 }  // namespace rpcz

@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -23,7 +24,6 @@
 
 #include <google/protobuf/stubs/common.h>
 
-#include "rpcz/error_handler.hpp"  // for error_handler
 #include "rpcz/response_message_handler.hpp"  // for response_message_handler
 #include "rpcz/rpcz_api.hpp"
 
@@ -52,7 +52,6 @@ class RPCZ_API rpc_channel {
                           const google::protobuf::MethodDescriptor* method,
                           const google::protobuf::Message& request,
                           const response_message_handler& msg_handler,
-                          const error_handler& err_handler,
                           long deadline_ms) = 0;
 
   virtual void sync_call(const std::string& service_name,

@@ -37,6 +37,21 @@ using namespace std;
 
 namespace rpcz {
 
+class delegate_replier {
+ public:
+  explicit delegate_replier(const replier & replier_copy) :
+      replier_copy_(replier_copy) {
+  }
+  void operator()(const rpc_error* e, const SearchResponse & resp)
+  {
+	  if (e) return;
+	  replier_copy_.send(resp);
+  }
+
+ private:
+  replier replier_copy_;
+};
+
 class SearchServiceImpl : public SearchService {
  public:
   // Will take ownership of backend.
@@ -56,7 +71,7 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "bar") {
       replier_copy.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      backend_->async_Search(request, boost::bind(&replier::send, replier_copy, _1));
+      backend_->async_Search(request, delegate_replier(replier_copy));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
@@ -172,7 +187,8 @@ TEST_F(server_test, SimpleRequestAsync) {
 
   struct hander {
     ::sync_event sync;
-    void operator()(const SearchResponse& resp) {
+    void operator()(const rpc_error* err, const SearchResponse& resp) {
+	  ASSERT_EQ(NULL, err);
       ASSERT_EQ(2, resp.results_size());
       ASSERT_EQ("The search for happiness", resp.results(0));
       sync.signal();
@@ -214,21 +230,22 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   SearchRequest request;
   request.set_query("timeout");
 
-  struct error_handler {
-    ::sync_event sync;
+  // DEL
+  //struct error_handler {
+  //  ::sync_event sync;
 
-    void operator()(const rpc_error& error) {
-      ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
-      sync.signal();
-    }
-  } err_hdl;
+  //  void operator()(const rpc_error& error) {
+  //    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
+  //    sync.signal();
+  //  }
+  //} err_hdl;
 
   // XXX
-  stub.async_Search(request,
-      0,  // No response handler
-      boost::ref(err_hdl),  // error handler
-      1/*timeout ms*/);
-  err_hdl.sync.wait();
+  //stub.async_Search(request,
+  //    0,  // No response handler
+  //    boost::ref(err_hdl),  // error handler
+  //    1/*timeout ms*/);
+  //err_hdl.sync.wait();
 }
 
 TEST_F(server_test, DelegatedRequest) {

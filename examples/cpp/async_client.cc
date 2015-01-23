@@ -8,12 +8,17 @@
 
 #include "cpp/search.pb.h"
 #include "cpp/search.rpcz.h"
+#include "rpcz/rpc_error.hpp"
 #include "rpcz/rpcz.hpp"
 
 using namespace std;
 
-void done(const examples::SearchResponse& response) {
-  cout << response.DebugString() << endl;
+void done(const rpcz::rpc_error* error,
+	const examples::SearchResponse& response) {
+  if (error) 
+	cout << error->what() << endl;
+  else
+    cout << response.DebugString() << endl;
 }
 
 int main() {

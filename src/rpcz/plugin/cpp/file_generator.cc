@@ -63,6 +63,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "#include <rpcz/cpp_service.hpp>\n"
     "#include <rpcz/rpc_error.hpp>\n"
     "#include <rpcz/service_stub.hpp>\n"
+    "#include <boost/function.hpp>\n"
     "\n"
     "namespace google {\n"
     "namespace protobuf {\n"
@@ -73,6 +74,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "namespace rpcz {\n"
     "class replier;\n"
     "class rpc_channel;\n"
+    "class rpc_error;\n"
     "}  // namespace rpcz\n"
     "\n"
     ,
@@ -120,7 +122,6 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     "#include <google/protobuf/stubs/once.h>\n"
     "#include <rpcz/application_error_code.hpp>  // for application_error\n"
     "#include <rpcz/cpp_handler_wrapper.hpp>\n"
-    "#include <rpcz/error_handler.hpp>\n"
     "#include <rpcz/rpcz.hpp>\n"
     "\n"
     "namespace {\n",

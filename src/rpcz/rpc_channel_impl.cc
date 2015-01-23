@@ -120,8 +120,7 @@ void rpc_channel_impl::async_call(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
-    const response_message_handler& msg_handler,
-    const error_handler& err_handler,
+    const response_message_handler& handler,
     long deadline_ms) {
   // XXX CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
   rpc_request_header generic_request;
@@ -146,7 +145,7 @@ void rpc_channel_impl::async_call(
   // rpc_context will be deleted on response or timeout.
   // rpc_context deleted in worker_thread_fun().
   // XXX delete on timeout.
-  rpc_context* ctx = new rpc_context(msg_handler, err_handler, deadline_ms);
+  rpc_context* ctx = new rpc_context(handler, deadline_ms);
   connection_.send_request(msg_vector, ctx);
 }
 
@@ -158,7 +157,7 @@ void rpc_channel_impl::sync_call(
     google::protobuf::Message* response) {
   sync_call_handler handler(response);
   async_call(service_name, method, request,
-      handler, handler.get_error_handler(), deadline_ms);
+      handler, deadline_ms);
   handler.wait();
   rpc_error* err = handler.get_rpc_error();
   if (err)

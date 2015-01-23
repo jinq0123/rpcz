@@ -142,24 +142,23 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
     const VariablesMap& sub_vars, io::Printer* printer) {
   // async interfaces
   printer->Print(sub_vars,
-      "typedef boost::function<void (const $output_type$&)> $name$_Handler;\n");
+      "typedef boost::function<void (const rpcz::rpc_error*, const $output_type$&)> $name$_Handler;\n");
   printer->Print(sub_vars,
       "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler,\n"
-      "    const ::rpcz::error_handler& err_handler,\n"
       "    long deadline_ms);\n");
   printer->Print(sub_vars,
       "inline $virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
-      "    const $name$_Handler& handler,\n"
-      "    const ::rpcz::error_handler& err_handler) {\n"
-      "  async_$name$(request, handler, err_handler, default_deadline_ms_);\n"
+	  "    const $name$_Handler& handler) {\n"
+      "  async_$name$(request, handler, default_deadline_ms_);\n"
       "}\n");
-  printer->Print(sub_vars,
-      "$virtual$void async_$name$(\n"
-      "    const $input_type$& request,\n"
-      "    const $name$_Handler& handler);\n");
+  // DEL
+  //printer->Print(sub_vars,
+  //    "$virtual$void async_$name$(\n"
+  //    "    const $input_type$& request,\n"
+  //    "    const $name$_Handler& handler);\n");
 
   // sync interfaces
   printer->Print(sub_vars,
@@ -363,28 +362,27 @@ void ServiceGenerator::GenerateOneStubMethod(
     "void $classname$_Stub::async_$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler,\n"
-    "    const ::rpcz::error_handler& err_handler,\n"
     "    long deadline_ms) {\n"
     "  // XXX optimize empty handler...\n"
     "  channel_->async_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"
-    "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler, err_handler),\n"
-    "      err_handler,\n"
+    "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler),\n"
     "      deadline_ms);\n"
     "}\n");
-  printer->Print(sub_vars,
-    "void $classname$_Stub::async_$name$(\n"
-    "    const $input_type$& request,\n"
-    "    const $name$_Handler& handler) {\n"
-    "  // XXX optimize empty handler...\n"
-    "  channel_->async_call(service_name_,\n"
-    "      $classname$::descriptor()->method($index$),\n"
-    "      request,\n"
-    "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler, default_error_handler_),\n"
-    "      default_error_handler_,\n"
-    "      default_deadline_ms_);\n"  // XXX input ms
-    "}\n");
+  // DEL
+  //printer->Print(sub_vars,
+  //  "void $classname$_Stub::async_$name$(\n"
+  //  "    const $input_type$& request,\n"
+  //  "    const $name$_Handler& handler) {\n"
+  //  "  // XXX optimize empty handler...\n"
+  //  "  channel_->async_call(service_name_,\n"
+  //  "      $classname$::descriptor()->method($index$),\n"
+  //  "      request,\n"
+  //  "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler, default_error_handler_),\n"
+  //  "      default_error_handler_,\n"
+  //  "      default_deadline_ms_);\n"  // XXX input ms
+  //  "}\n");
 
   // sync methods
   printer->Print(sub_vars,
