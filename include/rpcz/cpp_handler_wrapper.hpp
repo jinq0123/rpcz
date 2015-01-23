@@ -14,16 +14,15 @@ class rpc_error;
 
 // Wrap C++ response handler type to response_message_handler.
 // Response should be subtype of protocol::Message.
-// The 2 input handlers will be copied.
-// Error handler is used when message is invalid.
+// The input handler will be copied.
 template <typename Response>
 struct cpp_handler_wrapper {
 public:
-  typedef boost::function<void (const rpc_error*, const Response&)> handler;
+  typedef boost::function<void (const rpc_error*, const Response&)> cpp_handler;
 
 public:
-  inline explicit cpp_handler_wrapper(const handler& hdl) :
-      handler_(hdl) {
+  inline explicit cpp_handler_wrapper(const cpp_handler& hdl) :
+      cpp_handler_(hdl) {
   }
 
 public:
@@ -31,7 +30,7 @@ public:
 	  const void* data, size_t size);
 
 private:
-  handler handler_;
+  cpp_handler cpp_handler_;
 };
 
 // XXX RPCZ_API void handle_invalid_message(error_handler& err_handler);
@@ -39,17 +38,17 @@ private:
 template <typename Response>
 inline void cpp_handler_wrapper<Response>::operator()(
     const rpc_error* error, const void* data, size_t size) {
-  BOOST_ASSERT(data);
-  if (handler_.empty())
+  if (cpp_handler_.empty())
     return;  // ignore error and message
 
   Response resp;
   if (error) {
-	handler_(error, resp);
+	cpp_handler_(error, resp);
 	return;
   }
+  BOOST_ASSERT(data);
   if (resp.ParseFromArray(data, size)) {
-    handler_(NULL, resp);
+    cpp_handler_(NULL, resp);
     return;
   }
 
