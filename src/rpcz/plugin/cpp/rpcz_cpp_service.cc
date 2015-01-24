@@ -142,7 +142,8 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
     const VariablesMap& sub_vars, io::Printer* printer) {
   // async interfaces
   printer->Print(sub_vars,
-      "typedef boost::function<void (const rpcz::rpc_error*, const $output_type$&)> $name$_Handler;\n");
+      "typedef boost::function<void (const rpcz::rpc_error*,\n"
+      "    const $output_type$&)> $name$_Handler;\n");
   printer->Print(sub_vars,
       "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
@@ -158,6 +159,11 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
       "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    long deadline_ms);\n");
+  printer->Print(sub_vars,
+      "inline $virtual$void async_$name$(\n"
+      "    const $input_type$& request) {\n"
+      "  async_$name$(request, default_deadline_ms_);\n"
+      "}\n");
 
   // sync interfaces
   printer->Print(sub_vars,
