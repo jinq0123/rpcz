@@ -25,7 +25,7 @@ void rpc_context::handle_error(status_code status,
   int application_error_code,
   const std::string& error_message) {
   if (handler_.empty())
-	  return;
+    return;
   rpc_error e(status, application_error_code, error_message);
   handler_(&e, NULL, 0);
 }

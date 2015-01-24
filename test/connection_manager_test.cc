@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,6 +14,7 @@
 // limitations under the License.
 //
 // Author: nadavs@google.com <Nadav Samet>
+//         Jin Qing (http://blog.csdn.net/jq0123)
 
 #include <boost/lexical_cast.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -28,8 +30,10 @@
 #include "rpcz/client_connection.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/connection_manager.hpp"
+#include "rpcz/rpc_context.hpp"
+#include "rpcz/rpc_error.hpp"
+#include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
-#include "sync_event.hpp"
 
 namespace rpcz {
 
@@ -94,31 +98,27 @@ message_vector* create_quit_request() {
   return request;
 }
 
-void expect_timeout(connection_manager_status status,
-    message_iterator& iter, ::sync_event* sync) {
-  ASSERT_EQ(CMSTATUS_DEADLINE_EXCEEDED, status);
-  ASSERT_FALSE(iter.has_more());
-  sync->signal();
-}
-
-#if 0  // XXX
 TEST_F(connection_manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_connection_manager_threads(4);
-
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
-
   connection_manager_ptr cm = connection_manager::get();
   connection connection(cm->connect("inproc://server.test"));
   scoped_ptr<message_vector> request(create_simple_request());
 
-  ::sync_event event;
-  connection.send_request(*request, 0,
-                         boost::bind(&expect_timeout, _1, _2, &event));
-  event.wait();
+  struct handler {
+    rpcz::sync_event event;
+    void operator()(const rpc_error* error, const void*, size_t) {
+      ASSERT_TRUE(error);
+      ASSERT_EQ(status::DEADLINE_EXCEEDED, error->get_status());
+      event.signal();
+    }
+  } hdl;
+
+  connection.send_request(*request, new rpc_context(boost::ref(hdl), 0));
+  hdl.event.wait();
 }
-#endif  // XXX
 
 #if 0  // XXX
 class barrier_closure : public client_request_callback {
@@ -177,9 +177,9 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   }
   group.join_all();
   scoped_ptr<message_vector> request(create_quit_request());
-  ::sync_event event;
+  rpcz::sync_event event;
   connection.send_request(*request, -1,
-                         boost::bind(&::sync_event::signal, &event));
+                         boost::bind(&rpcz::sync_event::signal, &event));
   event.wait();
   thread.join();
 }

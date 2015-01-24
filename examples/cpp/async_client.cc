@@ -14,9 +14,9 @@
 using namespace std;
 
 void done(const rpcz::rpc_error* error,
-	const examples::SearchResponse& response) {
+    const examples::SearchResponse& response) {
   if (error) 
-	cout << error->what() << endl;
+    cout << error->what() << endl;
   else
     cout << response.DebugString() << endl;
 }

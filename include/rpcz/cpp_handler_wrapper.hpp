@@ -27,7 +27,7 @@ public:
 
 public:
   inline void operator()(const rpc_error* error,
-	  const void* data, size_t size);
+      const void* data, size_t size);
 
 private:
   cpp_handler cpp_handler_;
@@ -43,8 +43,8 @@ inline void cpp_handler_wrapper<Response>::operator()(
 
   Response resp;
   if (error) {
-	cpp_handler_(error, resp);
-	return;
+    cpp_handler_(error, resp);
+    return;
   }
   BOOST_ASSERT(data);
   if (resp.ParseFromArray(data, size)) {

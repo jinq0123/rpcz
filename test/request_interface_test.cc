@@ -29,7 +29,7 @@
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
-#include "sync_event.hpp"
+#include "rpcz/sync_event.hpp"
 
 #include "proto/search.pb.h"
 #include "proto/search.rpcz.h"
@@ -106,7 +106,7 @@ protected:
 };
 
 struct handler {
-  ::sync_event sync;
+  rpcz::sync_event sync;
   SearchResponse response;
   boost::optional<rpc_error> error;
 
@@ -114,9 +114,9 @@ struct handler {
   {
     if (e) {
       error.reset(*e);
-	} else {
+    } else {
       response = resp;
-	}
+    }
     sync.signal();
   }
 };
@@ -142,7 +142,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
   request.set_query("timeout");
   handler hdl;
   stub.async_Search(request,
-	  boost::ref(hdl), 
+      boost::ref(hdl), 
       1/*ms*/);
   hdl.sync.wait();
   ASSERT_TRUE(hdl.error);

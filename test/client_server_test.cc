@@ -28,7 +28,7 @@
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
-#include "sync_event.hpp"
+#include "rpcz/sync_event.hpp"
 
 #include "proto/search.pb.h"
 #include "proto/search.rpcz.h"
@@ -44,8 +44,8 @@ class delegate_replier {
   }
   void operator()(const rpc_error* e, const SearchResponse & resp)
   {
-	  if (e) return;
-	  replier_copy_.send(resp);
+    if (e) return;
+    replier_copy_.send(resp);
   }
 
  private:
@@ -96,7 +96,7 @@ class SearchServiceImpl : public SearchService {
     }
   }
 
-  ::sync_event timeout_request_received;
+  rpcz::sync_event timeout_request_received;
 
  private:
   scoped_ptr<SearchService_Stub> backend_;
@@ -186,9 +186,9 @@ TEST_F(server_test, SimpleRequestAsync) {
   request.set_query("happiness");
 
   struct hander {
-    ::sync_event sync;
+    rpcz::sync_event sync;
     void operator()(const rpc_error* err, const SearchResponse& resp) {
-	  ASSERT_EQ(NULL, err);
+      ASSERT_EQ(NULL, err);
       ASSERT_EQ(2, resp.results_size());
       ASSERT_EQ("The search for happiness", resp.results(0));
       sync.signal();
@@ -230,22 +230,20 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
   SearchRequest request;
   request.set_query("timeout");
 
-  // DEL
-  //struct error_handler {
-  //  ::sync_event sync;
+  struct handler {
+    rpcz::sync_event sync;
 
-  //  void operator()(const rpc_error& error) {
-  //    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
-  //    sync.signal();
-  //  }
-  //} err_hdl;
+    void operator()(const rpc_error* error, const SearchResponse &) {
+      ASSERT_TRUE(error);
+      ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error->get_status());
+      sync.signal();
+    }
+  } hdl;
 
-  // XXX
-  //stub.async_Search(request,
-  //    0,  // No response handler
-  //    boost::ref(err_hdl),  // error handler
-  //    1/*timeout ms*/);
-  //err_hdl.sync.wait();
+  stub.async_Search(request,
+      boost::ref(hdl),
+      1/*timeout ms*/);
+  hdl.sync.wait();
 }
 
 TEST_F(server_test, DelegatedRequest) {

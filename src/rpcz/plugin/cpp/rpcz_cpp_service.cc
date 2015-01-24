@@ -151,7 +151,7 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
   printer->Print(sub_vars,
       "inline $virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
-	  "    const $name$_Handler& handler) {\n"
+      "    const $name$_Handler& handler) {\n"
       "  async_$name$(request, handler, default_deadline_ms_);\n"
       "}\n");
   // DEL

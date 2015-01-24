@@ -24,7 +24,7 @@ class sync_call_handler {
 
  public:
   inline void operator()(const rpc_error* error,
-	  const void* data, size_t size);
+      const void* data, size_t size);
   inline void wait() { state_->sync.wait(); }
   inline rpc_error* get_rpc_error() const { return state_->error.get(); }
 
@@ -49,12 +49,12 @@ inline sync_call_handler::sync_call_handler(
 }
 
 inline void sync_call_handler::operator()(
-	const rpc_error* error,
-	const void* data, size_t size) {
+    const rpc_error* error,
+    const void* data, size_t size) {
   if (error) {
-	handle_error(*error);
-	signal();
-	return;
+    handle_error(*error);
+    signal();
+    return;
   }
   BOOST_ASSERT(data);
   if (NULL == state_->response) {
