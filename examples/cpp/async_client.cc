@@ -1,5 +1,4 @@
-// Licensed under the Apache License, Version 2.0 (the "License");
-//     http://www.apache.org/licenses/LICENSE-2.0
+// Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
 // Asynchronous client example.
@@ -24,7 +23,6 @@ void done(const rpcz::rpc_error* error,
 int main() {
   examples::SearchService_Stub search_stub("tcp://localhost:5555");
   examples::SearchRequest request;
-  examples::SearchResponse response;
   request.set_query("gold");
 
   cout << "Sending request." << endl;

@@ -22,31 +22,53 @@ which zsendrpc need.
 
 Example
 --------
-### Client
-See example_client.cc
+### Sync Client
+See sync_client.cc
 
-		SearchService_Stub search_stub("tcp://localhost:5555");
-		SearchRequest request;
-		request.set_query("gold");
-		SearchResponse response = search_stub.Search(request);
+    SearchService_Stub search_stub("tcp://localhost:5555");
+    SearchRequest request;
+    request.set_query("gold");
+    SearchResponse response = search_stub.Search(request);
 
 ### Server
 See example_server.cc
 
-        class SearchServiceImpl : public SearchService {
-          virtual void Search(const SearchRequest& request,
-                              rpcz::replier replier_copy) {
-            SearchResponse response;
-            response.add_results("result1 for " + request.query());
-            response.add_results("this is result2");
-            replier_copy.send(response);
-          }
-        };
-        
-        int main() {
-          rpcz::server svr;
-          svr.register_service<SearchServiceImpl>();
-          svr.bind("tcp://*:5555");
-          rpcz::application::run();
-        }
-        
+    class SearchServiceImpl : public SearchService {
+      virtual void Search(const SearchRequest& request,
+                          rpcz::replier replier_copy) {
+        SearchResponse response;
+        response.add_results("result1 for " + request.query());
+        response.add_results("this is result2");
+        replier_copy.send(response);
+      }
+    };
+    
+    int main() {
+      rpcz::server svr;
+      svr.register_service<SearchServiceImpl>();
+      svr.bind("tcp://*:5555");
+      rpcz::application::run();
+    }
+
+### Async Client
+See async_client.cc
+
+    void done(const rpcz::rpc_error* error,
+        const SearchResponse& response) {
+      if (error) 
+        cout << error->what() << endl;
+      else
+        cout << response.DebugString() << endl;
+    }
+    
+    int main() {
+      SearchService_Stub search_stub("tcp://localhost:5555");
+      SearchRequest request;
+      request.set_query("gold");
+    
+      search_stub.async_Search(request, done);
+    
+      // Do other works...
+      cin.get();
+    }
+    
