@@ -160,21 +160,25 @@ TEST_F(server_test, AsyncOnewayRequest) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
   request.set_query("rocket");
-  // XXX fix crash on reset...
-  //stub.async_Search(request, 0/*ms*/);
-  //stub.async_Search(request, 1/*ms*/);
-  //stub.async_Search(request, 10/*ms*/);
-  //stub.async_Search(request, 1000/*ms*/);
-  //stub.async_Search(request, 10000/*ms*/);
-  //stub.async_Search(request, -1/*ms*/);
+  stub.async_Search(request, 0/*ms*/);
+  stub.async_Search(request, 1/*ms*/);
+  stub.async_Search(request, 10/*ms*/);
+  stub.async_Search(request, 1000/*ms*/);
+  stub.async_Search(request, 10000/*ms*/);
+  stub.async_Search(request, -1/*ms*/);
+
+  // Sync request to end. Crash on reset if not.
+  (void)stub.Search(request);
 }
 
 TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
   request.set_query("robot");
-  // XXX fix crash on reset...
-  //stub.async_Search(request);
+  stub.async_Search(request);
+
+  // Sync request to end. Crash on reset if not.
+  (void)stub.Search(request);
 }
 
 // Sync interfaces:
