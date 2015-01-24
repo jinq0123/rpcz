@@ -6,7 +6,10 @@
 #define RPCZ_CPP_HANDLER_WRAPPER_HPP
 
 #include <boost/function.hpp>
+#include "rpcz/application_error_code.hpp"
+#include "rpcz/rpc_error.hpp"
 #include "rpcz/rpcz_api.hpp"
+#include "rpcz/status_code.hpp"
 
 namespace rpcz {
 
@@ -33,8 +36,6 @@ private:
   cpp_handler cpp_handler_;
 };
 
-// XXX RPCZ_API void handle_invalid_message(error_handler& err_handler);
-
 template <typename Response>
 inline void cpp_handler_wrapper<Response>::operator()(
     const rpc_error* error, const void* data, size_t size) {
@@ -52,8 +53,11 @@ inline void cpp_handler_wrapper<Response>::operator()(
     return;
   }
 
-  // invalid message, XXX post to dispose...
-  // XXX handle_invalid_message(error_handler_);
+  // invalid message
+  rpc_error e(status::APPLICATION_ERROR,
+      application_error::INVALID_MESSAGE,
+      "");
+  cpp_handler_(&e, resp);
 }  // operator()()
 
 }  // namespace rpcz
