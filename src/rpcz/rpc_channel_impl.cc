@@ -151,9 +151,9 @@ void rpc_channel_impl::sync_call(
     google::protobuf::Message* response) {
   sync_call_handler handler(response);
   async_call(service_name, method, request,
-      handler, deadline_ms);
+      boost::ref(handler), deadline_ms);
   handler.wait();
-  rpc_error* err = handler.get_rpc_error();
+  const rpc_error* err = handler.get_rpc_error();
   if (err)
     throw *err;
 }

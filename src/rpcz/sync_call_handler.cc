@@ -11,7 +11,7 @@
 namespace rpcz {
 
 void sync_call_handler::handle_error(const rpc_error& err) {
-  state_->error.reset(new rpc_error(err));  // scoped_ptr
+  error_ = err;
 }
 
 void sync_call_handler::handle_invalid_message() {
