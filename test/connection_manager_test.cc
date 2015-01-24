@@ -120,12 +120,11 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
   hdl.event.wait();
 }
 
-#if 0  // XXX
-class barrier_closure : public client_request_callback {
+class barrier_handler {
  public:
-  barrier_closure() : count_(0) {}
+  barrier_handler() : count_(0) {}
 
-  void run(connection_manager_status status, message_iterator& iter) {
+  void operator()(const rpc_error*, const void*, size_t) {
     boost::unique_lock<boost::mutex> lock(mutex_);
     ++count_;
     cond_.notify_all();
@@ -143,25 +142,20 @@ class barrier_closure : public client_request_callback {
   boost::condition_variable cond_;
   int count_;
 };
-#endif  // XXX
 
-#if 0  // XXX
 void SendManyMessages(connection connection, int thread_id) {
   boost::ptr_vector<message_vector> requests;
   const int request_count = 100;
-  barrier_closure barrier;
+  barrier_handler barrier;
   for (int i = 0; i < request_count; ++i) {
     message_vector* request = create_simple_request(
         thread_id * request_count * 17 + i);
     requests.push_back(request);
-    connection.send_request(*request, -1,
-                            boost::bind(&barrier_closure::run, &barrier, _1, _2));
+    connection.send_request(*request, new rpc_context(boost::ref(barrier), -1));
   }
   barrier.wait(request_count);
 }
-#endif  // XXX
 
-#if 0  // XXX
 TEST_F(connection_manager_test, ManyClientsTest) {
   ASSERT_TRUE(connection_manager::is_destroyed());
   application::set_connection_manager_threads(4);
@@ -177,13 +171,17 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   }
   group.join_all();
   scoped_ptr<message_vector> request(create_quit_request());
-  rpcz::sync_event event;
-  connection.send_request(*request, -1,
-                         boost::bind(&rpcz::sync_event::signal, &event));
-  event.wait();
+
+  struct handler {
+    rpcz::sync_event event;
+    void operator()(const rpc_error*, const void*, size_t) {
+      event.signal();
+    }
+  } hdl;
+  connection.send_request(*request, new rpc_context(boost::ref(hdl), -1));
+  hdl.event.wait();
   thread.join();
 }
-#endif  // XXX
 
 TEST_F(connection_manager_test, TestUnbind) {
   ASSERT_TRUE(connection_manager::is_destroyed());
