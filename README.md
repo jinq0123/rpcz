@@ -72,3 +72,15 @@ See async_client.cc
       cin.get();
     }
     
+### Async Handlers Using boost::bind
+See async_client_adv.cc
+
+    context ctx = { 123 };
+    search_stub.async_Search(request,
+        boost::bind(handler_fun, _1, _2, ctx));
+    search_stub.async_Search(request,
+        boost::bind(handler_fun, _1, _2, boost::ref(ctx)));
+  
+    handler hdl;
+    search_stub.async_Search(request,
+        boost::bind(&handler::fun, &hdl, _1, _2));
