@@ -49,19 +49,15 @@ class SearchServiceImpl : public SearchService {
   virtual void Search(
       const SearchRequest& request,
       replier replier_copy) {
-    if (request.query() == "foo") {
-      replier_copy.send_error(-4, "I don't like foo.");
-    } else if (request.query() == "bar") {
-      replier_copy.send_error(17, "I don't like bar.");
-    } else if (request.query() == "timeout") {
+    if (request.query() == "timeout") {
       // We "lose" the request.
       return;
-    } else {
-      SearchResponse response;
-      response.add_results("The search for " + request.query());
-      response.add_results("is great");
-      replier_copy.send(response);
     }
+
+    SearchResponse response;
+    response.add_results("The search for " + request.query());
+    response.add_results("is great");
+    replier_copy.send(response);
   }
 };
 
@@ -164,13 +160,20 @@ TEST_F(server_test, AsyncOnewayRequest) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
   request.set_query("rocket");
-  // XXX fix crach on reset...
+  // XXX fix crash on reset...
   //stub.async_Search(request, 0/*ms*/);
   //stub.async_Search(request, 1/*ms*/);
   //stub.async_Search(request, 10/*ms*/);
   //stub.async_Search(request, 1000/*ms*/);
   //stub.async_Search(request, 10000/*ms*/);
   //stub.async_Search(request, -1/*ms*/);
+}
+
+TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  request.set_query("robot");
+  // XXX fix crash on reset...
   //stub.async_Search(request);
 }
 
@@ -179,48 +182,39 @@ TEST_F(server_test, AsyncOnewayRequest) {
 TEST_F(server_test, SyncRequest) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
+  request.set_query("student");
+  SearchResponse response;
+  stub.Search(request, 5000/*ms*/, &response);
+  ASSERT_EQ(2, response.results_size());
+  ASSERT_EQ("The search for student", response.results(0));
+}
+
+TEST_F(server_test, SyncRequestDefaultMs) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
   request.set_query("stupid");
-  SearchResponse response = stub.Search(request);
+  SearchResponse response;
+  stub.Search(request, &response);
   ASSERT_EQ(2, response.results_size());
   ASSERT_EQ("The search for stupid", response.results(0));
 }
 
-TEST_F(server_test, RequestWithError) {
+TEST_F(server_test, SyncRequestReturn) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
-  request.set_query("foo");
-  try {
-    (void)stub.Search(request);
-    ASSERT_TRUE(false);
-  } catch (const rpc_error& error) {
-    ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, error.get_status());
-    ASSERT_EQ("I don't like foo.", error.get_error_message());
-  }
+  request.set_query("spool");
+  SearchResponse response = stub.Search(request, 5000/*ms*/);
+  ASSERT_EQ(2, response.results_size());
+  ASSERT_EQ("The search for spool", response.results(0));
 }
 
-TEST_F(server_test, RequestWithTimeout) {
+TEST_F(server_test, SyncRequestReturnDefaultMs) {
   SearchService_Stub stub(rpc_channel::create(*connection_), true);
   SearchRequest request;
-  request.set_query("timeout");
-  try {
-    (void)stub.Search(request, 1/*ms*/);
-    ASSERT_TRUE(false);
-  } catch (const rpc_error& error) {
-    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
-  }
-}
-
-TEST_F(server_test, RequestRaisesExceptions) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
-  SearchRequest request;
-  request.set_query("foo");
-  try {
-    (void)stub.Search(request);
-    ASSERT_TRUE(false);
-  } catch (const rpc_error& error) {
-    ASSERT_EQ(status::APPLICATION_ERROR, error.get_status());
-    ASSERT_EQ(-4, error.get_application_error_code());
-  }
+  request.set_query("star");
+  SearchResponse response = stub.Search(request);
+  ASSERT_EQ(2, response.results_size());
+  ASSERT_EQ("The search for star", response.results(0));
 }
 
 // Other interfaces:

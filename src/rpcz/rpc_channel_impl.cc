@@ -67,15 +67,9 @@ rpc_channel_impl::~rpc_channel_impl() {
 //  msg_vector.push_back(msg_out.release());
 //  msg_vector.push_back(payload_out.release());
 //
-//  // XXX Merge rpc_context and rpc_controller.
 //  // rpc_context will be deleted on response or timeout.
 //  rpc_context* ctx = new rpc_context(
 //      response_message_handler(), error_handler(), -1);  // XXX
-//  // XXX ctx->rpc_controller = rpc_controller;
-//  // XXX ctx->user_closure = done;
-//  // DEL ctx->response_str = response_str;
-//  // DEL ctx->response_msg = response_msg;
-//  rpc_controller->set_status(status::ACTIVE);
 //  connection_.send_request(msg_vector, ctx);
 //}
 

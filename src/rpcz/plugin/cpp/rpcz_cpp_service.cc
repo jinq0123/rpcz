@@ -169,21 +169,23 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
+      "    long deadline_ms,\n"
+      "    $output_type$* response);\n");
+  printer->Print(sub_vars,
+      "$virtual$void $name$(\n"
+      "    const $input_type$& request,\n"
       "    $output_type$* response) {\n"
       "  $name$(request, default_deadline_ms_, response);\n"
       "}\n");
   printer->Print(sub_vars,
-      "$virtual$void $name$(\n"
-      "    const $input_type$& request,\n"
-      "    long deadline_ms,\n"
-      "    $output_type$* response);\n");
-  printer->Print(sub_vars,
-      "$virtual$$output_type$ $name$(\n"
-      "    const $input_type$& request);\n");
-  printer->Print(sub_vars,
       "$virtual$$output_type$ $name$(\n"
       "    const $input_type$& request,\n"
       "    long deadline_ms);\n");
+  printer->Print(sub_vars,
+      "$virtual$$output_type$ $name$(\n"
+      "    const $input_type$& request) {\n"
+      "  return $name$(request, default_deadline_ms_);\n"
+      "}\n");
 }
 
 void ServiceGenerator::GenerateOneMethodSignature(
@@ -395,13 +397,6 @@ void ServiceGenerator::GenerateOneStubMethod(
     "  channel_->sync_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request, deadline_ms, response);\n"
-    "}\n");
-  printer->Print(sub_vars,
-    "$output_type$ $classname$_Stub::$name$(\n"
-    "    const $input_type$& request) {\n"
-    "  $output_type$ response;\n"
-    "  $name$(request, &response);\n"
-    "  return response;\n"
     "}\n");
   printer->Print(sub_vars,
     "$output_type$ $classname$_Stub::$name$(\n"
