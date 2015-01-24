@@ -162,6 +162,13 @@ TEST_F(server_test, AsyncRequest) {
   ASSERT_EQ("The search for stone", hdl.response.results(0));
 }
 
+TEST_F(server_test, AsyncOnewayRequestTimeout) {
+  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchRequest request;
+  request.set_query("rocket");
+  stub.async_Search(request, 1/*ms*/);
+}
+
 // Sync interfaces:
 
 TEST_F(server_test, SyncRequest) {

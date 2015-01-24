@@ -154,11 +154,10 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
       "    const $name$_Handler& handler) {\n"
       "  async_$name$(request, handler, default_deadline_ms_);\n"
       "}\n");
-  // DEL
-  //printer->Print(sub_vars,
-  //    "$virtual$void async_$name$(\n"
-  //    "    const $input_type$& request,\n"
-  //    "    const $name$_Handler& handler);\n");
+  printer->Print(sub_vars,
+      "$virtual$void async_$name$(\n"
+      "    const $input_type$& request,\n"
+      "    long deadline_ms);\n");
 
   // sync interfaces
   printer->Print(sub_vars,
@@ -363,26 +362,23 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler,\n"
     "    long deadline_ms) {\n"
-    "  // XXX optimize empty handler...\n"
     "  channel_->async_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler),\n"
     "      deadline_ms);\n"
     "}\n");
-  // DEL
-  //printer->Print(sub_vars,
-  //  "void $classname$_Stub::async_$name$(\n"
-  //  "    const $input_type$& request,\n"
-  //  "    const $name$_Handler& handler) {\n"
-  //  "  // XXX optimize empty handler...\n"
-  //  "  channel_->async_call(service_name_,\n"
-  //  "      $classname$::descriptor()->method($index$),\n"
-  //  "      request,\n"
-  //  "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler, default_error_handler_),\n"
-  //  "      default_error_handler_,\n"
-  //  "      default_deadline_ms_);\n"  // XXX input ms
-  //  "}\n");
+  printer->Print(sub_vars,
+    "void $classname$_Stub::async_$name$(\n"
+    "    const $input_type$& request,\n"
+    "    long deadline_ms) {\n"
+    "  // optimized for empty handler\n"
+    "  channel_->async_call(service_name_,\n"
+    "      $classname$::descriptor()->method($index$),\n"
+    "      request,\n"
+    "      rpcz::response_message_handler(),\n"
+    "      deadline_ms);\n"
+    "}\n");
 
   // sync methods
   printer->Print(sub_vars,

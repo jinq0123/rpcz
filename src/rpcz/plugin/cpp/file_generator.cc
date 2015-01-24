@@ -122,6 +122,7 @@ void FileGenerator::GenerateSource(io::Printer* printer) {
     "#include <google/protobuf/stubs/once.h>\n"
     "#include <rpcz/application_error_code.hpp>  // for application_error\n"
     "#include <rpcz/cpp_handler_wrapper.hpp>\n"
+    "#include <rpcz/response_message_handler.hpp>\n"
     "#include <rpcz/rpcz.hpp>\n"
     "\n"
     "namespace {\n",
