@@ -103,11 +103,9 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(vars_,
-    "$classname$_Stub(\n"
-    "    ::rpcz::rpc_channel* channel,\n"
-    "    bool owns_channel=false);\n"
+    "explicit $classname$_Stub(::rpcz::rpc_channel_ptr channel);\n"
     "explicit $classname$_Stub(const ::std::string& endpoint);  // like: \"tcp://a.com:5566\"\n"
-    "~$classname$_Stub();\n"
+    "virtual ~$classname$_Stub();\n"
     "\n");
 
   GenerateMethodSignatures(NON_VIRTUAL, printer, true);
@@ -234,19 +232,14 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
   // Generate stub implementation.
   printer->Print(vars_,
     "$classname$_Stub::$classname$_Stub(\n"
-    "    ::rpcz::rpc_channel* channel,\n"
-    "    bool owns_channel)\n"
+    "    ::rpcz::rpc_channel_ptr channel)\n"
     "  : service_stub(channel,\n"
-    "                 $classname$::descriptor()->name(),\n"
-    "                 owns_channel) {}\n"
+    "                 $classname$::descriptor()->name()) {}\n"
     "$classname$_Stub::$classname$_Stub(\n"
     "    const ::std::string& endpoint)\n"
-    "  : service_stub(::rpcz::rpc_channel::create(endpoint),\n"
-    "                 $classname$::descriptor()->name(),\n"
-    "                 true) {}\n"
-    "$classname$_Stub::~$classname$_Stub() {\n"
-    "  if (owns_channel_) delete channel_;\n"
-    "}\n"
+    "  : service_stub(::rpcz::rpc_channel::make_shared(endpoint),\n"
+    "                 $classname$::descriptor()->name()) {}\n"
+    "$classname$_Stub::~$classname$_Stub() {}\n"
     "\n");
 
   GenerateStubMethods(printer);

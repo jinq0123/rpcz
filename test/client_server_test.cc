@@ -153,7 +153,7 @@ class server_test : public ::testing::Test {
     *backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_service_.reset(new SearchServiceImpl(
-        new SearchService_Stub(rpc_channel::create(*backend_connection_), true)));
+        new SearchService_Stub(rpc_channel::make_shared(*backend_connection_))));
     frontend_server_->register_singleton_service(*frontend_service_);
     frontend_server_->bind("inproc://myserver.frontend");
     *frontend_connection_ = cm->connect("inproc://myserver.frontend");
@@ -172,7 +172,7 @@ protected:
 };
 
 TEST_F(server_test, SimpleRequest) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("happiness");
   SearchResponse response = stub.Search(request);
@@ -181,7 +181,7 @@ TEST_F(server_test, SimpleRequest) {
 }
 
 TEST_F(server_test, SimpleRequestAsync) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("happiness");
 
@@ -199,7 +199,7 @@ TEST_F(server_test, SimpleRequestAsync) {
 }
 
 TEST_F(server_test, SimpleRequestWithError) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("foo");
   try {
@@ -212,7 +212,7 @@ TEST_F(server_test, SimpleRequestWithError) {
 }
 
 TEST_F(server_test, SimpleRequestWithTimeout) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("timeout");
   try {
@@ -226,7 +226,7 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
 }
 
 TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("timeout");
 
@@ -247,7 +247,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
 }
 
 TEST_F(server_test, DelegatedRequest) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("delegate");
   SearchResponse response = stub.Search(request);
@@ -255,7 +255,7 @@ TEST_F(server_test, DelegatedRequest) {
 }
 
 TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   SearchResponse response;
   request.set_query("foo");
@@ -269,7 +269,7 @@ TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
 }
 
 TEST_F(server_test, EasyBlockingRequestWithTimeout) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   SearchResponse response;
   request.set_query("timeout");
@@ -287,7 +287,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
 }
 
 TEST_F(server_test, ConnectionManagerTermination) {
-  SearchService_Stub stub(rpc_channel::create(*frontend_connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*frontend_connection_));
   SearchRequest request;
   request.set_query("terminate");
   try {

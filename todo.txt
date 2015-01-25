@@ -5,8 +5,6 @@
                    bool owns_channel=false);
   ::std::string service_name_;
 
-* Delete 
-  bool owns_channel=false
-  
 * Replace std::map with boost::unordered_map.
   
+* rpc_channel and connection are the same thing?

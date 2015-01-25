@@ -131,7 +131,7 @@ Ordered as the declaration in search.rpcz.h.
 // Async interfaces:
 
 TEST_F(server_test, AsyncRequestWithTimeout) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("timeout");
   handler hdl;
@@ -144,7 +144,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
 }
 
 TEST_F(server_test, AsyncRequest) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("stone");
   handler hdl;
@@ -157,7 +157,7 @@ TEST_F(server_test, AsyncRequest) {
 }
 
 TEST_F(server_test, AsyncOnewayRequest) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("rocket");
   stub.async_Search(request, 0/*ms*/);
@@ -172,7 +172,7 @@ TEST_F(server_test, AsyncOnewayRequest) {
 }
 
 TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("robot");
   stub.async_Search(request);
@@ -184,7 +184,7 @@ TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
 // Sync interfaces:
 
 TEST_F(server_test, SyncRequest) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("student");
   SearchResponse response;
@@ -194,7 +194,7 @@ TEST_F(server_test, SyncRequest) {
 }
 
 TEST_F(server_test, SyncRequestDefaultMs) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("stupid");
   SearchResponse response;
@@ -204,7 +204,7 @@ TEST_F(server_test, SyncRequestDefaultMs) {
 }
 
 TEST_F(server_test, SyncRequestReturn) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("spool");
   SearchResponse response = stub.Search(request, 5000/*ms*/);
@@ -213,7 +213,7 @@ TEST_F(server_test, SyncRequestReturn) {
 }
 
 TEST_F(server_test, SyncRequestReturnDefaultMs) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("star");
   SearchResponse response = stub.Search(request);
@@ -224,7 +224,7 @@ TEST_F(server_test, SyncRequestReturnDefaultMs) {
 // Other interfaces:
 
 TEST_F(server_test, SetDefaulDeadlineMs) {
-  SearchService_Stub stub(rpc_channel::create(*connection_), true);
+  SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   SearchResponse response;
   request.set_query("timeout");

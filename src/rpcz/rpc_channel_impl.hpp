@@ -27,7 +27,7 @@ class closure;
 
 class rpc_channel_impl: public rpc_channel {
  public:
-  rpc_channel_impl(connection connection);
+  rpc_channel_impl(const connection& connection);
 
   virtual ~rpc_channel_impl();
 

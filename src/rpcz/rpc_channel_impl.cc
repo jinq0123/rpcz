@@ -26,8 +26,8 @@
 
 namespace rpcz {
 
-rpc_channel_impl::rpc_channel_impl(connection connection)
-    : connection_(connection) {
+rpc_channel_impl::rpc_channel_impl(const connection& connection)
+    : connection_(connection) {  // connection copy
 }
 
 rpc_channel_impl::~rpc_channel_impl() {

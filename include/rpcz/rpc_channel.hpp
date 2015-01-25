@@ -25,6 +25,7 @@
 #include <google/protobuf/stubs/common.h>
 
 #include "rpcz/response_message_handler.hpp"  // for response_message_handler
+#include "rpcz/rpc_channel_ptr.hpp"
 #include "rpcz/rpcz_api.hpp"
 
 namespace google {
@@ -71,12 +72,10 @@ class RPCZ_API rpc_channel {
   //                         rpc_controller* rpc_controller,
   //                         closure* done) = 0;
 
-  static rpc_channel* create(connection connection);
+  static rpc_channel_ptr make_shared(const connection& connection);
 
-  // Creates an rpc_channel to the given endpoint. Attach it to a Stub and you
-  // can start making calls through this channel from any thread. No locking
-  // needed. It is your responsibility to delete this object.
-  static rpc_channel* create(const std::string& endpoint);
+  // Creates an rpc_channel to the given endpoint.
+  static rpc_channel_ptr make_shared(const std::string& endpoint);
 
   virtual ~rpc_channel() {};
 };  // class rpc_channel
