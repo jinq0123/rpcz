@@ -14,11 +14,11 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "reactor.hpp"
+#include <rpcz/reactor.hpp>
 
-#include "clock.hpp"
-#include "logging.hpp"
-#include "rpcz/callback.hpp"
+#include <rpcz/callback.hpp>
+#include <rpcz/clock.hpp>
+#include <rpcz/logging.hpp>
 
 namespace rpcz {
 namespace {

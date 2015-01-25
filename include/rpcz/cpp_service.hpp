@@ -18,8 +18,8 @@
 #ifndef RPCZ_CPP_SERVICE_H
 #define RPCZ_CPP_SERVICE_H
 
-#include "rpcz/iservice.hpp"
-#include "rpcz/rpcz_api.hpp"
+#include <rpcz/iservice.hpp>
+#include <rpcz/rpcz_api.hpp>
 
 namespace google {
 namespace protobuf {

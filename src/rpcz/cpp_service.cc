@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpcz/cpp_service.hpp"
+#include <rpcz/cpp_service.hpp>
 
 #include <assert.h>
 #include <string>
@@ -23,10 +23,10 @@
 #include <google/protobuf/descriptor.h>  // for FindMethodByName()
 #include <google/protobuf/message.h>  // for Message
 
-#include "logging.hpp"  // for INFO
-#include "rpcz/application_error_code.hpp"  // for application_error
-#include "rpcz/common.hpp"  // for scoped_ptr
-#include "rpcz/replier.hpp"
+#include <rpcz/application_error_code.hpp>  // for application_error
+#include <rpcz/common.hpp>  // for scoped_ptr
+#include <rpcz/logging.hpp>  // for INFO
+#include <rpcz/replier.hpp>
 
 namespace rpcz {
 

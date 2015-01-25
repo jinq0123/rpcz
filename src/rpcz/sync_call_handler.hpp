@@ -8,9 +8,9 @@
 #include <boost/optional.hpp>
 #include <google/protobuf/message.h>
 
-#include "rpcz/common.hpp"  // for scoped_ptr
-#include "rpcz/rpc_error.hpp"
-#include "sync_event.hpp"
+#include <rpcz/common.hpp>  // for scoped_ptr
+#include <rpcz/rpc_error.hpp>
+#include <rpcz/sync_event.hpp>
 
 namespace rpcz {
 

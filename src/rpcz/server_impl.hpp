@@ -21,9 +21,9 @@
 #include <set>
 #include <boost/noncopyable.hpp>
 
-#include "rpcz/manager_ptr.hpp"
-#include "rpcz/service_factory_map.hpp"
-#include "rpcz/service_factory_ptr.hpp"
+#include <rpcz/manager_ptr.hpp>
+#include <rpcz/service_factory_map.hpp>
+#include <rpcz/service_factory_ptr.hpp>
 
 namespace rpcz {
 

@@ -1,10 +1,10 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "singleton_service_factory.hpp"
+#include <rpcz/singleton_service_factory.hpp>
 
 #include <boost/make_shared.hpp>
 
-#include "mono_state_service.hpp"
+#include <rpcz/mono_state_service.hpp>
 
 namespace rpcz {
 

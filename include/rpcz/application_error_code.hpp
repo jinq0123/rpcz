@@ -18,7 +18,7 @@
 #ifndef RPCZ_APPLICATION_ERROR_CODE_HPP
 #define RPCZ_APPLICATION_ERROR_CODE_HPP
 
-#include "rpcz/rpcz.pb.h"  // for rpc_response_header
+#include <rpcz/rpcz.pb.h>  // for rpc_response_header
 
 namespace rpcz {
 

@@ -3,7 +3,7 @@
 //
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpcz/rpc_error.hpp"
+#include <rpcz/rpc_error.hpp>
 
 #include <boost/lexical_cast.hpp>
 

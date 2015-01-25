@@ -8,7 +8,7 @@
 
 #include <string>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
-#include "rpcz/rpc_channel_ptr.hpp"
+#include <rpcz/rpc_channel_ptr.hpp>
 
 namespace rpcz {
 

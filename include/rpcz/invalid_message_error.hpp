@@ -5,7 +5,7 @@
 
 #include <stdexcept>
 #include <string>
-#include "rpcz/rpcz_api.hpp"
+#include <rpcz/rpcz_api.hpp>
 
 namespace rpcz {
 

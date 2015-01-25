@@ -15,13 +15,13 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpcz/server.hpp"
+#include <rpcz/server.hpp>
 
 #include <google/protobuf/descriptor.h>
 
-#include "rpcz/cpp_service.hpp"
-#include "server_impl.hpp"
-#include "singleton_service_factory.hpp"
+#include <rpcz/cpp_service.hpp>
+#include <rpcz/server_impl.hpp>
+#include <rpcz/singleton_service_factory.hpp>
 
 namespace rpcz {
 

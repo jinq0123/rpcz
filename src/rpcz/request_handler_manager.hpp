@@ -4,9 +4,9 @@
 #define RPCZ_REQUEST_HANDLER_MANAGER
 
 #include <boost/unordered_map.hpp>
-#include "request_handler_ptr.hpp"
-#include "rpcz/common.hpp"  // for uint64
-#include "service_factory_map.hpp"
+#include <rpcz/common.hpp>  // for uint64
+#include <rpcz/request_handler_ptr.hpp>
+#include <rpcz/service_factory_map.hpp>
 
 namespace rpcz {
 

@@ -20,7 +20,7 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "rpcz/rpcz_api.hpp"
+#include <rpcz/rpcz_api.hpp>
 
 namespace google {
 namespace protobuf {

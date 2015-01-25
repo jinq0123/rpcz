@@ -20,7 +20,7 @@
 #define RPCZ_APPLICATION_H
 
 #include <string>
-#include "rpcz/rpcz_api.hpp"
+#include <rpcz/rpcz_api.hpp>
 
 namespace zmq {
 class context_t; 

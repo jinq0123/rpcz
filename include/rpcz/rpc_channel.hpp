@@ -24,9 +24,9 @@
 
 #include <google/protobuf/stubs/common.h>
 
-#include "rpcz/response_message_handler.hpp"  // for response_message_handler
-#include "rpcz/rpc_channel_ptr.hpp"
-#include "rpcz/rpcz_api.hpp"
+#include <rpcz/response_message_handler.hpp>  // for response_message_handler
+#include <rpcz/rpc_channel_ptr.hpp>
+#include <rpcz/rpcz_api.hpp>
 
 namespace google {
 namespace protobuf {

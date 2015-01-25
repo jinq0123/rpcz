@@ -3,7 +3,7 @@
 #ifndef RPCZ_SERVICE_FACTORY_HPP
 #define RPCZ_SERVICE_FACTORY_HPP
 
-#include "rpcz/rpcz_api.hpp"
+#include <rpcz/rpcz_api.hpp>
 
 namespace rpcz {
 

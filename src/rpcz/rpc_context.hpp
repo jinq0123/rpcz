@@ -9,8 +9,8 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 
-#include "rpcz/response_message_handler.hpp"
-#include "rpcz/status_code.hpp"
+#include <rpcz/response_message_handler.hpp>
+#include <rpcz/status_code.hpp>
 
 namespace rpcz {
 

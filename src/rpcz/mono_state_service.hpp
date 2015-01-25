@@ -4,7 +4,7 @@
 #ifndef RPCZ_MONO_STATE_SERVICE_HPP
 #define RPCZ_MONO_STATE_SERVICE_HPP
 
-#include "rpcz/iservice.hpp"
+#include <rpcz/iservice.hpp>
 
 namespace rpcz {
 

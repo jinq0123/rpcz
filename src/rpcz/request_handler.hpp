@@ -4,8 +4,8 @@
 #define RPCZ_REQUEST_HANDLER_H
 
 #include <map>
-#include "client_connection.hpp"
-#include "rpcz/common.hpp"  // for uint64
+#include <rpcz/client_connection.hpp>
+#include <rpcz/common.hpp>  // for uint64
 
 namespace rpcz {
 

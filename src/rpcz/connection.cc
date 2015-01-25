@@ -15,14 +15,14 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "connection.hpp"
+#include <rpcz/connection.hpp>
 
 #include <zmq.hpp>
 
-#include "rpcz/internal_commands.hpp"
-#include "rpcz/manager.hpp"
-#include "rpcz/rpc_context.hpp"  // for rpc_context
-#include "rpcz/zmq_utils.hpp"
+#include <rpcz/internal_commands.hpp>
+#include <rpcz/manager.hpp>
+#include <rpcz/rpc_context.hpp>  // for rpc_context
+#include <rpcz/zmq_utils.hpp>
 
 namespace rpcz {
 

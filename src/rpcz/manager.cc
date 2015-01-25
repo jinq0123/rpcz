@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpcz/manager.hpp"
+#include <rpcz/manager.hpp>
 
 #include <string>
 
@@ -26,14 +26,14 @@
 #include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>
 
-#include "rpcz/application_options.hpp"
-#include "rpcz/broker_thread.hpp"
-#include "rpcz/connection.hpp"
-#include "rpcz/internal_commands.hpp"  // for kConnect
-#include "rpcz/logging.hpp"
-#include "rpcz/sync_event.hpp"
-#include "rpcz/worker_thread_fun.hpp"  // for worker_thread_fun
-#include "rpcz/zmq_utils.hpp"  // for send_empty_message
+#include <rpcz/application_options.hpp>
+#include <rpcz/broker_thread.hpp>
+#include <rpcz/connection.hpp>
+#include <rpcz/internal_commands.hpp>  // for kConnect
+#include <rpcz/logging.hpp>
+#include <rpcz/sync_event.hpp>
+#include <rpcz/worker_thread_fun.hpp>  // for worker_thread_fun
+#include <rpcz/zmq_utils.hpp>  // for send_empty_message
 
 namespace rpcz {
 

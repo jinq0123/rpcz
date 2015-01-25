@@ -15,16 +15,16 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "broker_thread.hpp"
+#include <rpcz/broker_thread.hpp>
 
-#include "rpcz/callback.hpp"
-#include "rpcz/clock.hpp"  // for zclock_ms()
-#include "rpcz/internal_commands.hpp"
-#include "rpcz/logging.hpp"
-#include "rpcz/manager_status.hpp"  // for CMSTATUS_DONE
-#include "rpcz/rpc_context.hpp"  // for rpc_context
-#include "rpcz/sync_event.hpp"
-#include "rpcz/zmq_utils.hpp"
+#include <rpcz/callback.hpp>
+#include <rpcz/clock.hpp>  // for zclock_ms()
+#include <rpcz/internal_commands.hpp>
+#include <rpcz/logging.hpp>
+#include <rpcz/manager_status.hpp>  // for CMSTATUS_DONE
+#include <rpcz/rpc_context.hpp>  // for rpc_context
+#include <rpcz/sync_event.hpp>
+#include <rpcz/zmq_utils.hpp>
 
 namespace rpcz {
 

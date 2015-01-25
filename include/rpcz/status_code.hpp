@@ -18,7 +18,7 @@
 #ifndef RPCZ_STATUS_CODE_HPP
 #define RPCZ_STATUS_CODE_HPP
 
-#include "rpcz/rpcz.pb.h"
+#include <rpcz/rpcz.pb.h>
 
 namespace rpcz {
 

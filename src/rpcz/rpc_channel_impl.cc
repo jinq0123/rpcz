@@ -15,14 +15,14 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "rpc_channel_impl.hpp"
+#include <rpcz/rpc_channel_impl.hpp>
 
-#include "logging.hpp"  // for CHECK_EQ
-#include "rpc_context.hpp"
-#include "rpcz/invalid_message_error.hpp"
-#include "rpcz/rpc_error.hpp"
-#include "sync_call_handler.hpp"
-#include "zmq_utils.hpp"  // for string_to_message()
+#include <rpcz/invalid_message_error.hpp>
+#include <rpcz/logging.hpp>  // for CHECK_EQ
+#include <rpcz/rpc_context.hpp>
+#include <rpcz/rpc_error.hpp>
+#include <rpcz/sync_call_handler.hpp>
+#include <rpcz/zmq_utils.hpp>  // for string_to_message()
 
 namespace rpcz {
 

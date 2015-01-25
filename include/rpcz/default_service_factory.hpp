@@ -4,7 +4,7 @@
 #define RPCZ_DEFAULT_SERVICE_FACTORY_HPP
 
 #include <boost/make_shared.hpp>
-#include "rpcz/service_factory.hpp"
+#include <rpcz/service_factory.hpp>
 
 namespace rpcz {
 

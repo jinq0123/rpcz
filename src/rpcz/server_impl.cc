@@ -15,11 +15,11 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "server_impl.hpp"
+#include <rpcz/server_impl.hpp>
 
 #include <boost/foreach.hpp>
 
-#include "rpcz/manager.hpp"
+#include <rpcz/manager.hpp>
 
 namespace rpcz {
 

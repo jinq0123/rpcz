@@ -22,10 +22,10 @@
 #include <google/protobuf/dynamic_message.h>
 #include <google/protobuf/text_format.h>
 
-#include "rpcz/application.hpp"
-#include "rpcz/common.hpp"  // for scoped_ptr
-#include "rpcz/rpc_channel.hpp"
-#include "rpcz/rpc_error.hpp"
+#include <rpcz/application.hpp>
+#include <rpcz/common.hpp>  // for scoped_ptr
+#include <rpcz/rpc_channel.hpp>
+#include <rpcz/rpc_error.hpp>
 
 using google::protobuf::DynamicMessageFactory;
 using google::protobuf::FileDescriptor;

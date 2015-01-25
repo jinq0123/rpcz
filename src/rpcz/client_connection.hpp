@@ -18,7 +18,7 @@
 #ifndef RPCZ_CLIENT_CONNECTION_H
 #define RPCZ_CLIENT_CONNECTION_H
 
-#include "rpcz/common.hpp"
+#include <rpcz/common.hpp>
 
 namespace zmq {
 class context_t;

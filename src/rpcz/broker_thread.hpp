@@ -21,10 +21,10 @@
 #include <map>
 #include <vector>
 
-#include "event_id_generator.hpp"
-#include "reactor.hpp"
-#include "request_handler_manager.hpp"
-#include "service_factory_map.hpp"
+#include <rpcz/event_id_generator.hpp>
+#include <rpcz/reactor.hpp>
+#include <rpcz/request_handler_manager.hpp>
+#include <rpcz/service_factory_map.hpp>
 
 namespace rpcz {
 

@@ -3,7 +3,7 @@
 #ifndef RPCZ_SINGLETON_SERVICE_FACTORY_HPP
 #define RPCZ_SINGLETON_SERVICE_FACTORY_HPP
 
-#include "rpcz/service_factory.hpp"
+#include <rpcz/service_factory.hpp>
 
 namespace rpcz {
 

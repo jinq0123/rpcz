@@ -14,7 +14,7 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "zmq_utils.hpp"
+#include <rpcz/zmq_utils.hpp>
 
 #include <stddef.h>
 #include <string.h>
@@ -28,7 +28,7 @@
 #include <google/protobuf/stubs/common.h>
 #include <zmq.hpp>
 
-#include "logging.hpp"
+#include <rpcz/logging.hpp>
 
 namespace rpcz {
 std::string message_to_string(zmq::message_t& msg) {

@@ -19,7 +19,7 @@
 #define RPCZ_EVENT_ID_GENERATOR_H
 
 #include <boost/noncopyable.hpp>
-#include "rpcz/common.hpp"
+#include <rpcz/common.hpp>
 
 namespace rpcz {
 

@@ -21,8 +21,8 @@
 #include <stdexcept>
 #include <string>
 
-#include "rpcz/rpcz_api.hpp"
-#include "rpcz/status_code.hpp"  // for status_code
+#include <rpcz/rpcz_api.hpp>
+#include <rpcz/status_code.hpp>  // for status_code
 
 namespace rpcz {
 

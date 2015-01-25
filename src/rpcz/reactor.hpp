@@ -22,7 +22,7 @@
 #include <vector>
 #include <boost/noncopyable.hpp>
 #include <zmq.hpp>
-#include "rpcz/common.hpp"
+#include <rpcz/common.hpp>
 
 namespace rpcz {
 

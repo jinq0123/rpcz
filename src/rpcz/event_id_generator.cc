@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include "event_id_generator.hpp"
+#include <rpcz/event_id_generator.hpp>
 
 #ifdef WIN32
 #include <process.h>  // for getpid()

@@ -14,7 +14,7 @@
 //
 // Author: nadavs@google.com <Nadav Samet>
 
-#include "sync_event.hpp"
+#include <rpcz/sync_event.hpp>
 
 namespace rpcz {
 
