@@ -64,7 +64,7 @@ void replier::send_error(int application_error,
     assert(reply_context_->clt_connection);
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();
-    generic_rpc_response.set_status(status::APPLICATION_ERROR);
+    // DEL generic_rpc_response.set_status(status::APPLICATION_ERROR);
     generic_rpc_response.set_application_error(application_error);
     if (!error_message.empty()) {
       generic_rpc_response.set_error(error_message);

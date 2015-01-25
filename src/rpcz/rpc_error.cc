@@ -13,7 +13,7 @@ static std::string to_string(status_code status,
     int application_error_code,
     const std::string& error_message) {
   std::string result =
-      "status: " + rpc_response_header_status_code_Name(status);
+      "status: ";  // XXX rpc_response_header_status_code_Name(status);
   if (status::APPLICATION_ERROR == status) {
     result += " (" + boost::lexical_cast<std::string>(
         application_error_code) + ")";

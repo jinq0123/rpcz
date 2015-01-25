@@ -21,6 +21,7 @@
 #include <rpcz/logging.hpp>  // for CHECK_EQ
 #include <rpcz/rpc_context.hpp>
 #include <rpcz/rpc_error.hpp>
+#include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/sync_call_handler.hpp>
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
 

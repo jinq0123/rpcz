@@ -8,15 +8,15 @@ message rpc_request_header {
 }
 
 message rpc_response_header {
-  enum status_code {
-    INACTIVE = 0;
-    ACTIVE = 1;
-    OK = 2;  // Done
-    CANCELLED = 3;
-    APPLICATION_ERROR = 4;
-    DEADLINE_EXCEEDED = 5;
-    TERMINATED = 6;
-  }
+  //enum status_code {
+  //  INACTIVE = 0;
+  //  ACTIVE = 1;
+  //  OK = 2;  // Done
+  //  CANCELLED = 3;
+  //  APPLICATION_ERROR = 4;
+  //  DEADLINE_EXCEEDED = 5;
+  //  TERMINATED = 6;
+  //}
   enum application_error_code {
     APPLICATION_NO_ERROR = 0;
     INVALID_HEADER = -1;
@@ -25,7 +25,7 @@ message rpc_response_header {
     INVALID_MESSAGE = -4;
     METHOD_NOT_IMPLEMENTED = -5;
   }
-  optional status_code status = 1 [default = OK];
+  // DELETED optional status_code status = 1 [default = OK];
   optional int32 application_error = 2 [default = 0];
   optional string error = 3;
 }

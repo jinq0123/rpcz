@@ -206,7 +206,7 @@ TEST_F(server_test, SimpleRequestWithError) {
     (void)stub.Search(request);
     ASSERT_TRUE(false);
   } catch (const rpc_error& e) {
-    ASSERT_EQ(rpc_response_header::APPLICATION_ERROR, e.get_status());
+    ASSERT_EQ(status::APPLICATION_ERROR, e.get_status());
     ASSERT_EQ("I don't like foo.", e.get_error_message());
   }
 }
@@ -219,7 +219,7 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
     (void)stub.Search(request, 1);
     ASSERT_TRUE(false);
   } catch (const rpc_error& error) {
-    ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error.get_status());
+    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
     return;
   }
   ASSERT_TRUE(false);
@@ -235,7 +235,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
 
     void operator()(const rpc_error* error, const SearchResponse &) {
       ASSERT_TRUE(error);
-      ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, error->get_status());
+      ASSERT_EQ(status::DEADLINE_EXCEEDED, error->get_status());
       sync.signal();
     }
   } hdl;

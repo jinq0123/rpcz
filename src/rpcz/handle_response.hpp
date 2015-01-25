@@ -31,7 +31,8 @@ inline void handle_done_response(
     context.handle_application_error(application_error::INVALID_MESSAGE, "");
     return;
   }
-  if (generic_response.status() != status::OK) {
+  // DEL if (generic_response.status() != status::OK) {
+  if (generic_response.has_application_error()) {
     context.handle_application_error(
         generic_response.application_error(),
         generic_response.error());

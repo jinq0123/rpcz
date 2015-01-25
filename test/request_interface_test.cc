@@ -140,7 +140,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
       1/*ms*/);
   hdl.sync.wait();
   ASSERT_TRUE(hdl.error);
-  ASSERT_EQ(rpc_response_header::DEADLINE_EXCEEDED, hdl.error->get_status());
+  ASSERT_EQ(status::DEADLINE_EXCEEDED, hdl.error->get_status());
 }
 
 TEST_F(server_test, AsyncRequest) {
