@@ -23,8 +23,8 @@
 
 #include "rpcz/application.hpp"
 #include "rpcz/connection.hpp"
-#include "rpcz/connection_manager.hpp"
-#include "rpcz/connection_manager_ptr.hpp"
+#include "rpcz/manager.hpp"
+#include "rpcz/manager_ptr.hpp"
 #include "rpcz/replier.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"

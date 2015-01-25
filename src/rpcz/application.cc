@@ -20,9 +20,9 @@
 #include <string>
 #include <zmq.hpp>
 
-#include "application_options.hpp"
-#include "connection.hpp"
-#include "connection_manager.hpp"
+#include "rpcz/application_options.hpp"
+#include "rpcz/connection.hpp"
+#include "rpcz/manager.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
 

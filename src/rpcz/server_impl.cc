@@ -19,7 +19,7 @@
 
 #include <boost/foreach.hpp>
 
-#include "connection_manager.hpp"
+#include "rpcz/manager.hpp"
 
 namespace rpcz {
 

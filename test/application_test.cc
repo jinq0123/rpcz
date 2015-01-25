@@ -16,7 +16,7 @@
 
 #include <zmq.hpp>
 #include "rpcz/application.hpp"
-#include "rpcz/connection_manager.hpp"
+#include "rpcz/manager.hpp"
 #include "gtest/gtest.h"
 
 namespace rpcz {

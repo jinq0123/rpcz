@@ -19,7 +19,7 @@
 #define RPCZ_CONNECTION_H
 
 #include "rpcz/common.hpp"
-#include "rpcz/connection_manager_ptr.hpp"
+#include "rpcz/manager_ptr.hpp"
 
 namespace rpcz {
 class message_vector;

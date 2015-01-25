@@ -17,14 +17,14 @@
 
 #include "broker_thread.hpp"
 
-#include "clock.hpp"  // for zclock_ms()
-#include "connection_manager_status.hpp"  // for CMSTATUS_DONE
-#include "internal_commands.hpp"
-#include "logging.hpp"
-#include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/callback.hpp"
-#include "sync_event.hpp"
-#include "zmq_utils.hpp"
+#include "rpcz/clock.hpp"  // for zclock_ms()
+#include "rpcz/internal_commands.hpp"
+#include "rpcz/logging.hpp"
+#include "rpcz/manager_status.hpp"  // for CMSTATUS_DONE
+#include "rpcz/rpc_context.hpp"  // for rpc_context
+#include "rpcz/sync_event.hpp"
+#include "rpcz/zmq_utils.hpp"
 
 namespace rpcz {
 

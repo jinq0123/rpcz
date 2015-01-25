@@ -23,10 +23,11 @@
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
 #include <boost/weak_ptr.hpp>
-#include "connection_manager_status.hpp"
+
 #include "rpcz/common.hpp"
-#include "rpcz/connection_manager_ptr.hpp"
-#include "service_factory_map.hpp"
+#include "rpcz/manager_ptr.hpp"
+#include "rpcz/manager_status.hpp"
+#include "rpcz/service_factory_map.hpp"
 
 namespace zmq {
 class context_t;

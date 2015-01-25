@@ -19,10 +19,10 @@
 
 #include <zmq.hpp>
 
-#include "connection_manager.hpp"
-#include "internal_commands.hpp"
-#include "rpc_context.hpp"  // for rpc_context
-#include "zmq_utils.hpp"
+#include "rpcz/internal_commands.hpp"
+#include "rpcz/manager.hpp"
+#include "rpcz/rpc_context.hpp"  // for rpc_context
+#include "rpcz/zmq_utils.hpp"
 
 namespace rpcz {
 

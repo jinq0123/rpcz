@@ -19,14 +19,14 @@
 
 #include <zmq.hpp>
 
-#include "connection_manager_status.hpp"  // for connection_manager_status
-#include "handle_response.hpp"  // for handle_response()
-#include "internal_commands.hpp"  // for kReady
-#include "logging.hpp"  // for CHECK_EQ()
-#include "request_handler.hpp"
-#include "rpc_context.hpp"  // for rpc_context
 #include "rpcz/callback.hpp"  // for closure
-#include "zmq_utils.hpp"  // for send_empty_message()
+#include "rpcz/handle_response.hpp"  // for handle_response()
+#include "rpcz/internal_commands.hpp"  // for kReady
+#include "rpcz/logging.hpp"  // for CHECK_EQ()
+#include "rpcz/manager_status.hpp"  // for connection_manager_status
+#include "rpcz/request_handler.hpp"
+#include "rpcz/rpc_context.hpp"  // for rpc_context
+#include "rpcz/zmq_utils.hpp"  // for send_empty_message()
 
 namespace rpcz {
 

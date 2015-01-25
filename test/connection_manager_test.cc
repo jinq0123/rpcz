@@ -29,7 +29,7 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/client_connection.hpp"
 #include "rpcz/connection.hpp"
-#include "rpcz/connection_manager.hpp"
+#include "rpcz/manager.hpp"
 #include "rpcz/rpc_context.hpp"
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"

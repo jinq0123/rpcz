@@ -9,6 +9,8 @@ protobuf_generate_cpp(RPCZ_PB_SRCS RPCZ_PB_HDRS proto/rpcz.proto)
 set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
 
 include_directories(${Rpcz_BINARY_DIR})
+include_directories(${Rpcz_SOURCE_DIR}/src)
+
 set(RPCZ_SOURCES
     application.cc
     application_options.cc
@@ -16,9 +18,9 @@ set(RPCZ_SOURCES
     client_connection.cc
     clock.cc
     connection.cc
-    connection_manager.cc
     cpp_service.cc
     event_id_generator.cc
+    manager.cc
     reactor.cc
     replier.cc
     request_handler.cc

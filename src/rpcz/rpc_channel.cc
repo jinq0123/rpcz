@@ -1,8 +1,8 @@
 #include "rpcz/rpc_channel.hpp"
 
 #include <boost/make_shared.hpp>
-#include "connection_manager.hpp"
-#include "rpc_channel_impl.hpp"
+#include "rpcz/manager.hpp"
+#include "rpcz/rpc_channel_impl.hpp"
 
 namespace rpcz {
 
