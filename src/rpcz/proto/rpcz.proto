@@ -2,7 +2,7 @@ package rpcz;
 
 message rpc_request_header {
   optional int64 event_id = 1;
-  optional int32 deadline = 2;
+  // DELETED optional int32 deadline = 2;
   optional string service = 3;
   optional string method = 4;
 }
