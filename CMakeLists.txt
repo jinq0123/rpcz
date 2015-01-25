@@ -44,7 +44,7 @@ endif(NOT MSVC)
 
 set(CMAKE_OSX_ARCHITECTURES x86_64)
 
-file(GLOB RPCZ_PUBLIC_HEADERS include/rpcz/*.hpp)
+file(GLOB RPCZ_PUBLIC_HEADERS include/rpcz/*.h*)
 
 add_subdirectory(src)
 
