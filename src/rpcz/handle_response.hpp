@@ -12,6 +12,7 @@
 #include <rpcz/logging.hpp>  // for CHECK()
 #include <rpcz/manager_status.hpp>  // for connection_manager_status
 #include <rpcz/rpc_context.hpp>  // for rpc_context
+#include <rpcz/rpcz.pb.h>  // for rpc_response_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator
 
 namespace rpcz {

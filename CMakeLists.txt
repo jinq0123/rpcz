@@ -34,7 +34,6 @@ include_directories(${CPPZMQ_DIR})
 include_directories(${PROTOBUF_INCLUDE_DIRS})
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${Rpcz_SOURCE_DIR}/include)
-include_directories(${Rpcz_BINARY_DIR}/src)
 
 if(NOT MSVC)
 set(CMAKE_CXX_FLAGS
@@ -59,4 +58,3 @@ endif(rpcz_build_examples)
 
 message(STATUS ${RPCZ_PUBLIC_HEADERS})
 install(FILES ${RPCZ_PUBLIC_HEADERS} DESTINATION include/rpcz)
-install(FILES ${Rpcz_BINARY_DIR}/src/rpcz/rpcz.pb.h DESTINATION include/rpcz)
