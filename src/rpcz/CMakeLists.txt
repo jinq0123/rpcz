@@ -8,7 +8,7 @@ add_subdirectory(plugin)
 protobuf_generate_cpp(RPCZ_PB_SRCS RPCZ_PB_HDRS proto/rpcz.proto)
 set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
 
-include_directories(${Rpcz_BINARY_DIR})
+include_directories(${Rpcz_BINARY_DIR}/src)
 include_directories(${Rpcz_SOURCE_DIR}/src)
 
 set(RPCZ_SOURCES
