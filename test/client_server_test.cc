@@ -123,7 +123,7 @@ class server_test : public ::testing::Test {
       context_(new zmq::context_t(1)) /* scoped_ptr */ {
     EXPECT_TRUE(manager::is_destroyed());
     application::set_zmq_context(context_.get());
-    application::set_connection_manager_threads(10);
+    application::set_manager_threads(10);
     frontend_connection_.reset(new connection);
     backend_connection_.reset(new connection);
     frontend_server_.reset(new server);

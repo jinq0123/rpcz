@@ -45,8 +45,8 @@ void set_zmq_io_threads(int n) {
   application_options::set_zmq_io_threads(n);
 }
 
-void set_connection_manager_threads(int n) {
-  application_options::set_connection_manager_threads(n);
+void set_manager_threads(int n) {
+  application_options::set_manager_threads(n);
 }
 
 }  // namespace application

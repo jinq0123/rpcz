@@ -50,7 +50,7 @@ namespace application {
   //   context must outlive the rpcz application. Default NULL.
   // * Number of ZeroMQ I/O threads, to be passed to zmq_init(). This value is
   //   ignored when you provide your own ZeroMQ context. Default 1.
-  RPCZ_API void set_connection_manager_threads(int n);  // default 1
+  RPCZ_API void set_manager_threads(int n);  // default 1
   RPCZ_API void set_zmq_context(zmq::context_t* context);  // default NULL
   RPCZ_API void set_zmq_io_threads(int n);  // default 1
 }  // namespace application

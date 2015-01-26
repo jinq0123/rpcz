@@ -37,7 +37,7 @@ int application_options::get_zmq_io_threads() {
   return zmq_io_threads_;
 }
 
-void application_options::set_connection_manager_threads(int n) {
+void application_options::set_manager_threads(int n) {
   lock_guard lock(mutex_);
   if (n <= 0) return;
   connection_manager_threads_ = n;

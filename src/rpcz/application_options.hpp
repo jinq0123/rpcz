@@ -4,7 +4,7 @@
 #include <boost/thread.hpp>
 
 namespace zmq {
-class context_t; 
+class context_t;
 }  // namespace zmq
 
 namespace rpcz {
@@ -21,7 +21,7 @@ public:
   static zmq::context_t* get_zmq_context();
   static void set_zmq_io_threads(int n);
   static int get_zmq_io_threads();
-  static void set_connection_manager_threads(int n);
+  static void set_manager_threads(int n);
   static int get_connection_manager_threads();
 
  private:
