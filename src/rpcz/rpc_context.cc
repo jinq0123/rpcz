@@ -29,13 +29,6 @@ inline void rpc_context::handle_response_message(
   }
 }  // handle_response_message
 
-inline void rpc_context::handle_done_response(
-    message_iterator& iter) {
-  const zmq::message_t* payload = handle_response_header(iter);
-  if (payload)
-    handle_response_message(payload->data(), payload->size());
-}  // hanele_done_response()
-
 void rpc_context::handle_deadline_exceed() {
   handle_error(status::DEADLINE_EXCEEDED, 0, "");
 }
@@ -48,38 +41,39 @@ void rpc_context::handle_application_error(
 }
 
 void rpc_context::handle_error(status_code status,
-  int application_error_code,
-  const std::string& error_message) {
-  if (handler_.empty())
-    return;
+                               int application_error_code,
+                               const std::string& error_message) {
+  if (handler_.empty()) return;
   rpc_error e(status, application_error_code, error_message);
   handler_(&e, NULL, 0);
 }
 
 // Must be implemented in .cc file because of rpc_response_header.
-inline const zmq::message_t* rpc_context::handle_response_header(
-    message_iterator& iter) {
+inline void rpc_context::handle_done_response(message_iterator& iter) {
   if (!iter.has_more()) {
     handle_application_error(application_error::INVALID_MESSAGE, "");
-    return NULL;
+    return;
   }
   rpc_response_header generic_response;
   zmq::message_t& msg_in = iter.next();
   if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
     handle_application_error(application_error::INVALID_MESSAGE, "");
-    return NULL;
+    return;
   }
   if (generic_response.has_application_error()) {
     handle_application_error(
         generic_response.application_error(),
         generic_response.error());
-    return NULL;
+    return;
   }
-  if (iter.has_more()) {
-    return &(iter.next());  // most case
+  if (!iter.has_more()) {
+    handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
   }
-  handle_application_error(application_error::INVALID_MESSAGE, "");
-  return NULL;
-}
+
+  // the most case
+  const zmq::message_t& payload = iter.next();
+  handle_response_message(payload.data(), payload.size());
+}  // handle_done_response()
 
 }  // namespace rpcz

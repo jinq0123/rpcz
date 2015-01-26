@@ -41,7 +41,6 @@ class rpc_context : boost::noncopyable {
  private:
   inline void handle_response_message(const void* data, size_t size);
   inline void handle_done_response(message_iterator& iter);
-  inline const zmq::message_t* handle_response_header(message_iterator& iter);
 
  private:
   // Error handlers are not inlined.
