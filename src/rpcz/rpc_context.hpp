@@ -12,7 +12,13 @@
 #include <rpcz/response_message_handler.hpp>
 #include <rpcz/status_code.hpp>
 
+namespace zmq {
+class message_t;
+}  // namespace zmq
+
 namespace rpcz {
+
+class message_iterator;
 
 class rpc_context : boost::noncopyable {
  public:
@@ -20,24 +26,32 @@ class rpc_context : boost::noncopyable {
       const response_message_handler& handler,
       long deadline_ms)
       : handler_(handler),
-        deadline_ms_(deadline_ms) {
+        deadline_ms_(deadline_ms),
+        deadline_exceeded_(false) {
   }
 
   inline ~rpc_context() {}
 
  public:
+  inline long get_deadline_ms() const { return deadline_ms_; }
+  inline void set_deadline_exceeded() { deadline_exceeded_ = true; }
+
+ public:
+  // Not inlined to inline all other private handlers in .cc file.
+  // And hide rpcz.pb.h.
+  void handle_response(message_iterator& iter);
+
+ private:
   inline void handle_response_message(const void* data, size_t size);
+  inline void handle_done_response(message_iterator& iter);
+  inline const zmq::message_t* handle_response_header(message_iterator& iter);
+
+ private:
+  // Error handlers are not inlined.
   void handle_deadline_exceed();
   void handle_application_error(
       int application_error_code,
       const std::string& error_message);
-
- public:
-  inline long get_deadline_ms() const {
-    return deadline_ms_;
-  }
-
- private:
   void handle_error(status_code status,
       int application_error_code,
       const std::string& error_message);
@@ -45,15 +59,8 @@ class rpc_context : boost::noncopyable {
  private:
   response_message_handler handler_;
   long deadline_ms_;
+  bool deadline_exceeded_;
 };
-
-inline void rpc_context::handle_response_message(
-    const void* data, size_t size) {
-  BOOST_ASSERT(data);
-  if (handler_) {
-    handler_(NULL, data, size);
-  }
-}  // handle_response_message
 
 }  // namespace rpcz
 #endif  // RPCZ_RPC_CONTEXT_HPP

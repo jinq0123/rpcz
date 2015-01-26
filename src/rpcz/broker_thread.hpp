@@ -83,7 +83,7 @@ class broker_thread {
   inline void send_reply(message_iterator& iter);
 
  private:
-  typedef std::map<event_id, const rpc_context*>
+  typedef std::map<event_id, rpc_context*>
       remote_response_map;
   typedef std::map<uint64, event_id> deadline_map;
   remote_response_map remote_response_map_;

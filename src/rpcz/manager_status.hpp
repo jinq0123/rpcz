@@ -17,6 +17,7 @@
 #ifndef RPCZ_CONNECTION_MANAGER_STATUS_H
 #define RPCZ_CONNECTION_MANAGER_STATUS_H
 
+// DEL
 enum connection_manager_status {
     CMSTATUS_INACTIVE = 0,
     CMSTATUS_ACTIVE = 1,

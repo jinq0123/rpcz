@@ -201,8 +201,7 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
 
 void broker_thread::send_request(message_iterator& iter) {
   uint64 connection_id = interpret_message<uint64>(iter.next());
-  const rpc_context* ctx =
-      interpret_message<const rpc_context*>(iter.next());
+  rpc_context* ctx = interpret_message<rpc_context*>(iter.next());
   BOOST_ASSERT(ctx);
   event_id event_id = event_id_generator_.get_next();
   remote_response_map_[event_id] = ctx;
@@ -245,10 +244,12 @@ void broker_thread::handle_timeout(event_id event_id) {
   if (response_iter == remote_response_map_.end()) {
       return;
   }
-  const rpc_context* ctx = response_iter->second;
+  rpc_context* ctx = response_iter->second;
+  BOOST_ASSERT(ctx);
+  ctx->set_deadline_exceeded();
   begin_worker_command(kHandleResponse);
   send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
-  send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
+  // DEL send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
   remote_response_map_.erase(response_iter);
 }
 
