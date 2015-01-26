@@ -53,7 +53,7 @@ class connection_manager_test : public ::testing::Test {
 TEST_F(connection_manager_test, TestStartsAndFinishes) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
-  manager_ptr cm = manager::get();
+  manager_ptr mgr = manager::get();
 }
 
 void echo_server(zmq::context_t& context) {
@@ -103,8 +103,8 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
   application::set_manager_threads(4);
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
-  manager_ptr cm = manager::get();
-  connection connection(cm->connect("inproc://server.test"));
+  manager_ptr mgr = manager::get();
+  connection connection(mgr->connect("inproc://server.test"));
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -161,9 +161,9 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   application::set_manager_threads(4);
 
   boost::thread thread(start_server(context));
-  manager_ptr cm = manager::get();
+  manager_ptr mgr = manager::get();
 
-  connection connection(cm->connect("inproc://server.test"));
+  connection connection(mgr->connect("inproc://server.test"));
   boost::thread_group group;
   for (int i = 0; i < 10; ++i) {
     group.add_thread(
@@ -185,11 +185,11 @@ TEST_F(connection_manager_test, ManyClientsTest) {
 
 TEST_F(connection_manager_test, TestUnbind) {
   ASSERT_TRUE(manager::is_destroyed());
-  manager_ptr cm = manager::get();
+  manager_ptr mgr = manager::get();
   const char kEndpoint[] = "inproc://server.point";
   service_factory_map m;
-  cm->bind(kEndpoint, m);
-  cm->unbind(kEndpoint);
+  mgr->bind(kEndpoint, m);
+  mgr->unbind(kEndpoint);
 }
 
 const static char* kEndpoint = "inproc://test";
@@ -208,10 +208,10 @@ void DoThis(zmq::context_t* context) {
 TEST_F(connection_manager_test, ProcessesSingleCallback) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
-  manager_ptr cm = manager::get();
+  manager_ptr mgr = manager::get();
   zmq::socket_t socket(context, ZMQ_PULL);
   socket.bind(kEndpoint);
-  cm->add(new_callback(&DoThis, &context));
+  mgr->add(new_callback(&DoThis, &context));
   message_vector messages;
   CHECK(read_message_to_vector(&socket, &messages));
   ASSERT_EQ(1, messages.size());
@@ -232,9 +232,9 @@ void add_many_closures() {
   boost::unique_lock<boost::mutex> lock(mu);
   int x = 0;
   const int kMany = 137;
-  manager_ptr cm = manager::get();
+  manager_ptr mgr = manager::get();
   for (int i = 0; i < kMany; ++i) {
-    cm->add(new_callback(&Increment, &mu, &cond, &x));
+    mgr->add(new_callback(&Increment, &mu, &cond, &x));
   }
   CHECK_EQ(0, x);  // since we are holding the lock
   while (x != kMany) {
@@ -246,7 +246,7 @@ TEST_F(connection_manager_test, ProcessesManyCallbacksFromManyThreads) {
   ASSERT_TRUE(manager::is_destroyed());
   const int thread_count = 10;
   application::set_manager_threads(thread_count);
-  manager_ptr cm = manager::get();
+  manager_ptr mgr = manager::get();
   boost::thread_group thread_group;
   for (int i = 0; i < thread_count; ++i) {
     thread_group.add_thread(

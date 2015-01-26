@@ -29,7 +29,7 @@ TEST_F(application_test, InitializesWithProvidedZeroMQContext) {
   {
     ASSERT_TRUE(manager::is_destroyed());
     application::set_zmq_context(context.get());
-    manager_ptr cm = manager::get();
+    manager_ptr mgr = manager::get();
   }
   context.reset();
 }

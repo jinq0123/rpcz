@@ -85,11 +85,11 @@ class server_test : public ::testing::Test {
   }
 
   void start_server() {
-    rpcz::manager_ptr cm = rpcz::manager::get();
+    rpcz::manager_ptr mgr = rpcz::manager::get();
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
     server_->bind("inproc://myserver.frontend");
-    *connection_ = cm->connect("inproc://myserver.frontend");
+    *connection_ = mgr->connect("inproc://myserver.frontend");
   }
 
 protected:
