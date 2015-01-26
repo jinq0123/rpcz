@@ -246,9 +246,10 @@ void broker_thread::handle_timeout(event_id event_id) {
       return;
   }
   const rpc_context* ctx = response_iter->second;
+  ctx->set_deadline_exceeded();
   begin_worker_command(kHandleResponse);
   send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
-  send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
+  // DEL send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
   remote_response_map_.erase(response_iter);
 }
 
