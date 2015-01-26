@@ -1,6 +1,4 @@
-// Licensed under the Apache License, Version 2.0 (the "License");
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
+// Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
 #include <rpcz/rpc_context.hpp>
@@ -16,7 +14,7 @@ namespace rpcz {
 void rpc_context::handle_response(
     message_iterator& iter) {
   if (!deadline_exceeded_) {
-    // in most case
+    // in most cases
     handle_done_response(iter);
     return;
   }
@@ -77,12 +75,11 @@ inline const zmq::message_t* rpc_context::handle_response_header(
         generic_response.error());
     return NULL;
   }
-
-  if (!iter.has_more()) {
-    handle_application_error(application_error::INVALID_MESSAGE, "");
-    return NULL;
+  if (iter.has_more()) {
+    return &(iter.next());  // most case
   }
-  return &(iter.next());
+  handle_application_error(application_error::INVALID_MESSAGE, "");
+  return NULL;
 }
 
 }  // namespace rpcz

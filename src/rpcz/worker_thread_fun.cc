@@ -59,7 +59,7 @@ void worker_thread_fun(zmq::context_t& context,
         rpc_context* ctx =
             interpret_message<rpc_context*>(iter.next());
         BOOST_ASSERT(ctx);
-        ctx->handle_response(iter);  // inlined
+        ctx->handle_response(iter);
         delete ctx;
       }
     }

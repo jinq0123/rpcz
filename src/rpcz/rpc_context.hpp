@@ -1,7 +1,6 @@
-// Licensed under the Apache License, Version 2.0 (the "License");
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
+// Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
+// Rpc context used to call the response handler.
 
 #ifndef RPCZ_RPC_CONTEXT_HPP
 #define RPCZ_RPC_CONTEXT_HPP
