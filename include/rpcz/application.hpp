@@ -41,7 +41,7 @@ namespace application {
 
   // You can change the default options BEFORE any client or server.
   // These options are:
-  // * Number of connection manager threads. Those threads are used for
+  // * Number of worker threads. Those threads are used for
   //   running user code: handling server requests or running callbacks.
   //   Default 1.
   // * ZeroMQ context to use for our application. If NULL, then application will

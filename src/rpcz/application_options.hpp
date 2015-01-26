@@ -29,7 +29,7 @@ public:
   typedef boost::lock_guard<boost::mutex> lock_guard;
 
  private:
-  // Number of connection manager threads. Those threads are used for
+  // Number of worker threads. Those threads are used for
   // running user code: handling server requests or running callbacks.
   static int connection_manager_threads_;  // default 1
 

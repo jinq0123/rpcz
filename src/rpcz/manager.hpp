@@ -59,10 +59,10 @@ class manager : boost::noncopyable {
   static bool is_destroyed();  // for debug
 
  public:
-  // Blocks the current thread until all connection managers have completed.
+  // Blocks the current thread until all connections have completed.
   ~manager();
 
-  // connects all manager threads to the given endpoint. On success
+  // connects all worker threads to the given endpoint. On success
   // this method returns a connection object that can be used from any thread
   // to communicate with this endpoint.
   connection connect(const std::string& endpoint);
