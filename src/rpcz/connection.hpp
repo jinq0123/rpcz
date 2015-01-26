@@ -43,7 +43,7 @@ class connection {
   explicit connection(uint64 connection_id);
 
  private:
-  connection_manager_ptr manager_;
+  manager_ptr manager_;
   uint64 connection_id_;
   friend class manager;
 };

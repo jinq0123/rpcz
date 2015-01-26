@@ -85,7 +85,7 @@ class server_test : public ::testing::Test {
   }
 
   void start_server() {
-    rpcz::connection_manager_ptr cm = rpcz::manager::get();
+    rpcz::manager_ptr cm = rpcz::manager::get();
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
     server_->bind("inproc://myserver.frontend");

@@ -55,7 +55,7 @@ class manager : boost::noncopyable {
 
  public:
   // Dynamic singleton. Auto destruct.
-  static inline connection_manager_ptr get();
+  static inline manager_ptr get();
   static bool is_destroyed();  // for debug
 
  public:
@@ -89,7 +89,7 @@ class manager : boost::noncopyable {
   zmq::socket_t& new_frontend_socket();
 
  private:
-  static connection_manager_ptr get_new();  // used by get()
+  static manager_ptr get_new();  // used by get()
 
  private:
   typedef boost::weak_ptr<manager> weak_ptr;
@@ -108,8 +108,8 @@ class manager : boost::noncopyable {
   scoped_ptr<sync_event> is_terminating_;
 };  // class manager
 
-connection_manager_ptr manager::get() {
-  connection_manager_ptr p = this_weak_ptr_.lock();
+manager_ptr manager::get() {
+  manager_ptr p = this_weak_ptr_.lock();
   if (p) return p;
   return get_new();
 }

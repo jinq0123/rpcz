@@ -5,7 +5,7 @@
 
 namespace rpcz {
 class manager;
-typedef boost::shared_ptr<manager> connection_manager_ptr;
+typedef boost::shared_ptr<manager> manager_ptr;
 }  // namespace rpcz
 
 #endif  // RPCZ_CONNECTION_MANAGER_PTR_H

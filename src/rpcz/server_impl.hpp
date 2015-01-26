@@ -46,7 +46,7 @@ class server_impl : boost::noncopyable {
   // Must register service before bind. Registeration after bind will be ignored.
 
  private:
-  connection_manager_ptr connection_manager_ptr_;
+  manager_ptr connection_manager_ptr_;
   typedef std::set<std::string> bind_endpoint_set;
   bind_endpoint_set endpoints_;
   bool binding_;  // To ignore registeration after bind.

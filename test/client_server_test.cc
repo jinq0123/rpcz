@@ -102,7 +102,7 @@ class SearchServiceImpl : public SearchService {
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
   scoped_ptr<replier> old_replier_;
-  connection_manager_ptr cm_;
+  manager_ptr cm_;
 };
 
 // For handling complex delegated queries.
@@ -149,7 +149,7 @@ class server_test : public ::testing::Test {
     backend_service_.reset(new BackendSearchServiceImpl);
     backend_server_->register_singleton_service(*backend_service_);
     backend_server_->bind("inproc://myserver.backend");
-    rpcz::connection_manager_ptr cm = rpcz::manager::get();
+    rpcz::manager_ptr cm = rpcz::manager::get();
     *backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_service_.reset(new SearchServiceImpl(

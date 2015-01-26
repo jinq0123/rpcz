@@ -73,9 +73,9 @@ manager::manager()
   event.wait();
 }
 
-connection_manager_ptr manager::get_new() {
+manager_ptr manager::get_new() {
   lock_guard lock(this_weak_ptr_mutex_);
-  connection_manager_ptr p = this_weak_ptr_.lock();
+  manager_ptr p = this_weak_ptr_.lock();
   if (p) return p;
   p.reset(new manager);
   this_weak_ptr_ = p;
