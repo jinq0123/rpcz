@@ -14,6 +14,7 @@ include_directories(${Rpcz_SOURCE_DIR}/src)
 set(RPCZ_SOURCES
     application.cc
     application_options.cc
+    assert_application_error_code.cc
     broker_thread.cc
     client_connection.cc
     clock.cc
