@@ -52,15 +52,52 @@ class rpc_context : boost::noncopyable {
   void handle_application_error(
       int application_error_code,
       const std::string& error_message);
+  inline void handle_response_message(const void* data, size_t size);
+  void handle_deadline_exceed();
+  void handle_application_error(
+      int application_error_code,
+      const std::string& error_message);
+
+ private:
   void handle_error(status_code status,
       int application_error_code,
       const std::string& error_message);
+  inline void handle_done_response(
+      message_iterator& iter);
 
  private:
   response_message_handler handler_;
   long deadline_ms_;
   bool deadline_exceeded_;
 };
+
+inline void rpc_context::handle_done_response(
+    message_iterator& iter) {
+  if (!iter.has_more()) {
+    handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
+  }
+  rpc_response_header generic_response;
+  zmq::message_t& msg_in = iter.next();
+  if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
+    handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
+  }
+  if (generic_response.has_application_error()) {
+    handle_application_error(
+        generic_response.application_error(),
+        generic_response.error());
+    return;
+  }
+
+  if (!iter.has_more()) {
+    handle_application_error(application_error::INVALID_MESSAGE, "");
+    return;
+  }
+
+  zmq::message_t& payload = iter.next();
+  handle_response_message(payload.data(), payload.size());
+}  // hanele_done_response()
 
 }  // namespace rpcz
 #endif  // RPCZ_RPC_CONTEXT_HPP

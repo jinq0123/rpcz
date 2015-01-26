@@ -247,6 +247,7 @@ void broker_thread::handle_timeout(event_id event_id) {
   rpc_context* ctx = response_iter->second;
   BOOST_ASSERT(ctx);
   ctx->set_deadline_exceeded();
+  ctx->set_deadline_exceeded();
   begin_worker_command(kHandleResponse);
   send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
   // DEL send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
