@@ -5,6 +5,10 @@ set (RPCZ_VERSION_MINOR 9)
 
 add_subdirectory(plugin)
 
+protobuf_generate_cpp(RPCZ_PB_SRCS RPCZ_PB_HDRS proto/rpcz.proto)
+set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
+
+include_directories(${Rpcz_BINARY_DIR})
 include_directories(${Rpcz_SOURCE_DIR}/src)
 
 set(RPCZ_SOURCES
@@ -25,14 +29,14 @@ set(RPCZ_SOURCES
     rpc_channel.cc
     rpc_channel_impl.cc
     rpc_error.cc
-    rpcz.pb.cc
     server.cc
     server_impl.cc
     singleton_service_factory.cc
     sync_call_handler.cc
     sync_event.cc
     worker_thread_fun.cc
-    zmq_utils.cc)
+    zmq_utils.cc
+    ${PROTO_SOURCES})
 file(GLOB RPCZ_HEADERS *.hpp)
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${Boost_CHRONO_LIBRARIES}
