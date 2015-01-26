@@ -13,7 +13,7 @@ namespace rpcz {
 
 client_connection::client_connection(uint64 server_socket_idx,
                                      const std::string& sender)
-    : manager_(*connection_manager::get()),
+    : manager_(*manager::get()),
       server_socket_idx_(server_socket_idx),
       sender_(sender) {
 };

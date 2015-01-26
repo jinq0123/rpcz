@@ -26,7 +26,7 @@ class context_t;
 
 namespace rpcz {
 
-class connection_manager;
+class manager;
 class message_vector;
 
 class client_connection {
@@ -37,7 +37,7 @@ class client_connection {
   client_connection(uint64 server_socket_idx, const std::string& sender);
 
  private:
-  connection_manager& manager_;
+  manager& manager_;
   const uint64 server_socket_idx_;
   const std::string sender_;
 };

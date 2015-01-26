@@ -57,7 +57,7 @@ class SearchServiceImpl : public SearchService {
   // Will take ownership of backend.
   SearchServiceImpl(SearchService_Stub* backend)
       : backend_(backend), 
-        cm_(connection_manager::get()) {
+        cm_(manager::get()) {
   }
 
   ~SearchServiceImpl() {
@@ -121,7 +121,7 @@ class server_test : public ::testing::Test {
  public:
   server_test() :
       context_(new zmq::context_t(1)) /* scoped_ptr */ {
-    EXPECT_TRUE(connection_manager::is_destroyed());
+    EXPECT_TRUE(manager::is_destroyed());
     application::set_zmq_context(context_.get());
     application::set_connection_manager_threads(10);
     frontend_connection_.reset(new connection);
@@ -141,7 +141,7 @@ class server_test : public ::testing::Test {
     frontend_connection_.reset();
     backend_connection_.reset();
 
-    EXPECT_TRUE(connection_manager::is_destroyed());
+    EXPECT_TRUE(manager::is_destroyed());
     context_.reset();
   }
 
@@ -149,7 +149,7 @@ class server_test : public ::testing::Test {
     backend_service_.reset(new BackendSearchServiceImpl);
     backend_server_->register_singleton_service(*backend_service_);
     backend_server_->bind("inproc://myserver.backend");
-    rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
+    rpcz::connection_manager_ptr cm = rpcz::manager::get();
     *backend_connection_ = cm->connect("inproc://myserver.backend");
 
     frontend_service_.reset(new SearchServiceImpl(
@@ -296,7 +296,7 @@ TEST_F(server_test, ConnectionManagerTermination) {
     ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
   }
   LOG(INFO)<<"I'm here";
-  connection_manager::get()->run();
+  manager::get()->run();
   LOG(INFO)<<"I'm there";
 }
 

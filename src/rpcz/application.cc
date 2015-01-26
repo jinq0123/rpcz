@@ -30,11 +30,11 @@ namespace rpcz {
 namespace application {
 
 void run() {
-  connection_manager::get()->run();
+  manager::get()->run();
 }
 
 void terminate() {
-  connection_manager::get()->terminate();
+  manager::get()->terminate();
 }
 
 void set_zmq_context(zmq::context_t* context) {

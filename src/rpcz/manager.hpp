@@ -43,15 +43,15 @@ class connection_thread_context;
 class message_iterator;
 class sync_event;
 
-// A connection_manager is a multi-threaded asynchronous system for communication
+// A manager is a multi-threaded asynchronous system for communication
 // over ZeroMQ sockets.
-// A connection_manager can connect to a remote server:
-//      connection_manager::get()->connect("tcp://localhost:5557");
-// connection_manager and connection are thread-safe.
-// connection_manager is singleton.
-class connection_manager : boost::noncopyable {
+// A manager can connect to a remote server:
+//      manager::get()->connect("tcp://localhost:5557");
+// manager and connection are thread-safe.
+// manager is singleton.
+class manager : boost::noncopyable {
  private:
-  connection_manager();
+  manager();
 
  public:
   // Dynamic singleton. Auto destruct.
@@ -60,9 +60,9 @@ class connection_manager : boost::noncopyable {
 
  public:
   // Blocks the current thread until all connection managers have completed.
-  ~connection_manager();
+  ~manager();
 
-  // connects all connection_manager threads to the given endpoint. On success
+  // connects all manager threads to the given endpoint. On success
   // this method returns a connection object that can be used from any thread
   // to communicate with this endpoint.
   connection connect(const std::string& endpoint);
@@ -92,7 +92,7 @@ class connection_manager : boost::noncopyable {
   static connection_manager_ptr get_new();  // used by get()
 
  private:
-  typedef boost::weak_ptr<connection_manager> weak_ptr;
+  typedef boost::weak_ptr<manager> weak_ptr;
   typedef boost::lock_guard<boost::mutex> lock_guard;
   static weak_ptr this_weak_ptr_;
   static boost::mutex this_weak_ptr_mutex_;
@@ -106,15 +106,15 @@ class connection_manager : boost::noncopyable {
   boost::thread_specific_ptr<zmq::socket_t> socket_;
   std::string frontend_endpoint_;
   scoped_ptr<sync_event> is_terminating_;
-};  // class connection_manager
+};  // class manager
 
-connection_manager_ptr connection_manager::get() {
+connection_manager_ptr manager::get() {
   connection_manager_ptr p = this_weak_ptr_.lock();
   if (p) return p;
   return get_new();
 }
 
-zmq::socket_t& connection_manager::get_frontend_socket() {
+zmq::socket_t& manager::get_frontend_socket() {
   zmq::socket_t* socket = socket_.get();
   if (socket)
       return *socket;

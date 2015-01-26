@@ -45,7 +45,7 @@ class connection {
  private:
   connection_manager_ptr manager_;
   uint64 connection_id_;
-  friend class connection_manager;
+  friend class manager;
 };
 
 }  // namespace rpcz

@@ -11,7 +11,7 @@ rpc_channel_ptr rpc_channel::make_shared(const connection& c) {
 }
 
 rpc_channel_ptr rpc_channel::make_shared(const std::string& endpoint) {
-  return make_shared(connection_manager::get()->connect(endpoint));
+  return make_shared(manager::get()->connect(endpoint));
 }
 
 }  // namespace rpcz

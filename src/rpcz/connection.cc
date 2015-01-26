@@ -27,12 +27,12 @@
 namespace rpcz {
 
 connection::connection()
-    : manager_(connection_manager::get()),
+    : manager_(manager::get()),
       connection_id_(0) {
 }
 
 connection::connection(uint64 connection_id)
-    : manager_(connection_manager::get()),
+    : manager_(manager::get()),
       connection_id_(connection_id) {
 }
 

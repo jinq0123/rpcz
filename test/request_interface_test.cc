@@ -65,7 +65,7 @@ class server_test : public ::testing::Test {
  public:
   server_test() :
       context_(new zmq::context_t(1)) /* scoped_ptr */ {
-    EXPECT_TRUE(connection_manager::is_destroyed());
+    EXPECT_TRUE(manager::is_destroyed());
     application::set_zmq_context(context_.get());
     application::set_connection_manager_threads(10);
     connection_.reset(new connection);
@@ -80,12 +80,12 @@ class server_test : public ::testing::Test {
     service_.reset();
     connection_.reset();
 
-    EXPECT_TRUE(connection_manager::is_destroyed());
+    EXPECT_TRUE(manager::is_destroyed());
     context_.reset();
   }
 
   void start_server() {
-    rpcz::connection_manager_ptr cm = rpcz::connection_manager::get();
+    rpcz::connection_manager_ptr cm = rpcz::manager::get();
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
     server_->bind("inproc://myserver.frontend");

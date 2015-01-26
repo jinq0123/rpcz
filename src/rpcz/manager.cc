@@ -37,15 +37,15 @@
 
 namespace rpcz {
 
-connection_manager::weak_ptr connection_manager::this_weak_ptr_;
-boost::mutex connection_manager::this_weak_ptr_mutex_;
+manager::weak_ptr manager::this_weak_ptr_;
+boost::mutex manager::this_weak_ptr_mutex_;
 
-connection_manager::connection_manager()
+manager::manager()
   : context_(NULL),
     is_terminating_(new sync_event) { // scoped_ptr
-  DLOG(INFO) << "connection_manager() ";
+  DLOG(INFO) << "manager() ";
   frontend_endpoint_ = "inproc://" + boost::lexical_cast<std::string>(this)
-      + ".rpcz.connection_manager.frontend";
+      + ".rpcz.manager.frontend";
 
   application_options options;
   context_ = options.get_zmq_context();
@@ -73,21 +73,21 @@ connection_manager::connection_manager()
   event.wait();
 }
 
-connection_manager_ptr connection_manager::get_new() {
+connection_manager_ptr manager::get_new() {
   lock_guard lock(this_weak_ptr_mutex_);
   connection_manager_ptr p = this_weak_ptr_.lock();
   if (p) return p;
-  p.reset(new connection_manager);
+  p.reset(new manager);
   this_weak_ptr_ = p;
   return p;
 }
 
-bool connection_manager::is_destroyed() {
+bool manager::is_destroyed() {
   return 0 == this_weak_ptr_.use_count();
 }
 
 // used by get_frontend_socket()
-zmq::socket_t& connection_manager::new_frontend_socket() {
+zmq::socket_t& manager::new_frontend_socket() {
   assert(NULL == socket_.get());
   zmq::socket_t* socket = new zmq::socket_t(*context_, ZMQ_DEALER);
   int linger_ms = 0;
@@ -98,7 +98,7 @@ zmq::socket_t& connection_manager::new_frontend_socket() {
   return *socket;
 }
 
-connection connection_manager::connect(const std::string& endpoint) {
+connection manager::connect(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kConnect, ZMQ_SNDMORE);
@@ -110,7 +110,7 @@ connection connection_manager::connect(const std::string& endpoint) {
   return connection(connection_id);
 }
 
-void connection_manager::bind(const std::string& endpoint,
+void manager::bind(const std::string& endpoint,
     const service_factory_map& factories) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
@@ -123,7 +123,7 @@ void connection_manager::bind(const std::string& endpoint,
 }
 
 // Unbind socket and unregister server_function.
-void connection_manager::unbind(const std::string& endpoint) {
+void manager::unbind(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kUnbind, ZMQ_SNDMORE);
@@ -133,7 +133,7 @@ void connection_manager::unbind(const std::string& endpoint) {
   socket.recv(&msg);
 }
 
-void connection_manager::add(closure* closure) {
+void manager::add(closure* closure) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kRunClosure, ZMQ_SNDMORE);
@@ -141,16 +141,16 @@ void connection_manager::add(closure* closure) {
   return;
 }
 
-void connection_manager::run() {
+void manager::run() {
   is_terminating_->wait();
 }
 
-void connection_manager::terminate() {
+void manager::terminate() {
   is_terminating_->signal();
 }
 
-connection_manager::~connection_manager() {
-  DLOG(INFO) << "~connection_manager()";
+manager::~manager() {
+  DLOG(INFO) << "~manager()";
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kQuit, 0);
