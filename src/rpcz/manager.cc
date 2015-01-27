@@ -60,7 +60,7 @@ manager::manager()
   int linger_ms = 0;
   frontend_socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   frontend_socket->bind(frontend_endpoint_.c_str());
-  int nthreads = options.get_connection_manager_threads();
+  int nthreads = options.get_worker_threads();
   assert(nthreads > 0);
   for (int i = 0; i < nthreads; ++i) {
     worker_threads_.add_thread(new boost::thread(worker_thread_fun,

@@ -22,7 +22,7 @@ public:
   static void set_zmq_io_threads(int n);
   static int get_zmq_io_threads();
   static void set_manager_threads(int n);
-  static int get_connection_manager_threads();
+  static int get_worker_threads();
 
  private:
   static boost::mutex mutex_;
@@ -31,7 +31,7 @@ public:
  private:
   // Number of worker threads. Those threads are used for
   // running user code: handling server requests or running callbacks.
-  static int connection_manager_threads_;  // default 1
+  static int worker_threads_;  // default 1
 
   // ZeroMQ context to use for our application. If NULL, then application will
   // construct its own ZeroMQ context and own it. If you provide your own

@@ -5,7 +5,7 @@
 namespace rpcz {
 
 boost::mutex application_options::mutex_;
-int application_options::connection_manager_threads_ = 1;
+int application_options::worker_threads_ = 1;
 zmq::context_t* application_options::zmq_context_ = NULL;
 int application_options::zmq_io_threads_ = 1;
 
@@ -40,13 +40,13 @@ int application_options::get_zmq_io_threads() {
 void application_options::set_manager_threads(int n) {
   lock_guard lock(mutex_);
   if (n <= 0) return;
-  connection_manager_threads_ = n;
+  worker_threads_ = n;
 }
 
-int application_options::get_connection_manager_threads() {
+int application_options::get_worker_threads() {
   lock_guard lock(mutex_);
-  assert(connection_manager_threads_ > 0);
-  return connection_manager_threads_;
+  assert(worker_threads_ > 0);
+  return worker_threads_;
 }
 
 }  // namespace rpcz
