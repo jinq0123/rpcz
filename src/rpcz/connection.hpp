@@ -23,7 +23,7 @@
 
 namespace rpcz {
 class message_vector;
-class rpc_context;
+class rpc_controller;
 
 // Represents a connection to a server. Thread-safe.
 class connection {
@@ -35,9 +35,9 @@ class connection {
   //          request. The vector has to live valid at least until the request
   //          completes. It can be safely de-allocated inside the provided
   //          closure or after remote_response->wait() returns.
-  // ctx: context to run on one of the worker threads when a response arrives
-  //      or it timeouts.
-  void send_request(message_vector& request, rpc_context* ctx);
+  // ctrl: controller to run handler on one of the worker threads
+  //       when a response arrives or timeout expires.
+  void send_request(message_vector& request, rpc_controller* ctrl);
 
  private:
   explicit connection(uint64 connection_id);

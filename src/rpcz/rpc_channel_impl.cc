@@ -19,7 +19,7 @@
 
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/logging.hpp>  // for CHECK_EQ
-#include <rpcz/rpc_context.hpp>
+#include <rpcz/rpc_controller.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/sync_call_handler.hpp>
@@ -68,10 +68,10 @@ rpc_channel_impl::~rpc_channel_impl() {
 //  msg_vector.push_back(msg_out.release());
 //  msg_vector.push_back(payload_out.release());
 //
-//  // rpc_context will be deleted on response or timeout.
-//  rpc_context* ctx = new rpc_context(
+//  // rpc_controller will be deleted on response or timeout.
+//  rpc_controller* ctrl = new rpc_controller(
 //      response_message_handler(), error_handler(), -1);  // XXX
-//  connection_.send_request(msg_vector, ctx);
+//  connection_.send_request(msg_vector, ctrl);
 //}
 
 // XXX
@@ -137,11 +137,11 @@ void rpc_channel_impl::async_call(
   msg_vector.push_back(msg_out.release());
   msg_vector.push_back(payload_out.release());
 
-  // rpc_context will be deleted on response or timeout.
-  // rpc_context deleted in worker_thread_fun().
+  // rpc_controller will be deleted on response or timeout.
+  // rpc_controller deleted in worker_thread_fun().
   // XXX delete on timeout.
-  rpc_context* ctx = new rpc_context(handler, timeout_ms);
-  connection_.send_request(msg_vector, ctx);
+  rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
+  connection_.send_request(msg_vector, ctrl);
 }
 
 void rpc_channel_impl::sync_call(

@@ -23,7 +23,7 @@
 #include <rpcz/internal_commands.hpp>  // for kReady
 #include <rpcz/logging.hpp>  // for CHECK_EQ()
 #include <rpcz/request_handler.hpp>
-#include <rpcz/rpc_context.hpp>  // for rpc_context
+#include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message()
 
 namespace rpcz {
@@ -54,11 +54,11 @@ void worker_thread_fun(zmq::context_t& context,
         }
         break;
       case kHandleResponse: {
-        rpc_context* ctx =
-            interpret_message<rpc_context*>(iter.next());
-        BOOST_ASSERT(ctx);
-        ctx->handle_response(iter);
-        delete ctx;
+        rpc_controller* ctrl =
+            interpret_message<rpc_controller*>(iter.next());
+        BOOST_ASSERT(ctrl);
+        ctrl->handle_response(iter);
+        delete ctrl;
         }
         break;
       default:

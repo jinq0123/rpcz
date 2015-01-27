@@ -1,7 +1,7 @@
 // Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/rpc_context.hpp>
+#include <rpcz/rpc_controller.hpp>
 
 #include <rpcz/application_error_code.hpp>  // for application_error
 #include <rpcz/rpc_error.hpp>
@@ -11,7 +11,7 @@
 namespace rpcz {
 
 // Run in worker thread.
-void rpc_context::handle_response(
+void rpc_controller::handle_response(
     message_iterator& iter) {
   if (!timeout_expired_) {
     // in most cases
@@ -21,7 +21,7 @@ void rpc_context::handle_response(
   handle_timeout_expired();
 }  // handle_response()
 
-inline void rpc_context::handle_response_message(
+inline void rpc_controller::handle_response_message(
     const void* data, size_t size) {
   BOOST_ASSERT(data);
   if (handler_) {
@@ -29,18 +29,18 @@ inline void rpc_context::handle_response_message(
   }
 }  // handle_response_message
 
-void rpc_context::handle_timeout_expired() {
+void rpc_controller::handle_timeout_expired() {
   handle_error(status::DEADLINE_EXCEEDED, 0, "");
 }
 
-void rpc_context::handle_application_error(
+void rpc_controller::handle_application_error(
   int application_error_code,
   const std::string& error_message) {
   handle_error(status::APPLICATION_ERROR,
       application_error_code, error_message);
 }
 
-void rpc_context::handle_error(status_code status,
+void rpc_controller::handle_error(status_code status,
                                int application_error_code,
                                const std::string& error_message) {
   if (handler_.empty()) return;
@@ -49,7 +49,7 @@ void rpc_context::handle_error(status_code status,
 }
 
 // Must be implemented in .cc file because of rpc_response_header.
-inline void rpc_context::handle_done_response(message_iterator& iter) {
+inline void rpc_controller::handle_done_response(message_iterator& iter) {
   if (!iter.has_more()) {
     handle_application_error(application_error::INVALID_MESSAGE, "");
     return;

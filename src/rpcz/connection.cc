@@ -21,7 +21,7 @@
 
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/manager.hpp>
-#include <rpcz/rpc_context.hpp>  // for rpc_context
+#include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/zmq_utils.hpp>
 
 namespace rpcz {
@@ -38,13 +38,13 @@ connection::connection(uint64 connection_id)
 
 void connection::send_request(
     message_vector& request,
-    rpc_context* ctx) {
-  BOOST_ASSERT(ctx);
+    rpc_controller* ctrl) {
+  BOOST_ASSERT(ctrl);
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kRequest, ZMQ_SNDMORE);
   send_uint64(&socket, connection_id_, ZMQ_SNDMORE);
-  send_pointer(&socket, ctx, ZMQ_SNDMORE);
+  send_pointer(&socket, ctrl, ZMQ_SNDMORE);
   write_vector_to_socket(&socket, request);
 }
 

@@ -30,7 +30,7 @@
 namespace rpcz {
 
 class message_iterator;
-class rpc_context;
+class rpc_controller;
 class sync_event;
 
 // Client and server use the same broker_thread.
@@ -84,7 +84,7 @@ class broker_thread {
   inline void send_reply(message_iterator& iter);
 
  private:
-  typedef std::map<event_id, rpc_context*>
+  typedef std::map<event_id, rpc_controller*>
       remote_response_map;
   remote_response_map remote_response_map_;
   detail::event_id_generator event_id_generator_;

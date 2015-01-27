@@ -19,15 +19,15 @@ namespace rpcz {
 
 class message_iterator;
 
-class rpc_context : boost::noncopyable {
+class rpc_controller : boost::noncopyable {
  public:
-  inline rpc_context(
+  inline rpc_controller(
       const response_message_handler& handler,
       long timeout_ms)
       : handler_(handler),
         timeout_ms_(timeout_ms),
         timeout_expired_(false) {}
-  inline ~rpc_context() {}
+  inline ~rpc_controller() {}
 
  public:
   inline long get_timeout_ms() const { return timeout_ms_; }
@@ -56,7 +56,7 @@ class rpc_context : boost::noncopyable {
   response_message_handler handler_;
   long timeout_ms_;
   bool timeout_expired_;
-};  // class rpc_context
+};  // class rpc_controller
 
 }  // namespace rpcz
 #endif  // RPCZ_RPC_CONTEXT_HPP

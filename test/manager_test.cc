@@ -30,7 +30,7 @@
 #include "rpcz/client_connection.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/manager.hpp"
-#include "rpcz/rpc_context.hpp"
+#include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
@@ -116,7 +116,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
     }
   } hdl;
 
-  connection.send_request(*request, new rpc_context(boost::ref(hdl), 0));
+  connection.send_request(*request, new rpc_controller(boost::ref(hdl), 0));
   hdl.event.wait();
 }
 
@@ -151,7 +151,7 @@ void SendManyMessages(connection connection, int thread_id) {
     message_vector* request = create_simple_request(
         thread_id * request_count * 17 + i);
     requests.push_back(request);
-    connection.send_request(*request, new rpc_context(boost::ref(barrier), -1));
+    connection.send_request(*request, new rpc_controller(boost::ref(barrier), -1));
   }
   barrier.wait(request_count);
 }
@@ -178,7 +178,7 @@ TEST_F(manager_test, ManyClientsTest) {
       event.signal();
     }
   } hdl;
-  connection.send_request(*request, new rpc_context(boost::ref(hdl), -1));
+  connection.send_request(*request, new rpc_controller(boost::ref(hdl), -1));
   hdl.event.wait();
   thread.join();
 }

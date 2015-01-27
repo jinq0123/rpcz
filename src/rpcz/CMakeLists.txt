@@ -26,9 +26,9 @@ set(RPCZ_SOURCES
     replier.cc
     request_handler.cc
     request_handler_manager.cc
-    rpc_context.cc
     rpc_channel.cc
     rpc_channel_impl.cc
+    rpc_controller.cc
     rpc_error.cc
     server.cc
     server_impl.cc

@@ -21,7 +21,7 @@
 #include <rpcz/clock.hpp>  // for zclock_ms()
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/logging.hpp>
-#include <rpcz/rpc_context.hpp>  // for rpc_context
+#include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/sync_event.hpp>
 #include <rpcz/zmq_utils.hpp>
 
@@ -200,11 +200,11 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
 
 void broker_thread::send_request(message_iterator& iter) {
   uint64 connection_id = interpret_message<uint64>(iter.next());
-  rpc_context* ctx = interpret_message<rpc_context*>(iter.next());
-  BOOST_ASSERT(ctx);
+  rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
+  BOOST_ASSERT(ctrl);
   event_id event_id = event_id_generator_.get_next();
-  remote_response_map_[event_id] = ctx;
-  int64 timeout_ms = ctx->get_timeout_ms();
+  remote_response_map_[event_id] = ctrl;
+  int64 timeout_ms = ctrl->get_timeout_ms();
   if (-1 != timeout_ms) {
     // XXX when to delete timeout handler?
     reactor_.run_closure_at(zclock_ms() + timeout_ms,
@@ -229,10 +229,10 @@ void broker_thread::handle_client_socket(zmq::socket_t* socket) {
   if (response_iter == remote_response_map_.end()) {
     return;
   }
-  const rpc_context* ctx = response_iter->second;
-  BOOST_ASSERT(ctx);
+  const rpc_controller* ctrl = response_iter->second;
+  BOOST_ASSERT(ctrl);
   begin_worker_command(kHandleResponse);
-  send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
+  send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
   remote_response_map_.erase(response_iter);
 }
@@ -242,11 +242,11 @@ void broker_thread::handle_timeout(event_id event_id) {
   if (response_iter == remote_response_map_.end()) {
       return;
   }
-  rpc_context* ctx = response_iter->second;
-  BOOST_ASSERT(ctx);
-  ctx->set_timeout_expired();
+  rpc_controller* ctrl = response_iter->second;
+  BOOST_ASSERT(ctrl);
+  ctrl->set_timeout_expired();
   begin_worker_command(kHandleResponse);
-  send_pointer(frontend_socket_, ctx, 0);
+  send_pointer(frontend_socket_, ctrl, 0);
   remote_response_map_.erase(response_iter);
 }
 
