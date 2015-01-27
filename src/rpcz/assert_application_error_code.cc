@@ -12,4 +12,7 @@ BOOST_STATIC_ASSERT(application_error::NO_SUCH_SERVICE == rpc_response_header::N
 BOOST_STATIC_ASSERT(application_error::NO_SUCH_METHOD == rpc_response_header::NO_SUCH_METHOD);
 BOOST_STATIC_ASSERT(application_error::INVALID_MESSAGE == rpc_response_header::INVALID_MESSAGE);
 BOOST_STATIC_ASSERT(application_error::METHOD_NOT_IMPLEMENTED == rpc_response_header::METHOD_NOT_IMPLEMENTED);
+
+// warning LNK4221: This object file does not define any previously undefined public symbols, so it will not be used by any link operation that consumes this library
+char _ASSERT_APPLICATION_ERROR_CODE_CC_[] = "";
 }  // namespace rpcz
