@@ -20,7 +20,6 @@
 #include <zmq.hpp>
 
 #include <rpcz/callback.hpp>  // for closure
-#include <rpcz/handle_response.hpp>  // for handle_response()
 #include <rpcz/internal_commands.hpp>  // for kReady
 #include <rpcz/logging.hpp>  // for CHECK_EQ()
 #include <rpcz/manager_status.hpp>  // for connection_manager_status
