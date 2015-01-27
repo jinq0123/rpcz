@@ -42,14 +42,18 @@ namespace rpcz {
 class SearchServiceImpl : public SearchService {
  public:
   SearchServiceImpl() {
+    LOG(INFO) << "SearchServiceImpl()";
   }
 
   ~SearchServiceImpl() {
+    LOG(INFO) << "~SearchServiceImpl()";
   }
 
   virtual void Search(
       const SearchRequest& request,
       replier replier_copy) {
+    LOG(INFO) << "Search()";
+
     if (request.query() == "timeout") {
       // We "lose" the request.
       return;
@@ -66,6 +70,7 @@ class server_test : public ::testing::Test {
  public:
   server_test() :
       context_(new zmq::context_t(1)) /* scoped_ptr */ {
+    LOG(INFO) << "server_test()";
     EXPECT_TRUE(manager::is_destroyed());
     application::set_zmq_context(context_.get());
     application::set_manager_threads(10);
@@ -74,6 +79,7 @@ class server_test : public ::testing::Test {
   }
 
   ~server_test() {
+    LOG(INFO) << "~server_test()";
     // terminate the context, which will cause the thread to quit.
     application::terminate();
     server_.reset();
@@ -85,6 +91,7 @@ class server_test : public ::testing::Test {
   }
 
   void start_server() {
+    LOG(INFO) << "start_server()";
     rpcz::manager_ptr mgr = rpcz::manager::get();
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
@@ -109,6 +116,7 @@ struct handler {
 
   void operator()(const rpc_error* e, const SearchResponse& resp)
   {
+    LOG(INFO) << "handler operator()()";
     if (e) {
       error.reset(*e);
     } else {
@@ -132,6 +140,7 @@ Ordered as the declaration in search.rpcz.h.
 // Async interfaces:
 
 TEST_F(server_test, AsyncRequestWithTimeout) {
+  LOG(INFO) << "AsyncRequestWithTimeout";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("timeout");
@@ -145,6 +154,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
 }
 
 TEST_F(server_test, AsyncRequest) {
+  LOG(INFO) << "AsyncRequest";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("stone");
@@ -158,6 +168,7 @@ TEST_F(server_test, AsyncRequest) {
 }
 
 TEST_F(server_test, AsyncOnewayRequest) {
+  LOG(INFO) << "AsyncOnewayRequest";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("rocket");
@@ -173,6 +184,7 @@ TEST_F(server_test, AsyncOnewayRequest) {
 }
 
 TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
+  LOG(INFO) << "AsyncOnewayRequestDefaultMs";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("robot");
@@ -185,6 +197,7 @@ TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
 // Sync interfaces:
 
 TEST_F(server_test, SyncRequest) {
+  LOG(INFO) << "SyncRequest";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("student");
@@ -195,6 +208,7 @@ TEST_F(server_test, SyncRequest) {
 }
 
 TEST_F(server_test, SyncRequestDefaultMs) {
+  LOG(INFO) << "SyncRequestDefaultMs";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("stupid");
@@ -205,6 +219,7 @@ TEST_F(server_test, SyncRequestDefaultMs) {
 }
 
 TEST_F(server_test, SyncRequestReturn) {
+  LOG(INFO) << "SyncRequestReturn";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("spool");
@@ -214,6 +229,7 @@ TEST_F(server_test, SyncRequestReturn) {
 }
 
 TEST_F(server_test, SyncRequestReturnDefaultMs) {
+  LOG(INFO) << "SyncRequestReturnDefaultMs";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   request.set_query("star");
@@ -224,7 +240,8 @@ TEST_F(server_test, SyncRequestReturnDefaultMs) {
 
 // Other interfaces:
 
-TEST_F(server_test, SetDefaulDeadlineMs) {
+TEST_F(server_test, SetDefaulTimeoutMs) {
+  LOG(INFO) << "SetDefaulDeadlineMs";
   SearchService_Stub stub(rpc_channel::make_shared(*connection_));
   SearchRequest request;
   SearchResponse response;
