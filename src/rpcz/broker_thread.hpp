@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -85,9 +86,7 @@ class broker_thread {
  private:
   typedef std::map<event_id, rpc_context*>
       remote_response_map;
-  typedef std::map<uint64, event_id> deadline_map;
   remote_response_map remote_response_map_;
-  deadline_map deadline_map_;
   detail::event_id_generator event_id_generator_;
   reactor reactor_;
   std::vector<zmq::socket_t*> client_sockets_;  // Dealer sockets of client.

@@ -45,13 +45,13 @@ class rpc_channel_impl: public rpc_channel {
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,
       const response_message_handler& msg_handler,
-      long deadline_ms);
+      long timeout_ms);
 
   virtual void sync_call(
       const std::string& service_name,
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,
-      long deadline_ms,
+      long timeout_ms,
       google::protobuf::Message* response);
 
   // XXX

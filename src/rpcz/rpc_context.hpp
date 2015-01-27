@@ -23,15 +23,15 @@ class rpc_context : boost::noncopyable {
  public:
   inline rpc_context(
       const response_message_handler& handler,
-      long deadline_ms)
+      long timeout_ms)
       : handler_(handler),
-        deadline_ms_(deadline_ms),
-        deadline_exceeded_(false) {}
+        timeout_ms_(timeout_ms),
+        timeout_expired_(false) {}
   inline ~rpc_context() {}
 
  public:
-  inline long get_deadline_ms() const { return deadline_ms_; }
-  inline void set_deadline_exceeded() { deadline_exceeded_ = true; }
+  inline long get_timeout_ms() const { return timeout_ms_; }
+  inline void set_timeout_expired() { timeout_expired_ = true; }
 
  public:
   // Not inlined to inline all other private handlers in .cc file.
@@ -44,7 +44,7 @@ class rpc_context : boost::noncopyable {
 
  private:
   // Error handlers are not inlined.
-  void handle_deadline_exceed();
+  void handle_timeout_expired();
   void handle_application_error(
       int application_error_code,
       const std::string& error_message);
@@ -54,8 +54,8 @@ class rpc_context : boost::noncopyable {
 
  private:
   response_message_handler handler_;
-  long deadline_ms_;
-  bool deadline_exceeded_;
+  long timeout_ms_;
+  bool timeout_expired_;
 };  // class rpc_context
 
 }  // namespace rpcz

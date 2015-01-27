@@ -204,10 +204,10 @@ void broker_thread::send_request(message_iterator& iter) {
   BOOST_ASSERT(ctx);
   event_id event_id = event_id_generator_.get_next();
   remote_response_map_[event_id] = ctx;
-  int64 deadline_ms = ctx->get_deadline_ms();
-  if (-1 != deadline_ms) {
+  int64 timeout_ms = ctx->get_timeout_ms();
+  if (-1 != timeout_ms) {
     // XXX when to delete timeout handler?
-    reactor_.run_closure_at(zclock_ms() + deadline_ms,
+    reactor_.run_closure_at(zclock_ms() + timeout_ms,
         new_callback(this, &broker_thread::handle_timeout, event_id));
   }
   zmq::socket_t* socket = client_sockets_[connection_id];
@@ -244,7 +244,7 @@ void broker_thread::handle_timeout(event_id event_id) {
   }
   rpc_context* ctx = response_iter->second;
   BOOST_ASSERT(ctx);
-  ctx->set_deadline_exceeded();
+  ctx->set_timeout_expired();
   begin_worker_command(kHandleResponse);
   send_pointer(frontend_socket_, ctx, 0);
   remote_response_map_.erase(response_iter);

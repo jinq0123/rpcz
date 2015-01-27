@@ -120,7 +120,7 @@ struct handler {
 /*
 Test all kinds of request interfaces.
 . Sync or async
-. Explicit deadline or implicit default deadline
+. Explicit timeout or implicit default timeout
 . Return response or use output parameter (only for sync)
 . Explicit error handler or implicit default error handler (only for async)
 There are 4 sync interfaces and 4 async interfaces.
@@ -228,7 +228,7 @@ TEST_F(server_test, SetDefaulDeadlineMs) {
   SearchRequest request;
   SearchResponse response;
   request.set_query("timeout");
-  stub.set_default_deadline_ms(1);
+  stub.set_default_timeout_ms(1);
   try {
     stub.Search(request, &response);
     ASSERT_TRUE(false);

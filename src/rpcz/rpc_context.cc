@@ -13,12 +13,12 @@ namespace rpcz {
 // Run in worker thread.
 void rpc_context::handle_response(
     message_iterator& iter) {
-  if (!deadline_exceeded_) {
+  if (!timeout_expired_) {
     // in most cases
     handle_done_response(iter);
     return;
   }
-  handle_deadline_exceed();
+  handle_timeout_expired();
 }  // handle_response()
 
 inline void rpc_context::handle_response_message(
@@ -29,7 +29,7 @@ inline void rpc_context::handle_response_message(
   }
 }  // handle_response_message
 
-void rpc_context::handle_deadline_exceed() {
+void rpc_context::handle_timeout_expired() {
   handle_error(status::DEADLINE_EXCEEDED, 0, "");
 }
 

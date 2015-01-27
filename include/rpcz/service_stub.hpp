@@ -21,17 +21,17 @@ class service_stub {
                       const std::string& service_name) :
       channel_(channel),
       service_name_(service_name),
-      default_deadline_ms_(-1) {}
+      default_timeout_ms_(-1) {}
   inline virtual ~service_stub() {}
 
  public:
   inline rpc_channel_ptr channel() { return channel_; }
-  inline void set_default_deadline_ms(long ms) { default_deadline_ms_ = ms; }
+  inline void set_default_timeout_ms(long ms) { default_timeout_ms_ = ms; }
 
  protected:
   rpc_channel_ptr channel_;
   std::string service_name_;
-  long default_deadline_ms_;
+  long default_timeout_ms_;
 
  private:
   GOOGLE_DISALLOW_EVIL_CONSTRUCTORS(service_stub);

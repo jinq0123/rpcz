@@ -146,43 +146,43 @@ void ServiceGenerator::GenerateOneStubMethodSignature(
       "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler,\n"
-      "    long deadline_ms);\n");
+      "    long timeout_ms);\n");
   printer->Print(sub_vars,
       "inline $virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
       "    const $name$_Handler& handler) {\n"
-      "  async_$name$(request, handler, default_deadline_ms_);\n"
+      "  async_$name$(request, handler, default_timeout_ms_);\n"
       "}\n");
   printer->Print(sub_vars,
       "$virtual$void async_$name$(\n"
       "    const $input_type$& request,\n"
-      "    long deadline_ms);\n");
+      "    long timeout_ms);\n");
   printer->Print(sub_vars,
       "inline $virtual$void async_$name$(\n"
       "    const $input_type$& request) {\n"
-      "  async_$name$(request, default_deadline_ms_);\n"
+      "  async_$name$(request, default_timeout_ms_);\n"
       "}\n");
 
   // sync interfaces
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
-      "    long deadline_ms,\n"
+      "    long timeout_ms,\n"
       "    $output_type$* response);\n");
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
       "    $output_type$* response) {\n"
-      "  $name$(request, default_deadline_ms_, response);\n"
+      "  $name$(request, default_timeout_ms_, response);\n"
       "}\n");
   printer->Print(sub_vars,
       "$virtual$$output_type$ $name$(\n"
       "    const $input_type$& request,\n"
-      "    long deadline_ms);\n");
+      "    long timeout_ms);\n");
   printer->Print(sub_vars,
       "$virtual$$output_type$ $name$(\n"
       "    const $input_type$& request) {\n"
-      "  return $name$(request, default_deadline_ms_);\n"
+      "  return $name$(request, default_timeout_ms_);\n"
       "}\n");
 }
 
@@ -362,41 +362,41 @@ void ServiceGenerator::GenerateOneStubMethod(
     "void $classname$_Stub::async_$name$(\n"
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler,\n"
-    "    long deadline_ms) {\n"
+    "    long timeout_ms) {\n"
     "  channel_->async_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler),\n"
-    "      deadline_ms);\n"
+    "      timeout_ms);\n"
     "}\n");
   printer->Print(sub_vars,
     "void $classname$_Stub::async_$name$(\n"
     "    const $input_type$& request,\n"
-    "    long deadline_ms) {\n"
+    "    long timeout_ms) {\n"
     "  // optimized for empty handler\n"
     "  channel_->async_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      rpcz::response_message_handler(),\n"
-    "      deadline_ms);\n"
+    "      timeout_ms);\n"
     "}\n");
 
   // sync methods
   printer->Print(sub_vars,
     "void $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
-    "    long deadline_ms,\n"
+    "    long timeout_ms,\n"
     "    $output_type$* response) {\n"
     "  channel_->sync_call(service_name_,\n"
     "      $classname$::descriptor()->method($index$),\n"
-    "      request, deadline_ms, response);\n"
+    "      request, timeout_ms, response);\n"
     "}\n");
   printer->Print(sub_vars,
     "$output_type$ $classname$_Stub::$name$(\n"
     "    const $input_type$& request,\n"
-    "    long deadline_ms) {\n"
+    "    long timeout_ms) {\n"
     "  $output_type$ response;\n"
-    "  $name$(request, deadline_ms, &response);\n"
+    "  $name$(request, timeout_ms, &response);\n"
     "  return response;\n"
     "}\n");
 }
