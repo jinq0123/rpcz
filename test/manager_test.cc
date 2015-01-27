@@ -37,12 +37,12 @@
 
 namespace rpcz {
 
-class connection_manager_test : public ::testing::Test {
+class manager_test : public ::testing::Test {
  public:
-  connection_manager_test() : context(1) {
+  manager_test() : context(1) {
     application::set_zmq_context(&context);
   }
-  ~connection_manager_test() {
+  ~manager_test() {
     application::set_zmq_context(NULL);
   }
 
@@ -50,7 +50,7 @@ class connection_manager_test : public ::testing::Test {
   zmq::context_t context;
 };
 
-TEST_F(connection_manager_test, TestStartsAndFinishes) {
+TEST_F(manager_test, TestStartsAndFinishes) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
   manager_ptr mgr = manager::get();
@@ -98,7 +98,7 @@ message_vector* create_quit_request() {
   return request;
 }
 
-TEST_F(connection_manager_test, TestTimeoutAsync) {
+TEST_F(manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
   zmq::socket_t server(context, ZMQ_DEALER);
@@ -156,7 +156,7 @@ void SendManyMessages(connection connection, int thread_id) {
   barrier.wait(request_count);
 }
 
-TEST_F(connection_manager_test, ManyClientsTest) {
+TEST_F(manager_test, ManyClientsTest) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
 
@@ -183,7 +183,7 @@ TEST_F(connection_manager_test, ManyClientsTest) {
   thread.join();
 }
 
-TEST_F(connection_manager_test, TestUnbind) {
+TEST_F(manager_test, TestUnbind) {
   ASSERT_TRUE(manager::is_destroyed());
   manager_ptr mgr = manager::get();
   const char kEndpoint[] = "inproc://server.point";
@@ -205,7 +205,7 @@ void DoThis(zmq::context_t* context) {
   LOG(INFO)<<"socket closed";
 }
 
-TEST_F(connection_manager_test, ProcessesSingleCallback) {
+TEST_F(manager_test, ProcessesSingleCallback) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
   manager_ptr mgr = manager::get();
@@ -242,7 +242,7 @@ void add_many_closures() {
   }
 }
 
-TEST_F(connection_manager_test, ProcessesManyCallbacksFromManyThreads) {
+TEST_F(manager_test, ProcessesManyCallbacksFromManyThreads) {
   ASSERT_TRUE(manager::is_destroyed());
   const int thread_count = 10;
   application::set_manager_threads(thread_count);
