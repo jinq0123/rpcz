@@ -21,7 +21,7 @@
 #include <rpcz/clock.hpp>  // for zclock_ms()
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/logging.hpp>
-#include <rpcz/manager_status.hpp>  // for CMSTATUS_DONE
+// DEL #include <rpcz/manager_status.hpp>  // for CMSTATUS_DONE
 #include <rpcz/rpc_context.hpp>  // for rpc_context
 #include <rpcz/sync_event.hpp>
 #include <rpcz/zmq_utils.hpp>
@@ -234,7 +234,7 @@ void broker_thread::handle_client_socket(zmq::socket_t* socket) {
   BOOST_ASSERT(ctx);
   begin_worker_command(kHandleResponse);
   send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
-  send_uint64(frontend_socket_, CMSTATUS_DONE, ZMQ_SNDMORE);
+  // DEL send_uint64(frontend_socket_, CMSTATUS_DONE, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
   remote_response_map_.erase(response_iter);
 }
@@ -248,8 +248,7 @@ void broker_thread::handle_timeout(event_id event_id) {
   BOOST_ASSERT(ctx);
   ctx->set_deadline_exceeded();
   begin_worker_command(kHandleResponse);
-  send_pointer(frontend_socket_, ctx, ZMQ_SNDMORE);
-  // DEL send_uint64(frontend_socket_, CMSTATUS_DEADLINE_EXCEEDED, 0);
+  send_pointer(frontend_socket_, ctx, 0);
   remote_response_map_.erase(response_iter);
 }
 

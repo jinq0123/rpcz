@@ -36,14 +36,14 @@ void worker_thread_fun(zmq::context_t& context,
   socket.connect(endpoint.c_str());
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kReady);
-  bool should_quit = false;
-  while (!should_quit) {
+  bool should_continue = true;
+  do {
     message_iterator iter(socket);
     CHECK_EQ(0, iter.next().size());
     char command(interpret_message<char>(iter.next()));
     switch (command) {
       case kWorkerQuit:
-        should_quit = true;
+        should_continue = false;
         break;
       case kRunClosure:
         interpret_message<closure*>(iter.next())->run();
@@ -61,9 +61,13 @@ void worker_thread_fun(zmq::context_t& context,
         BOOST_ASSERT(ctx);
         ctx->handle_response(iter);
         delete ctx;
-      }
-    }
-  }
+        }
+        break;
+      default:
+        CHECK(false);
+        break;
+    }  // switch
+  } while (should_continue);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kWorkerDone);
 }
