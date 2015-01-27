@@ -33,6 +33,12 @@ broker_thread::broker_thread(
     : context_(context),
       frontend_socket_(frontend_socket),
       current_worker_(0) {
+  // Index 0 is reserved for debug check.
+  client_sockets_.push_back(NULL);
+  BOOST_ASSERT(1 == client_sockets_.size());
+  server_sockets_.push_back(NULL);
+  BOOST_ASSERT(1 == server_sockets_.size());
+
   wait_for_workers_ready_reply(nthreads);
   ready_event->signal();
   reactor_.add_socket(frontend_socket, new_permanent_callback(
@@ -130,6 +136,7 @@ void broker_thread::add_closure(closure* closure) {
 
 void broker_thread::handle_connect_command(
       const std::string& sender, const std::string& endpoint) {
+  BOOST_ASSERT(!client_sockets_.empty());  // idx 0 is reserved
   zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
   client_sockets_.push_back(socket);
   int linger_ms = 0;
@@ -153,6 +160,7 @@ void broker_thread::handle_bind_command(
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->bind(endpoint.c_str());  // TODO: catch exception
   uint64 server_socket_idx = server_sockets_.size();
+  BOOST_ASSERT(server_socket_idx);  // idx 0 is reserved
   server_sockets_.push_back(socket);
   bind_map_[endpoint] = socket;  // for unbind
   // reactor will own socket and callback.
@@ -187,6 +195,7 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
 void broker_thread::handle_server_socket(uint64 server_socket_idx,
     const service_factory_map* factories) {
   assert(NULL != factories);
+  BOOST_ASSERT(server_socket_idx);
   message_iterator iter(*server_sockets_[server_socket_idx]);
   std::string sender(message_to_string(iter.next()));
   if (iter.next().size() != 0) return;
@@ -200,6 +209,7 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
 
 void broker_thread::send_request(message_iterator& iter) {
   uint64 connection_id = interpret_message<uint64>(iter.next());
+  BOOST_ASSERT(connection_id);  // XXX rename to clt_skt_idx
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
   event_id event_id = event_id_generator_.get_next();
@@ -211,6 +221,7 @@ void broker_thread::send_request(message_iterator& iter) {
         new_callback(this, &broker_thread::handle_timeout, event_id));
   }
   zmq::socket_t* socket = client_sockets_[connection_id];
+  BOOST_ASSERT(socket);
   send_string(socket, "", ZMQ_SNDMORE);
   send_uint64(socket, event_id, ZMQ_SNDMORE);
   forward_messages(iter, *socket);
@@ -252,6 +263,7 @@ void broker_thread::handle_timeout(event_id event_id) {
 
 void broker_thread::send_reply(message_iterator& iter) {
   uint64 server_socket_idx = interpret_message<uint64>(iter.next());
+  BOOST_ASSERT(server_socket_idx);
   zmq::socket_t* socket = server_sockets_[server_socket_idx];
   forward_messages(iter, *socket);
 }

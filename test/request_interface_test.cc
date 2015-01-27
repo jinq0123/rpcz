@@ -69,7 +69,6 @@ class server_test : public ::testing::Test {
     EXPECT_TRUE(manager::is_destroyed());
     application::set_zmq_context(context_.get());
     application::set_manager_threads(10);
-    connection_.reset(new connection);
     server_.reset(new server);
     start_server();
   }
@@ -90,7 +89,8 @@ class server_test : public ::testing::Test {
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
     server_->bind("inproc://myserver.frontend");
-    *connection_ = mgr->connect("inproc://myserver.frontend");
+    connection_.reset(new connection(
+        mgr->connect("inproc://myserver.frontend")));
   }
 
 protected:
@@ -137,7 +137,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
   request.set_query("timeout");
   handler hdl;
   stub.async_Search(request,
-      boost::ref(hdl), 
+      boost::ref(hdl),
       1/*ms*/);
   hdl.sync.wait();
   ASSERT_TRUE(hdl.error);

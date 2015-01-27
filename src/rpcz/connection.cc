@@ -26,10 +26,11 @@
 
 namespace rpcz {
 
-connection::connection()
-    : manager_(manager::get()),
-      connection_id_(0) {
-}
+    // DEL
+//connection::connection()
+//    : manager_(manager::get()),
+//      connection_id_(0) {
+//}
 
 connection::connection(uint64 connection_id)
     : manager_(manager::get()),

@@ -98,6 +98,7 @@ zmq::socket_t& manager::new_frontend_socket() {
   return *socket;
 }
 
+// XXX move to connection class
 connection manager::connect(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);

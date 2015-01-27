@@ -28,7 +28,9 @@ class rpc_controller;
 // Represents a connection to a server. Thread-safe.
 class connection {
  public:
-  connection();
+  explicit connection(uint64 connection_id);
+  // DEL
+  // connection();
 
   // Asynchronously sends a request over the connection.
   // request: a vector of messages to be sent. Does not take ownership of the
@@ -40,12 +42,8 @@ class connection {
   void send_request(message_vector& request, rpc_controller* ctrl);
 
  private:
-  explicit connection(uint64 connection_id);
-
- private:
   manager_ptr manager_;
   uint64 connection_id_;
-  friend class manager;
 };
 
 }  // namespace rpcz
