@@ -1,7 +1,7 @@
-// Client XXXconnection.
+// Router connection.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/client_connection.hpp>
+#include <rpcz/router_connection.hpp>
 
 #include <zmq.hpp>
 
@@ -11,16 +11,14 @@
 
 namespace rpcz {
 
-client_connection::client_connection(uint64 router_index,
+router_connection::router_connection(uint64 router_index,
                                      const std::string& sender)
     : manager_(*manager::get()),
       router_index_(router_index),
       sender_(sender) {
 };
 
-// TODO: rename client_connection to reply_broker
-
-void client_connection::reply(const std::string& event_id, 
+void router_connection::reply(const std::string& event_id, 
                               message_vector* v) const {
   zmq::socket_t& socket = manager_.get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);

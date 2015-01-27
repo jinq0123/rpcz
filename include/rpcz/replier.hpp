@@ -34,7 +34,7 @@ class message_t;
 
 namespace rpcz {
 
-class client_connection;
+class router_connection;
 class rpc_response_header;
 struct reply_context;
 
@@ -45,7 +45,7 @@ struct reply_context;
 // XXX More comments...
 class RPCZ_API replier {
  public:
-  replier(client_connection& conn, const std::string& event_id);
+  replier(router_connection& conn, const std::string& event_id);
   ~replier();
 
  public:

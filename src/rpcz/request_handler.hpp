@@ -4,8 +4,8 @@
 #define RPCZ_REQUEST_HANDLER_H
 
 #include <map>
-#include <rpcz/client_connection.hpp>
 #include <rpcz/common.hpp>  // for uint64
+#include <rpcz/router_connection.hpp>
 
 namespace rpcz {
 
@@ -35,7 +35,7 @@ class request_handler {
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
-  client_connection client_connection_;
+  router_connection client_connection_;
 };
 
 }  // namespace rpcz

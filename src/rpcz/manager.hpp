@@ -35,7 +35,7 @@ class socket_t;
 }  // namespace zmq
 
 namespace rpcz {
-class client_connection;
+class router_connection;
 class closure;
 class dealer_connection;
 class connection_thread_context;

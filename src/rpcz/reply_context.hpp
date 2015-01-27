@@ -8,15 +8,15 @@
 
 namespace rpcz {
 
-class client_connection;
+class router_connection;
 
 struct reply_context {
-  client_connection* clt_connection;  // TODO: rename to reply_broker
-  // TODO: Do not use client_connection pointer, because XXXconnection may be deleted.
+  router_connection* clt_connection;  // TODO: rename to reply_broker
+  // TODO: Do not use router_connection pointer, because XXXconnection may be deleted.
   std::string event_id;
   bool replied;  // To assert one reply.
 
-  inline reply_context(client_connection* conn, const std::string& evt_id)
+  inline reply_context(router_connection* conn, const std::string& evt_id)
       : clt_connection(conn),
         event_id(evt_id),
         replied(false) {

@@ -29,12 +29,12 @@ namespace rpcz {
 class manager;
 class message_vector;
 
-class client_connection {
+class router_connection {
  public:
   void reply(const std::string& event_id, message_vector* v) const;
 
  public:
-  client_connection(uint64 router_index, const std::string& sender);
+  router_connection(uint64 router_index, const std::string& sender);
 
  private:
   manager& manager_;

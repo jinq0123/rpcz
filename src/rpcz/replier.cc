@@ -19,10 +19,10 @@
 
 #include <zmq.hpp>  // for message_t
 
-#include <rpcz/client_connection.hpp>
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/logging.hpp>  // for CHECK()
 #include <rpcz/reply_context.hpp>
+#include <rpcz/router_connection.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_response_header
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
 
@@ -30,8 +30,8 @@
 
 namespace rpcz {
 
-// TODO: Do not use client_connection pointer, because XXXconnection may be deleted.
-replier::replier(client_connection& conn,  // TODO: rename to reply_broker
+// TODO: Do not use router_connection pointer, because XXXconnection may be deleted.
+replier::replier(router_connection& conn,  // TODO: rename to reply_broker
                  const std::string& event_id)
     : reply_context_(new reply_context(&conn, event_id)) { // shared_ptr
 };

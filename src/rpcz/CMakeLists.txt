@@ -16,7 +16,6 @@ set(RPCZ_SOURCES
     application_options.cc
     assert_application_error_code.cc
     broker_thread.cc
-    client_connection.cc
     clock.cc
     cpp_service.cc
     dealer_connection.cc
@@ -26,6 +25,7 @@ set(RPCZ_SOURCES
     replier.cc
     request_handler.cc
     request_handler_manager.cc
+    router_connection.cc
     rpc_channel.cc
     rpc_channel_impl.cc
     rpc_controller.cc
