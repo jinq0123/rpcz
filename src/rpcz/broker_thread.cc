@@ -160,8 +160,8 @@ void broker_thread::handle_bind_command(
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->bind(endpoint.c_str());  // TODO: catch exception
+  BOOST_ASSERT(!router_sockets_.empty());  // Index 0 is reserved.
   uint64 router_index = router_sockets_.size();
-  BOOST_ASSERT(is_router_index_legal(router_index));
   router_sockets_.push_back(socket);
   bind_map_[endpoint] = socket;  // for unbind
   // reactor will own socket and callback.
