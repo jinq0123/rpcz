@@ -72,7 +72,7 @@ class broker_thread {
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
 
-  void handle_server_socket(uint64 server_socket_idx,
+  void handle_server_socket(uint64 router_index,
       const service_factory_map* factories);  // TODO: use reference instead of pointer
 
   inline void send_request(message_iterator& iter);
@@ -92,8 +92,8 @@ class broker_thread {
   remote_response_map remote_response_map_;
   detail::event_id_generator event_id_generator_;
   reactor reactor_;
-  std::vector<zmq::socket_t*> dealer_sockets_;  // Dealer sockets for client.
-  std::vector<zmq::socket_t*> router_sockets_;  // Router sockets.for server.
+  std::vector<zmq::socket_t*> dealer_sockets_;  // of client.
+  std::vector<zmq::socket_t*> router_sockets_;  // of server.
   typedef std::map<std::string, zmq::socket_t*> endpoint_to_socket;
   endpoint_to_socket bind_map_;  // for unbind
   zmq::context_t& context_;

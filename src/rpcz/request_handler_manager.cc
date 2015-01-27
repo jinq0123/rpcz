@@ -18,11 +18,11 @@ request_handler_manager::~request_handler_manager(void) {
 request_handler* request_handler_manager::create_handler(
     const std::string& sender,
     const service_factory_map& factories,
-    uint64 server_socket_idx) {
+    uint64 router_index) {
   assert(handler_map_.find(sender) == handler_map_.end());
   // New request_handler. TODO: delete request_handler on disconnection
   request_handler_ptr handler_ptr(new request_handler(  // shared_ptr
-      server_socket_idx, sender));
+      router_index, sender));
   // Create services for this handler...
   BOOST_FOREACH(const service_factory_map::value_type& v, factories) {
     iservice* svc = v.second->create();

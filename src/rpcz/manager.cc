@@ -107,8 +107,8 @@ connection manager::connect(const std::string& endpoint) {
   zmq::message_t msg;
   socket.recv(&msg);
   socket.recv(&msg);
-  uint64 connection_id = interpret_message<uint64>(msg);
-  return connection(connection_id);
+  uint64 dealer_index = interpret_message<uint64>(msg);
+  return connection(dealer_index);
 }
 
 void manager::bind(const std::string& endpoint,

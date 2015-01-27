@@ -11,10 +11,10 @@
 
 namespace rpcz {
 
-client_connection::client_connection(uint64 server_socket_idx,
+client_connection::client_connection(uint64 router_index,
                                      const std::string& sender)
     : manager_(*manager::get()),
-      server_socket_idx_(server_socket_idx),
+      router_index_(router_index),
       sender_(sender) {
 };
 
@@ -25,7 +25,7 @@ void client_connection::reply(const std::string& event_id,
   zmq::socket_t& socket = manager_.get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kReply, ZMQ_SNDMORE);
-  send_uint64(&socket, server_socket_idx_, ZMQ_SNDMORE);
+  send_uint64(&socket, router_index_, ZMQ_SNDMORE);
   send_string(&socket, sender_, ZMQ_SNDMORE);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_string(&socket, event_id, ZMQ_SNDMORE);

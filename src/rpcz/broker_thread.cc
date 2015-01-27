@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -159,14 +160,14 @@ void broker_thread::handle_bind_command(
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->bind(endpoint.c_str());  // TODO: catch exception
-  uint64 server_socket_idx = router_sockets_.size();
-  BOOST_ASSERT(is_router_index_legal(server_socket_idx));
+  uint64 router_index = router_sockets_.size();
+  BOOST_ASSERT(is_router_index_legal(router_index));
   router_sockets_.push_back(socket);
   bind_map_[endpoint] = socket;  // for unbind
   // reactor will own socket and callback.
   reactor_.add_socket(socket, new_permanent_callback(
       this, &broker_thread::handle_server_socket,
-      server_socket_idx, &factories));
+      router_index, &factories));
 
   send_string(frontend_socket_, sender, ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -192,15 +193,15 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
     send_empty_message(frontend_socket_, 0);
 }
 
-void broker_thread::handle_server_socket(uint64 server_socket_idx,
+void broker_thread::handle_server_socket(uint64 router_index,
     const service_factory_map* factories) {
   assert(NULL != factories);
-  BOOST_ASSERT(is_router_index_legal(server_socket_idx));
-  message_iterator iter(*router_sockets_[server_socket_idx]);
+  BOOST_ASSERT(is_router_index_legal(router_index));
+  message_iterator iter(*router_sockets_[router_index]);
   std::string sender(message_to_string(iter.next()));
   if (iter.next().size() != 0) return;
   request_handler* handler = request_handler_manager_
-      .get_handler(sender, *factories, server_socket_idx);
+      .get_handler(sender, *factories, router_index);
   assert(NULL != handler);
   begin_worker_command(kHandleRequest);
   send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
@@ -208,8 +209,8 @@ void broker_thread::handle_server_socket(uint64 server_socket_idx,
 }
 
 void broker_thread::send_request(message_iterator& iter) {
-  uint64 connection_id = interpret_message<uint64>(iter.next());
-  BOOST_ASSERT(is_dealer_index_legal(connection_id));  // XXX rename to clt_skt_idx
+  uint64 dealer_index = interpret_message<uint64>(iter.next());
+  BOOST_ASSERT(is_dealer_index_legal(dealer_index));
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
   event_id event_id = event_id_generator_.get_next();
@@ -220,7 +221,7 @@ void broker_thread::send_request(message_iterator& iter) {
     reactor_.run_closure_at(zclock_ms() + timeout_ms,
         new_callback(this, &broker_thread::handle_timeout, event_id));
   }
-  zmq::socket_t* socket = dealer_sockets_[connection_id];
+  zmq::socket_t* socket = dealer_sockets_[dealer_index];
   BOOST_ASSERT(socket);
   send_string(socket, "", ZMQ_SNDMORE);
   send_uint64(socket, event_id, ZMQ_SNDMORE);
@@ -262,9 +263,9 @@ void broker_thread::handle_timeout(event_id event_id) {
 }
 
 void broker_thread::send_reply(message_iterator& iter) {
-  uint64 server_socket_idx = interpret_message<uint64>(iter.next());
-  BOOST_ASSERT(is_router_index_legal(server_socket_idx));
-  zmq::socket_t* socket = router_sockets_[server_socket_idx];
+  uint64 router_index = interpret_message<uint64>(iter.next());
+  BOOST_ASSERT(is_router_index_legal(router_index));
+  zmq::socket_t* socket = router_sockets_[router_index];
   BOOST_ASSERT(socket);
   forward_messages(iter, *socket);
 }

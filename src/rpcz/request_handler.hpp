@@ -18,7 +18,7 @@ class iservice;
 // Non-thread-safe.
 class request_handler {
  public:
-  request_handler(uint64 server_socket_idx, const std::string& sender);
+  request_handler(uint64 router_index, const std::string& sender);
   ~request_handler();
 
  public:

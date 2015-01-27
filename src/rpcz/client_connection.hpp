@@ -34,12 +34,12 @@ class client_connection {
   void reply(const std::string& event_id, message_vector* v) const;
 
  public:
-  client_connection(uint64 server_socket_idx, const std::string& sender);
+  client_connection(uint64 router_index, const std::string& sender);
 
  private:
   manager& manager_;
-  const uint64 server_socket_idx_;
-  const std::string sender_;
+  const uint64 router_index_;
+  const std::string sender_;  // zmq sender id
 };
 
 }  // namespace rpcz
