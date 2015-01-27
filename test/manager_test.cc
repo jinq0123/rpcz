@@ -16,16 +16,19 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
+#include <stdio.h>
+
 #include <boost/lexical_cast.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/thread.hpp>
 #include <glog/logging.h>
-#include <stdio.h>
 #include <zmq.hpp>
+
 #include "gtest/gtest.h"
 #include "rpcz/application.hpp"
+#include "rpcz/application_error_code.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/client_connection.hpp"
 #include "rpcz/connection.hpp"
@@ -111,7 +114,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
     rpcz::sync_event event;
     void operator()(const rpc_error* error, const void*, size_t) {
       ASSERT_TRUE(NULL != error);
-      ASSERT_EQ(status::DEADLINE_EXCEEDED, error->get_status());
+      ASSERT_EQ(error_code::TIMEOUT_EXPIRED, error->get_error_code());
       event.signal();
     }
   } hdl;

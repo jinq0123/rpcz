@@ -9,7 +9,6 @@
 #include <rpcz/application_error_code.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/rpcz_api.hpp>
-#include <rpcz/status_code.hpp>
 
 namespace rpcz {
 
@@ -54,9 +53,7 @@ inline void cpp_handler_wrapper<Response>::operator()(
   }
 
   // invalid message
-  rpc_error e(status::APPLICATION_ERROR,
-      application_error::INVALID_MESSAGE,
-      "");
+  rpc_error e(error_code::INVALID_MESSAGE, "");
   cpp_handler_(&e, resp);
 }  // operator()()
 

@@ -16,8 +16,7 @@ void sync_call_handler::handle_error(const rpc_error& err) {
 
 void sync_call_handler::handle_invalid_message() {
   handle_error(rpc_error(
-      status::APPLICATION_ERROR,
-      application_error::INVALID_MESSAGE,
+      error_code::INVALID_MESSAGE,
       ""));
 }
 

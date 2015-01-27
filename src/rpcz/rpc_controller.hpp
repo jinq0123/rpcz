@@ -9,7 +9,6 @@
 #include <boost/noncopyable.hpp>
 
 #include <rpcz/response_message_handler.hpp>
-#include <rpcz/status_code.hpp>
 
 namespace zmq {
 class message_t;
@@ -45,12 +44,8 @@ class rpc_controller : boost::noncopyable {
  private:
   // Error handlers are not inlined.
   void handle_timeout_expired();
-  void handle_application_error(
-      int application_error_code,
-      const std::string& error_message);
-  void handle_error(status_code status,
-      int application_error_code,
-      const std::string& error_message);
+  void handle_error(int error_code,
+      const std::string& error_str);
 
  private:
   response_message_handler handler_;

@@ -22,6 +22,7 @@
 #include <zmq.hpp>
 
 #include "rpcz/application.hpp"
+#include "rpcz/application_error_code.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
@@ -206,8 +207,7 @@ TEST_F(server_test, SimpleRequestWithError) {
     (void)stub.Search(request);
     ASSERT_TRUE(false);
   } catch (const rpc_error& e) {
-    ASSERT_EQ(status::APPLICATION_ERROR, e.get_status());
-    ASSERT_EQ("I don't like foo.", e.get_error_message());
+    ASSERT_EQ("I don't like foo.", e.get_error_str());
   }
 }
 
@@ -219,7 +219,7 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
     (void)stub.Search(request, 1);
     ASSERT_TRUE(false);
   } catch (const rpc_error& error) {
-    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+    ASSERT_EQ(error_code::TIMEOUT_EXPIRED, error.get_error_code());
     return;
   }
   ASSERT_TRUE(false);
@@ -235,7 +235,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
 
     void operator()(const rpc_error* error, const SearchResponse &) {
       ASSERT_TRUE(NULL != error);
-      ASSERT_EQ(status::DEADLINE_EXCEEDED, error->get_status());
+      ASSERT_EQ(error_code::TIMEOUT_EXPIRED, error->get_error_code());
       sync.signal();
     }
   } hdl;
@@ -263,8 +263,7 @@ TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
     stub.Search(request, &response);
     ASSERT_TRUE(false);
   } catch (const rpc_error& error) {
-    ASSERT_EQ(status::APPLICATION_ERROR, error.get_status());
-    ASSERT_EQ(-4, error.get_application_error_code());
+    ASSERT_EQ(-4, error.get_error_code());
   }
 }
 
@@ -277,7 +276,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
     stub.Search(request, 1, &response);
     ASSERT_TRUE(false);
   } catch (const rpc_error& error) {
-    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+    ASSERT_EQ(error_code::TIMEOUT_EXPIRED, error.get_error_code());
   }
   // We may get here before the timing out request was processed, and if we
   // just send delay right away, the server may be unable to reply.
@@ -293,7 +292,7 @@ TEST_F(server_test, ConnectionManagerTermination) {
   try {
     stub.Search(request, 1/*ms*/);
   } catch (const rpc_error& error) {
-    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+    ASSERT_EQ(error_code::TIMEOUT_EXPIRED, error.get_error_code());
   }
   LOG(INFO)<<"I'm here";
   manager::get()->run();

@@ -22,34 +22,25 @@
 #include <string>
 
 #include <rpcz/rpcz_api.hpp>
-#include <rpcz/status_code.hpp>  // for status_code
 
 namespace rpcz {
 
 class RPCZ_API rpc_error : public std::runtime_error {
  public:
-  rpc_error(status_code status,
-            int application_error_code,
-            const std::string& error_message);
-
+  rpc_error(int error_code, const std::string& error_str);
   virtual ~rpc_error() throw();
 
-  inline status_code get_status() const {
-    return status_;
+  inline std::string get_error_str() const {
+    return error_str_;
   }
 
-  inline std::string get_error_message() const {
-    return error_message_;
-  }
-
-  inline int get_application_error_code() const {
-    return application_error_code_;
+  inline int get_error_code() const {
+    return error_code_;
   }
 
  private:
-  status_code status_;
-  int application_error_code_;
-  std::string error_message_;
+  int error_code_;
+  std::string error_str_;
 };
 
 }  // namespace

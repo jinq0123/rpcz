@@ -9,29 +9,21 @@
 
 namespace rpcz {
 
-static std::string to_string(status_code status,
-    int application_error_code,
-    const std::string& error_message) {
-  std::string result =
-      "status: ";  // XXX rpc_response_header_status_code_Name(status);
-  if (status::APPLICATION_ERROR == status) {
-    result += " (" + boost::lexical_cast<std::string>(
-        application_error_code) + ")";
-  }
-  if (!error_message.empty()) {
-    result += ": " + error_message;
-  }
+static std::string to_string(
+    int error_code, const std::string& error_str) {
+  std::string result
+      = "("
+      + boost::lexical_cast<std::string>(error_code)
+      + ")";
+  if (!error_str.empty())
+    result += ": " + error_str;
   return result;
 }
 
-rpc_error::rpc_error(status_code status,
-                    int application_error_code,
-                    const std::string& error_message) :
-    std::runtime_error(to_string(status,
-        application_error_code, error_message)),
-    status_(status),
-    application_error_code_(application_error_code),
-    error_message_(error_message) {
+rpc_error::rpc_error(int error_code, const std::string& error_str) :
+    std::runtime_error(to_string(error_code, error_str)),
+    error_code_(error_code),
+    error_str_(error_str) {
 }
 
 rpc_error::~rpc_error() throw() {

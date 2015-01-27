@@ -23,7 +23,7 @@
 #include <google/protobuf/descriptor.h>  // for FindMethodByName()
 #include <google/protobuf/message.h>  // for Message
 
-#include <rpcz/application_error_code.hpp>  // for application_error
+#include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/common.hpp>  // for scoped_ptr
 #include <rpcz/logging.hpp>  // for INFO
 #include <rpcz/replier.hpp>
@@ -38,7 +38,7 @@ void cpp_service::dispatch_request(const std::string& method,
     if (descriptor == NULL) {
       // Invalid method name
       DLOG(INFO) << "Invalid method name: " << method;
-      replier_copy.send_error(application_error::NO_SUCH_METHOD);
+      replier_copy.send_error(error_code::NO_SUCH_METHOD);
       return;
     }
 
@@ -48,7 +48,7 @@ void cpp_service::dispatch_request(const std::string& method,
     if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
-      replier_copy.send_error(application_error::INVALID_MESSAGE);
+      replier_copy.send_error(error_code::INVALID_MESSAGE);
       return;
     }
     call_method(descriptor, *request, replier_copy);

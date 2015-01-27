@@ -260,7 +260,7 @@ void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
       "    const $input_type$&,\n"
       "    ::rpcz::replier replier_copy) {\n"
       "  replier_copy.send_error(\n"
-      "      ::rpcz::application_error::METHOD_NOT_IMPLEMENTED,\n"
+      "      ::rpcz::error_code::METHOD_NOT_IMPLEMENTED,\n"
       "      \"Method $name$() not implemented.\");\n"
       "}\n"
       "\n");

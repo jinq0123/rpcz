@@ -44,7 +44,6 @@ rpc_channel_impl::~rpc_channel_impl() {
 //    std::string* response_str,
 //    rpc_controller* rpc_controller,
 //    closure* done) {
-//  CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
 //  rpc_request_header generic_request;
 //  generic_request.set_service(service_name);
 //  generic_request.set_method(method_name);

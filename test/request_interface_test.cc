@@ -23,6 +23,7 @@
 #include <zmq.hpp>
 
 #include "rpcz/application.hpp"
+#include "rpcz/application_error_code.hpp"
 #include "rpcz/connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
@@ -140,7 +141,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
       1/*ms*/);
   hdl.sync.wait();
   ASSERT_TRUE(hdl.error);
-  ASSERT_EQ(status::DEADLINE_EXCEEDED, hdl.error->get_status());
+  ASSERT_EQ(error_code::TIMEOUT_EXPIRED, hdl.error->get_error_code());
 }
 
 TEST_F(server_test, AsyncRequest) {
@@ -233,7 +234,7 @@ TEST_F(server_test, SetDefaulDeadlineMs) {
     stub.Search(request, &response);
     ASSERT_TRUE(false);
   } catch (const rpc_error& error) {
-    ASSERT_EQ(status::DEADLINE_EXCEEDED, error.get_status());
+    ASSERT_EQ(error_code::TIMEOUT_EXPIRED, error.get_error_code());
     return;
   }
   ASSERT_TRUE(false);

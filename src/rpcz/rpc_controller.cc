@@ -3,7 +3,7 @@
 
 #include <rpcz/rpc_controller.hpp>
 
-#include <rpcz/application_error_code.hpp>  // for application_error
+#include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_response_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator
@@ -30,44 +30,35 @@ inline void rpc_controller::handle_response_message(
 }  // handle_response_message
 
 void rpc_controller::handle_timeout_expired() {
-  handle_error(status::DEADLINE_EXCEEDED, 0, "");
+  handle_error(error_code::TIMEOUT_EXPIRED, "");
 }
 
-void rpc_controller::handle_application_error(
-  int application_error_code,
-  const std::string& error_message) {
-  handle_error(status::APPLICATION_ERROR,
-      application_error_code, error_message);
-}
-
-void rpc_controller::handle_error(status_code status,
-                               int application_error_code,
-                               const std::string& error_message) {
+void rpc_controller::handle_error(
+    int error_code, const std::string& error_str) {
   if (handler_.empty()) return;
-  rpc_error e(status, application_error_code, error_message);
+  rpc_error e(error_code, error_str);
   handler_(&e, NULL, 0);
 }
 
 // Must be implemented in .cc file because of rpc_response_header.
 inline void rpc_controller::handle_done_response(message_iterator& iter) {
   if (!iter.has_more()) {
-    handle_application_error(application_error::INVALID_MESSAGE, "");
+    handle_error(error_code::INVALID_MESSAGE, "");
     return;
   }
   rpc_response_header generic_response;
   zmq::message_t& msg_in = iter.next();
   if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
-    handle_application_error(application_error::INVALID_MESSAGE, "");
+    handle_error(error_code::INVALID_MESSAGE, "");
     return;
   }
   if (generic_response.has_error_code()) {
-    handle_application_error(
-        generic_response.error_code(),
+    handle_error(generic_response.error_code(),
         generic_response.error_str());
     return;
   }
   if (!iter.has_more()) {
-    handle_application_error(application_error::INVALID_MESSAGE, "");
+    handle_error(error_code::INVALID_MESSAGE, "");
     return;
   }
 

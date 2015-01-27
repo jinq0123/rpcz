@@ -5,7 +5,7 @@
 #include <boost/foreach.hpp>
 
 #include <rpcz/logging.hpp>
-#include <rpcz/application_error_code.hpp>  // for application_error
+#include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/iservice.hpp>  // for dispatch_request()
 #include <rpcz/replier.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
@@ -37,7 +37,7 @@ void request_handler::handle_request(message_iterator& iter) {
     if (!rpc_request_header.ParseFromArray(msg.data(), msg.size())) {
       // Handle bad rpc.
       DLOG(INFO) << "Received bad header.";
-      replier_copy.send_error(application_error::INVALID_HEADER);
+      replier_copy.send_error(error_code::INVALID_HEADER);
       return;
     };
   }
@@ -49,7 +49,7 @@ void request_handler::handle_request(message_iterator& iter) {
   if (service_it == service_map_.end()) {
     // Handle invalid service.
     DLOG(INFO) << "Invalid service: " << rpc_request_header.service();
-    replier_copy.send_error(application_error::NO_SUCH_SERVICE);
+    replier_copy.send_error(error_code::NO_SUCH_SERVICE);
     return;
   }
   rpcz::iservice* svc = service_it->second;
