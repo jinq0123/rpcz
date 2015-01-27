@@ -109,15 +109,12 @@ rpc_channel_impl::~rpc_channel_impl() {
 //                 done);
 //}
 
-// XXX rename other call_method() to async_call().
-// XXX Add sync_call().
 void rpc_channel_impl::async_call(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
     const response_message_handler& handler,
     long timeout_ms) {
-  // XXX CHECK_EQ(rpc_controller->get_status(), status::INACTIVE);
   rpc_request_header generic_request;
   generic_request.set_service(service_name);
   generic_request.set_method(method->name());

@@ -59,14 +59,14 @@ void replier::send0(const std::string& response) const {
                           string_to_message(response));
 }
 
-void replier::send_error(int application_error,
+void replier::send_error(int error_code,
         const std::string& error_message/* = "" */) const {
     assert(reply_context_->clt_connection);
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();
-    generic_rpc_response.set_application_error(application_error);
+    generic_rpc_response.set_error_code(error_code);
     if (!error_message.empty()) {
-      generic_rpc_response.set_error(error_message);
+      generic_rpc_response.set_error_str(error_message);
     }
     send_generic_response(generic_rpc_response, payload);
 }

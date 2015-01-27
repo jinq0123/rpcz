@@ -29,12 +29,12 @@ typedef int application_error_code;
 // Must equal rpc_response_header::application_error_code.
 // See rpcz.proto.
 namespace application_error {
-static const application_error_code APPLICATION_NO_ERROR = 0;
 static const application_error_code INVALID_HEADER = -1;
 static const application_error_code NO_SUCH_SERVICE = -2;
 static const application_error_code NO_SUCH_METHOD = -3;
 static const application_error_code INVALID_MESSAGE = -4;
 static const application_error_code METHOD_NOT_IMPLEMENTED = -5;
+static const application_error_code TIMEOUT_EXPIRED = -6;
 }  // namespace application_error
 
 }  // namespace rpcz

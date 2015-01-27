@@ -51,7 +51,7 @@ class RPCZ_API replier {
  public:
   void send(const google::protobuf::Message& response) const;
   void send0(const std::string& response) const;
-  void send_error(int application_error,
+  void send_error(int error_code,
       const std::string& error_message="") const;
 
  private:

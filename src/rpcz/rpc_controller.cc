@@ -60,10 +60,10 @@ inline void rpc_controller::handle_done_response(message_iterator& iter) {
     handle_application_error(application_error::INVALID_MESSAGE, "");
     return;
   }
-  if (generic_response.has_application_error()) {
+  if (generic_response.has_error_code()) {
     handle_application_error(
-        generic_response.application_error(),
-        generic_response.error());
+        generic_response.error_code(),
+        generic_response.error_str());
     return;
   }
   if (!iter.has_more()) {
