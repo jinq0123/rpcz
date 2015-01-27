@@ -83,14 +83,17 @@ class broker_thread {
 
   inline void send_reply(message_iterator& iter);
 
+  bool is_dealer_index_legal(uint64 dealer_index) const;
+  bool is_router_index_legal(uint64 router_index) const;
+
  private:
   typedef std::map<event_id, rpc_controller*>
       remote_response_map;
   remote_response_map remote_response_map_;
   detail::event_id_generator event_id_generator_;
   reactor reactor_;
-  std::vector<zmq::socket_t*> client_sockets_;  // Dealer sockets of client.
-  std::vector<zmq::socket_t*> server_sockets_;  // Router sockets.of server.
+  std::vector<zmq::socket_t*> dealer_sockets_;  // Dealer sockets for client.
+  std::vector<zmq::socket_t*> router_sockets_;  // Router sockets.for server.
   typedef std::map<std::string, zmq::socket_t*> endpoint_to_socket;
   endpoint_to_socket bind_map_;  // for unbind
   zmq::context_t& context_;
