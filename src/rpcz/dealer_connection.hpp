@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,12 +26,12 @@ namespace rpcz {
 class message_vector;
 class rpc_controller;
 
-// Represents a connection to a server. Thread-safe.
-class connection {
+// Represents a XXXconnection to a server. Thread-safe.
+class dealer_connection {
  public:
-  explicit connection(uint64 dealer_index);
+  explicit dealer_connection(uint64 dealer_index);
 
-  // Asynchronously sends a request over the connection.
+  // Asynchronously sends a request over the dealer socket.
   // request: a vector of messages to be sent. Does not take ownership of the
   //          request. The vector has to live valid at least until the request
   //          completes. It can be safely de-allocated inside the provided

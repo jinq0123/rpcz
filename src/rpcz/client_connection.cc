@@ -1,4 +1,4 @@
-// Client connection.
+// Client XXXconnection.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
 #include <rpcz/client_connection.hpp>

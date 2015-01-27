@@ -12,7 +12,7 @@ class client_connection;
 
 struct reply_context {
   client_connection* clt_connection;  // TODO: rename to reply_broker
-  // TODO: Do not use client_connection pointer, because connection may be deleted.
+  // TODO: Do not use client_connection pointer, because XXXconnection may be deleted.
   std::string event_id;
   bool replied;  // To assert one reply.
 

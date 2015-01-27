@@ -37,7 +37,7 @@ class MethodDescriptor;
 
 namespace rpcz {
 class closure;
-class connection;
+class dealer_connection;
 
 class RPCZ_API rpc_channel {
  public:
@@ -72,7 +72,7 @@ class RPCZ_API rpc_channel {
   //                         rpc_controller* rpc_controller,
   //                         closure* done) = 0;
 
-  static rpc_channel_ptr make_shared(const connection& connection);
+  static rpc_channel_ptr make_shared(const dealer_connection& conn);
 
   // Creates an rpc_channel to the given endpoint.
   static rpc_channel_ptr make_shared(const std::string& endpoint);

@@ -31,7 +31,7 @@
 #include "rpcz/application_error_code.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/client_connection.hpp"
-#include "rpcz/connection.hpp"
+#include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_error.hpp"
@@ -107,7 +107,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
   manager_ptr mgr = manager::get();
-  connection connection(mgr->connect("inproc://server.test"));
+  dealer_connection conn(mgr->connect("inproc://server.test"));
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -119,7 +119,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
     }
   } hdl;
 
-  connection.send_request(*request, new rpc_controller(boost::ref(hdl), 0));
+  conn.send_request(*request, new rpc_controller(boost::ref(hdl), 0));
   hdl.event.wait();
 }
 
@@ -146,7 +146,7 @@ class barrier_handler {
   int count_;
 };
 
-void SendManyMessages(connection connection, int thread_id) {
+void SendManyMessages(dealer_connection conn, int thread_id) {
   boost::ptr_vector<message_vector> requests;
   const int request_count = 100;
   barrier_handler barrier;
@@ -154,7 +154,7 @@ void SendManyMessages(connection connection, int thread_id) {
     message_vector* request = create_simple_request(
         thread_id * request_count * 17 + i);
     requests.push_back(request);
-    connection.send_request(*request, new rpc_controller(boost::ref(barrier), -1));
+    conn.send_request(*request, new rpc_controller(boost::ref(barrier), -1));
   }
   barrier.wait(request_count);
 }
@@ -166,11 +166,11 @@ TEST_F(manager_test, ManyClientsTest) {
   boost::thread thread(start_server(context));
   manager_ptr mgr = manager::get();
 
-  connection connection(mgr->connect("inproc://server.test"));
+  dealer_connection conn(mgr->connect("inproc://server.test"));
   boost::thread_group group;
   for (int i = 0; i < 10; ++i) {
     group.add_thread(
-        new boost::thread(boost::bind(SendManyMessages, connection, i)));
+        new boost::thread(boost::bind(SendManyMessages, conn, i)));
   }
   group.join_all();
   scoped_ptr<message_vector> request(create_quit_request());
@@ -181,7 +181,7 @@ TEST_F(manager_test, ManyClientsTest) {
       event.signal();
     }
   } hdl;
-  connection.send_request(*request, new rpc_controller(boost::ref(hdl), -1));
+  conn.send_request(*request, new rpc_controller(boost::ref(hdl), -1));
   hdl.event.wait();
   thread.join();
 }

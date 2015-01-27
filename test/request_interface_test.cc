@@ -24,7 +24,7 @@
 
 #include "rpcz/application.hpp"
 #include "rpcz/application_error_code.hpp"
-#include "rpcz/connection.hpp"
+#include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/replier.hpp"
@@ -96,14 +96,14 @@ class server_test : public ::testing::Test {
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
     server_->bind("inproc://myserver.frontend");
-    connection_.reset(new connection(
+    connection_.reset(new dealer_connection(
         mgr->connect("inproc://myserver.frontend")));
   }
 
 protected:
   // destruct in reversed order
   scoped_ptr<zmq::context_t> context_;  // destruct last
-  scoped_ptr<connection> connection_;
+  scoped_ptr<dealer_connection> connection_;
   scoped_ptr<SearchServiceImpl> service_;
   // Server must destruct before service. (Or unregister services before destruct.)
   scoped_ptr<server> server_;

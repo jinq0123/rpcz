@@ -28,7 +28,7 @@
 
 #include <rpcz/application_options.hpp>
 #include <rpcz/broker_thread.hpp>
-#include <rpcz/connection.hpp>
+#include <rpcz/dealer_connection.hpp>
 #include <rpcz/internal_commands.hpp>  // for kConnect
 #include <rpcz/logging.hpp>
 #include <rpcz/sync_event.hpp>
@@ -98,8 +98,8 @@ zmq::socket_t& manager::new_frontend_socket() {
   return *socket;
 }
 
-// XXX move to connection class
-connection manager::connect(const std::string& endpoint) {
+// XXX move to dealer_connection class
+dealer_connection manager::connect(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, kConnect, ZMQ_SNDMORE);
@@ -108,7 +108,7 @@ connection manager::connect(const std::string& endpoint) {
   socket.recv(&msg);
   socket.recv(&msg);
   uint64 dealer_index = interpret_message<uint64>(msg);
-  return connection(dealer_index);
+  return dealer_connection(dealer_index);
 }
 
 void manager::bind(const std::string& endpoint,

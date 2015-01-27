@@ -23,7 +23,7 @@
 
 #include "rpcz/application.hpp"
 #include "rpcz/application_error_code.hpp"
-#include "rpcz/connection.hpp"
+#include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/replier.hpp"
@@ -149,22 +149,22 @@ class server_test : public ::testing::Test {
     backend_server_->register_singleton_service(*backend_service_);
     backend_server_->bind("inproc://myserver.backend");
     rpcz::manager_ptr mgr = rpcz::manager::get();
-    backend_connection_.reset(new connection(
+    backend_connection_.reset(new dealer_connection(
         mgr->connect("inproc://myserver.backend")));
 
     frontend_service_.reset(new SearchServiceImpl(
         new SearchService_Stub(rpc_channel::make_shared(*backend_connection_))));
     frontend_server_->register_singleton_service(*frontend_service_);
     frontend_server_->bind("inproc://myserver.frontend");
-    frontend_connection_.reset(new connection(
+    frontend_connection_.reset(new dealer_connection(
         mgr->connect("inproc://myserver.frontend")));
   }
 
 protected:
   // destruct in reversed order
   scoped_ptr<zmq::context_t> context_;  // destruct last
-  scoped_ptr<connection> frontend_connection_;
-  scoped_ptr<connection> backend_connection_;
+  scoped_ptr<dealer_connection> frontend_connection_;
+  scoped_ptr<dealer_connection> backend_connection_;
   scoped_ptr<SearchServiceImpl> frontend_service_;
   scoped_ptr<BackendSearchServiceImpl> backend_service_;
   // Server must destruct before service. (Or unregister services before destruct.)

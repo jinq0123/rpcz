@@ -30,10 +30,10 @@
 
 namespace rpcz {
 
-// TODO: Do not use client_connection pointer, because connection may be deleted.
-replier::replier(client_connection& connection,  // TODO: rename to reply_broker
+// TODO: Do not use client_connection pointer, because XXXconnection may be deleted.
+replier::replier(client_connection& conn,  // TODO: rename to reply_broker
                  const std::string& event_id)
-    : reply_context_(new reply_context(&connection, event_id)) { // shared_ptr
+    : reply_context_(new reply_context(&conn, event_id)) { // shared_ptr
 };
 
 replier::~replier() {

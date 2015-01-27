@@ -37,7 +37,7 @@ class socket_t;
 namespace rpcz {
 class client_connection;
 class closure;
-class connection;
+class dealer_connection;
 class connection_thread_context;
 class message_iterator;
 class sync_event;
@@ -46,7 +46,7 @@ class sync_event;
 // over ZeroMQ sockets.
 // A manager can connect to a remote server:
 //      manager::get()->connect("tcp://localhost:5557");
-// manager and connection are thread-safe.
+// manager and dealer_connection are thread-safe.
 // manager is singleton.
 class manager : boost::noncopyable {
  private:
@@ -62,9 +62,9 @@ class manager : boost::noncopyable {
   ~manager();
 
   // connects all worker threads to the given endpoint. On success
-  // this method returns a connection object that can be used from any thread
+  // this method returns a dealer_connection object that can be used from any thread
   // to communicate with this endpoint.
-  connection connect(const std::string& endpoint);
+  dealer_connection connect(const std::string& endpoint);
 
   // binds a socket to the given endpoint. 
   void bind(const std::string& endpoint, const service_factory_map& factories);

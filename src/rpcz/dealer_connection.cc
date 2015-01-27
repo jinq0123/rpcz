@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +16,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/connection.hpp>
+#include <rpcz/dealer_connection.hpp>
 
 #include <zmq.hpp>
 
@@ -26,12 +27,11 @@
 
 namespace rpcz {
 
-connection::connection(uint64 dealer_index)
-    : manager_(manager::get()),
-      dealer_index_(dealer_index) {
+dealer_connection::dealer_connection(uint64 dealer_index)
+    : manager_(manager::get()), dealer_index_(dealer_index) {
 }
 
-void connection::send_request(
+void dealer_connection::send_request(
     message_vector& request,
     rpc_controller* ctrl) {
   BOOST_ASSERT(ctrl);

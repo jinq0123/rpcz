@@ -45,7 +45,7 @@ struct reply_context;
 // XXX More comments...
 class RPCZ_API replier {
  public:
-  replier(client_connection& connection, const std::string& event_id);
+  replier(client_connection& conn, const std::string& event_id);
   ~replier();
 
  public:

@@ -17,7 +17,7 @@
 #ifndef RPCZ_RPC_CHANNEL_IMPL_H
 #define RPCZ_RPC_CHANNEL_IMPL_H
 
-#include <rpcz/connection.hpp>
+#include <rpcz/dealer_connection.hpp>
 #include <rpcz/rpc_channel.hpp>
 
 namespace rpcz {
@@ -26,7 +26,7 @@ class closure;
 
 class rpc_channel_impl: public rpc_channel {
  public:
-  rpc_channel_impl(const connection& connection);
+  rpc_channel_impl(const dealer_connection& conn);
 
   virtual ~rpc_channel_impl();
 
@@ -76,7 +76,7 @@ class rpc_channel_impl: public rpc_channel {
   //    closure* done);
 
  private:
-  connection connection_;
+  dealer_connection connection_;
 };  // class rpc_channel_impl
 
 } // namespace rpcz
