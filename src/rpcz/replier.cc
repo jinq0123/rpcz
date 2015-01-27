@@ -24,7 +24,6 @@
 #include <rpcz/logging.hpp>  // for CHECK()
 #include <rpcz/reply_context.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_response_header
-#include <rpcz/status_code.hpp>  // for status
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
 
 // TODO: Use requester/responser instead of client/server
