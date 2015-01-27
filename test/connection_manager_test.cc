@@ -110,7 +110,7 @@ TEST_F(connection_manager_test, TestTimeoutAsync) {
   struct handler {
     rpcz::sync_event event;
     void operator()(const rpc_error* error, const void*, size_t) {
-      ASSERT_TRUE(error);
+      ASSERT_TRUE(NULL != error);
       ASSERT_EQ(status::DEADLINE_EXCEEDED, error->get_status());
       event.signal();
     }

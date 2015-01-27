@@ -26,7 +26,6 @@
 
 #include <rpcz/common.hpp>
 #include <rpcz/manager_ptr.hpp>
-#include <rpcz/manager_status.hpp>
 #include <rpcz/service_factory_map.hpp>
 
 namespace zmq {

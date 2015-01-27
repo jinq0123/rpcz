@@ -22,7 +22,6 @@
 #include <rpcz/callback.hpp>  // for closure
 #include <rpcz/internal_commands.hpp>  // for kReady
 #include <rpcz/logging.hpp>  // for CHECK_EQ()
-#include <rpcz/manager_status.hpp>  // for connection_manager_status
 #include <rpcz/request_handler.hpp>
 #include <rpcz/rpc_context.hpp>  // for rpc_context
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message()

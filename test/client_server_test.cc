@@ -234,7 +234,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
     rpcz::sync_event sync;
 
     void operator()(const rpc_error* error, const SearchResponse &) {
-      ASSERT_TRUE(error);
+      ASSERT_TRUE(NULL != error);
       ASSERT_EQ(status::DEADLINE_EXCEEDED, error->get_status());
       sync.signal();
     }
