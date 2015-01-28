@@ -54,7 +54,8 @@ void broker_thread::wait_for_workers_ready_reply(int nthreads) {
     assert(!sender.empty());  // zmq id
     CHECK_EQ(0, iter.next().size());
     char command(interpret_message<char>(iter.next()));
-    CHECK_EQ(kReady, command) << "Got unexpected command " << (int)command;
+    CHECK_EQ(c2b::kWorkerReady, command)
+        << "Got unexpected command " << (int)command;
     workers_.push_back(sender);
   }
 }
@@ -72,13 +73,14 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   std::string sender = message_to_string(iter.next());
   CHECK_EQ(0, iter.next().size());
   char command(interpret_message<char>(iter.next()));
+  using namespace c2b;  // command to broker
   switch (command) {
     case kQuit:
       // Ask the workers to quit. They'll in turn send kWorkerDone.
       for (size_t i = 0; i < workers_.size(); ++i) {
         send_string(frontend_socket_, workers_[i], ZMQ_SNDMORE);
         send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-        send_char(frontend_socket_, kWorkerQuit, 0);
+        send_char(frontend_socket_, b2w::kWorkerQuit, 0);
       }
       break;
     case kConnect:
@@ -103,7 +105,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     case kReply:
       send_reply(iter);
       break;
-    case kReady:
+    case kWorkerReady:
       CHECK(false);
       break;
     case kWorkerDone:
@@ -120,6 +122,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   }  // switch
 }
 
+// command must be broker to worker (b2w) command.
 void broker_thread::begin_worker_command(char command) {
   send_string(frontend_socket_, workers_[current_worker_], ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -131,7 +134,7 @@ void broker_thread::begin_worker_command(char command) {
 }
 
 void broker_thread::add_closure(closure* closure) {
-  begin_worker_command(kRunClosure);
+  begin_worker_command(b2w::kRunClosure);
   send_pointer(frontend_socket_, closure, 0);
 }
 
@@ -203,7 +206,7 @@ void broker_thread::handle_server_socket(uint64 router_index,
   request_handler* handler = request_handler_manager_
       .get_handler(sender, *factories, router_index);
   assert(NULL != handler);
-  begin_worker_command(kHandleRequest);
+  begin_worker_command(b2w::kHandleRequest);
   send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
 }
@@ -243,7 +246,7 @@ void broker_thread::handle_client_socket(zmq::socket_t* socket) {
   }
   const rpc_controller* ctrl = response_iter->second;
   BOOST_ASSERT(ctrl);
-  begin_worker_command(kHandleResponse);
+  begin_worker_command(b2w::kHandleResponse);
   send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
   remote_response_map_.erase(response_iter);
@@ -257,7 +260,7 @@ void broker_thread::handle_timeout(event_id event_id) {
   rpc_controller* ctrl = response_iter->second;
   BOOST_ASSERT(ctrl);
   ctrl->set_timeout_expired();
-  begin_worker_command(kHandleResponse);
+  begin_worker_command(b2w::kHandleResponse);
   send_pointer(frontend_socket_, ctrl, 0);
   remote_response_map_.erase(response_iter);
 }

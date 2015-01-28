@@ -102,7 +102,7 @@ zmq::socket_t& manager::new_frontend_socket() {
 dealer_connection manager::connect(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kConnect, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kConnect, ZMQ_SNDMORE);
   send_string(&socket, endpoint, 0);
   zmq::message_t msg;
   socket.recv(&msg);
@@ -115,7 +115,7 @@ void manager::bind(const std::string& endpoint,
     const service_factory_map& factories) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kBind, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kBind, ZMQ_SNDMORE);
   send_string(&socket, endpoint, ZMQ_SNDMORE);
   send_pointer(&socket, &factories, 0);
   zmq::message_t msg;
@@ -127,7 +127,7 @@ void manager::bind(const std::string& endpoint,
 void manager::unbind(const std::string& endpoint) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kUnbind, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kUnbind, ZMQ_SNDMORE);
   send_string(&socket, endpoint, 0);
   zmq::message_t msg;
   socket.recv(&msg);
@@ -137,7 +137,7 @@ void manager::unbind(const std::string& endpoint) {
 void manager::add(closure* closure) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kRunClosure, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kRunClosure, ZMQ_SNDMORE);
   send_pointer(&socket, closure, 0);
   return;
 }
@@ -154,7 +154,7 @@ manager::~manager() {
   DLOG(INFO) << "~manager()";
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kQuit, 0);
+  send_char(&socket, c2b::kQuit, 0);
   broker_thread_.join();
   worker_threads_.join_all();
   DLOG(INFO) << "All threads joined.";

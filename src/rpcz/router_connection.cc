@@ -22,7 +22,7 @@ void router_connection::reply(const std::string& event_id,
                               message_vector* v) const {
   zmq::socket_t& socket = manager_.get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kReply, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
   send_uint64(&socket, router_index_, ZMQ_SNDMORE);
   send_string(&socket, sender_, ZMQ_SNDMORE);
   send_empty_message(&socket, ZMQ_SNDMORE);

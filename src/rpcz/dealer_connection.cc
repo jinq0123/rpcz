@@ -37,7 +37,7 @@ void dealer_connection::send_request(
   BOOST_ASSERT(ctrl);
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kRequest, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kRequest, ZMQ_SNDMORE);
   send_uint64(&socket, dealer_index_, ZMQ_SNDMORE);
   send_pointer(&socket, ctrl, ZMQ_SNDMORE);
   write_vector_to_socket(&socket, request);

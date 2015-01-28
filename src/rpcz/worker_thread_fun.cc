@@ -33,12 +33,13 @@ void worker_thread_fun(zmq::context_t& context,
   zmq::socket_t socket(context, ZMQ_DEALER);
   socket.connect(endpoint.c_str());
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kReady);
+  send_char(&socket, c2b::kWorkerReady);
   bool should_continue = true;
   do {
     message_iterator iter(socket);
     CHECK_EQ(0, iter.next().size());
     char command(interpret_message<char>(iter.next()));
+    using namespace b2w;  // broker to worker command
     switch (command) {
       case kWorkerQuit:
         should_continue = false;
@@ -67,7 +68,7 @@ void worker_thread_fun(zmq::context_t& context,
     }  // switch
   } while (should_continue);
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, kWorkerDone);
+  send_char(&socket, c2b::kWorkerDone);
 }
 
 }  // namespace rpcz
