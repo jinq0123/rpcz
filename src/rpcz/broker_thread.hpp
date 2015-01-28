@@ -49,40 +49,33 @@ class broker_thread {
                   zmq::socket_t* frontend_socket);
 
  private:
-  void wait_for_workers_ready_reply(int nthreads);
-
-  void handle_frontend_socket(zmq::socket_t* frontend_socket);
-
-  inline void begin_worker_command(char command);
-
   inline void add_closure(closure* closure);
+  inline void send_request(message_iterator& iter);
+  inline void send_reply(message_iterator& iter);
 
-  void handle_connect_command(const std::string& sender,
-                              const std::string& endpoint);
-
+ private:
+  void wait_for_workers_ready_reply(int nthreads);
+  void handle_frontend_socket(zmq::socket_t* frontend_socket);
+  void begin_worker_command(char command);
+  void handle_connect_command(
+      const std::string& sender,
+      const std::string& endpoint);
   void handle_bind_command(
       const std::string& sender,
       const std::string& endpoint,
       const service_factory_map& factories);
-
   void handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint);
-
+  void handle_quit_command(message_iterator& iter);
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
-
   void handle_server_socket(uint64 router_index,
       const service_factory_map* factories);  // TODO: use reference instead of pointer
-
-  inline void send_request(message_iterator& iter);
-
   void handle_client_socket(zmq::socket_t* socket);
-
   void handle_timeout(event_id event_id);
 
-  inline void send_reply(message_iterator& iter);
-
+ private:
   bool is_dealer_index_legal(uint64 dealer_index) const;
   bool is_router_index_legal(uint64 router_index) const;
 

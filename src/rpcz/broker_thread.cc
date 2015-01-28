@@ -76,12 +76,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   using namespace c2b;  // command to broker
   switch (command) {
     case kQuit:
-      // Ask the workers to quit. They'll in turn send kWorkerDone.
-      for (size_t i = 0; i < workers_.size(); ++i) {
-        send_string(frontend_socket_, workers_[i], ZMQ_SNDMORE);
-        send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-        send_char(frontend_socket_, b2w::kWorkerQuit, 0);
-      }
+      handle_quit_command(iter);
       break;
     case kConnect:
       handle_connect_command(sender, message_to_string(iter.next()));
@@ -194,6 +189,15 @@ void broker_thread::handle_unbind_command(
   bind_map_.erase(it);
   // Socket is not delelted yet.
   // It will callback on deleted before next zmq_poll().
+}
+
+void broker_thread::handle_quit_command(message_iterator& iter) {
+  // Ask the workers to quit. They'll in turn send kWorkerDone.
+  for (size_t i = 0; i < workers_.size(); ++i) {
+    send_string(frontend_socket_, workers_[i], ZMQ_SNDMORE);
+    send_empty_message(frontend_socket_, ZMQ_SNDMORE);
+    send_char(frontend_socket_, b2w::kWorkerQuit, 0);
+  }
 }
 
 void broker_thread::handle_socket_deleted(const std::string sender) {
