@@ -62,12 +62,16 @@ class broker_thread {
       const std::string& endpoint);
   void handle_bind_command(
       const std::string& sender,
+      message_iterator& iter);
+  void handle_bind_command(
+      const std::string& sender,
       const std::string& endpoint,
       const service_factory_map& factories);
   void handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint);
   void handle_quit_command(message_iterator& iter);
+  void handle_worker_done_command(const std::string& sender);
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
   void handle_server_socket(uint64 router_index,

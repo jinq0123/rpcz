@@ -81,19 +81,12 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     case kConnect:
       handle_connect_command(sender, message_to_string(iter.next()));
       break;
-    case kBind: {
-      std::string endpoint(message_to_string(iter.next()));
-      const service_factory_map* factories
-          = interpret_message<const service_factory_map*>(iter.next());
-      assert(factories);
-      handle_bind_command(sender, endpoint, *factories);
+    case kBind:
+      handle_bind_command(sender, iter);
       break;
-    }
-    case kUnbind: {
-      std::string endpoint(message_to_string(iter.next()));
-      handle_unbind_command(sender, endpoint);
+    case kUnbind:
+      handle_unbind_command(sender, message_to_string(iter.next()));
       break;
-    }
     case kRequest:
       send_request(iter);
       break;
@@ -109,12 +102,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
       CHECK(false);
       break;
     case kWorkerDone:
-      workers_.erase(std::remove(workers_.begin(), workers_.end(), sender));
-      current_worker_ = 0;
-      if (workers_.size() == 0) {
-        // All workers are gone, time to quit.
-        reactor_.set_should_quit();
-      }
+      handle_worker_done_command(sender);
       break;
 
     default:
@@ -154,6 +142,15 @@ void broker_thread::handle_connect_command(
   send_string(frontend_socket_, sender, ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
   send_uint64(frontend_socket_, dealer_sockets_.size() - 1, 0);
+}
+
+void broker_thread::handle_bind_command(
+    const std::string& sender, message_iterator& iter) {
+  std::string endpoint(message_to_string(iter.next()));
+  const service_factory_map* factories
+      = interpret_message<const service_factory_map*>(iter.next());
+  assert(factories);
+  handle_bind_command(sender, endpoint, *factories);
 }
 
 void broker_thread::handle_bind_command(
@@ -198,6 +195,16 @@ void broker_thread::handle_quit_command(message_iterator& iter) {
     send_empty_message(frontend_socket_, ZMQ_SNDMORE);
     send_char(frontend_socket_, b2w::kWorkerQuit, 0);
   }
+}
+
+void broker_thread::handle_worker_done_command(
+    const std::string& sender) {
+  workers_.erase(std::remove(workers_.begin(), workers_.end(), sender));
+  current_worker_ = 0;  // XXX ?
+  if (!workers_.empty())
+    return;
+  // All workers are gone, time to quit.
+  reactor_.set_should_quit();
 }
 
 void broker_thread::handle_socket_deleted(const std::string sender) {
