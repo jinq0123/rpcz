@@ -8,14 +8,6 @@ message rpc_request_header {
 }
 
 message rpc_response_header {
-  enum application_error_code {
-    INVALID_HEADER = -1;
-    NO_SUCH_SERVICE = -2;
-    NO_SUCH_METHOD = -3;
-    INVALID_MESSAGE = -4;
-    METHOD_NOT_IMPLEMENTED = -5;
-    TIMEOUT_EXPIRED = -6;
-  }
   // optional status_code OBSOLETE_status = 1 [default = OK];
   optional int32 error_code = 2;
   optional string error_str = 3;

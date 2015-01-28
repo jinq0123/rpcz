@@ -22,8 +22,8 @@
 #include <zmq.hpp>
 
 #include "rpcz/application.hpp"
-#include "rpcz/application_error_code.hpp"
 #include "rpcz/dealer_connection.hpp"
+#include "rpcz/error_code.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/replier.hpp"

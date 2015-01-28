@@ -6,7 +6,7 @@
 #define RPCZ_CPP_HANDLER_WRAPPER_HPP
 
 #include <boost/function.hpp>
-#include <rpcz/application_error_code.hpp>
+#include <rpcz/error_code.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/rpcz_api.hpp>
 

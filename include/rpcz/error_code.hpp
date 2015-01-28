@@ -19,12 +19,9 @@
 #ifndef RPCZ_APPLICATION_ERROR_CODE_HPP
 #define RPCZ_APPLICATION_ERROR_CODE_HPP
 
-// Can not #include rpcz.pb.h for rpc_response_header,
-// because rpcz.pb.h is only for internal use.
-
 namespace rpcz {
 
-// Must equal rpc_response_header::application_error_code.
+// Predefined values of rpc_response_header::error_code.
 // See rpcz.proto.
 namespace error_code {
 static const int INVALID_HEADER = -1;
