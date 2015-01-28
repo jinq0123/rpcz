@@ -105,6 +105,11 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     case kReply:
       send_reply(iter);
       break;
+    case kRunClosure:
+      add_closure(interpret_message<closure*>(iter.next()));
+      break;
+
+    // worker to broker commands
     case kWorkerReady:
       CHECK(false);
       break;
@@ -116,8 +121,9 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
         reactor_.set_should_quit();
       }
       break;
-    case kRunClosure:
-      add_closure(interpret_message<closure*>(iter.next()));
+
+    default:
+      BOOST_ASSERT(false);
       break;
   }  // switch
 }
