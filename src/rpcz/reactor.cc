@@ -93,6 +93,7 @@ void reactor::process_del_sockets() {
     if (r.first == r.second)
       continue;
 
+    // XXX Need to tell broker_thread that socket is deleted and don't use it.
     delete socket;  // will close it
     delete sockets_[i].second;  // delele callback
     sockets_[i] = sockets_[--nSize];  // fill with the last

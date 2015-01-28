@@ -180,7 +180,8 @@ TEST_F(server_test, AsyncOnewayRequest) {
   stub.async_Search(request, -1/*ms*/);
 
   // Sync request to end. Crash on reset if not.
-  (void)stub.Search(request);
+  (void)stub.Search(request);(void)stub.Search(request);(void)stub.Search(request);
+  (void)stub.Search(request);(void)stub.Search(request);(void)stub.Search(request);
 }
 
 TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
@@ -191,7 +192,8 @@ TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
   stub.async_Search(request);
 
   // Sync request to end. Crash on reset if not.
-  (void)stub.Search(request);
+  (void)stub.Search(request);(void)stub.Search(request);(void)stub.Search(request);
+  (void)stub.Search(request);(void)stub.Search(request);(void)stub.Search(request);
 }
 
 // Sync interfaces:
