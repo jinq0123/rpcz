@@ -23,8 +23,8 @@
 #include <google/protobuf/descriptor.h>  // for FindMethodByName()
 #include <google/protobuf/message.h>  // for Message
 
+#include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/common.hpp>  // for scoped_ptr
-#include <rpcz/error_code.hpp>  // for error_code
 #include <rpcz/logging.hpp>  // for INFO
 #include <rpcz/replier.hpp>
 

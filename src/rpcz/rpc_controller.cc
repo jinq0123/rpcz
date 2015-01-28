@@ -3,7 +3,7 @@
 
 #include <rpcz/rpc_controller.hpp>
 
-#include <rpcz/error_code.hpp>  // for error_code
+#include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_response_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator

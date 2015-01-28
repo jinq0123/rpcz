@@ -5,8 +5,8 @@
 
 #include <rpcz/sync_call_handler.hpp>
 
-#include <rpcz/error_code.hpp>
 #include <rpcz/rpc_error.hpp>
+#include <rpcz/application_error_code.hpp>
 
 namespace rpcz {
 

@@ -28,9 +28,9 @@
 
 #include "gtest/gtest.h"
 #include "rpcz/application.hpp"
+#include "rpcz/application_error_code.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/dealer_connection.hpp"
-#include "rpcz/error_code.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/router_connection.hpp"
 #include "rpcz/rpc_controller.hpp"
