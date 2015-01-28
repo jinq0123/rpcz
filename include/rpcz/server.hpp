@@ -53,7 +53,7 @@ class RPCZ_API server : boost::noncopyable {
   void register_singleton_service(iservice& svc, const std::string& name);
 
   // Register service. XXX Only for cpp service.
-  // Each XXXconnection will create it's own service instance.
+  // Each connection will create it's own service instance.
   template <typename Service>
   void register_service();
   template <typename Service>
@@ -71,7 +71,7 @@ class RPCZ_API server : boost::noncopyable {
   //       service_factory_map_ owned by broker thread.
 
  public:
-  // service_factory creates service for each XXXconnection.
+  // service_factory creates service for each connection.
   void register_service_factory(service_factory_ptr factory, const std::string& name);
 
  private:

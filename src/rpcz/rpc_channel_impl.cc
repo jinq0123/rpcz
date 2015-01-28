@@ -69,7 +69,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 //
 //  // rpc_controller will be deleted on response or timeout.
 //  rpc_controller* ctrl = new rpc_controller(
-//      response_message_handler(), error_handler(), -1);  // XXX
+//      response_message_handler(), error_handler(), -1);
 //  connection_.send_request(msg_vector, ctrl);
 //}
 

@@ -30,8 +30,8 @@
 
 namespace rpcz {
 
-// TODO: Do not use router_connection pointer, because XXXconnection may be deleted.
-replier::replier(router_connection& conn,  // TODO: rename to reply_broker
+// TODO: Do not use router_connection pointer, because connection may be deleted.
+replier::replier(router_connection& conn,
                  const std::string& event_id)
     : reply_context_(new reply_context(&conn, event_id)) { // shared_ptr
 };
@@ -40,7 +40,7 @@ replier::~replier() {
 }
 
 void replier::send(const google::protobuf::Message& response) const {
-    assert(reply_context_->clt_connection);
+    assert(reply_context_->router_conn);
     rpc_response_header generic_rpc_response;
     int msg_size = response.ByteSize();
     scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -52,7 +52,7 @@ void replier::send(const google::protobuf::Message& response) const {
 }
 
 void replier::send0(const std::string& response) const {
-    assert(reply_context_->clt_connection);
+    assert(reply_context_->router_conn);
     rpc_response_header generic_rpc_response;
     send_generic_response(generic_rpc_response,
                           string_to_message(response));
@@ -60,7 +60,7 @@ void replier::send0(const std::string& response) const {
 
 void replier::send_error(int error_code,
         const std::string& error_message/* = "" */) const {
-    assert(reply_context_->clt_connection);
+    assert(reply_context_->router_conn);
     rpc_response_header generic_rpc_response;
     zmq::message_t* payload = new zmq::message_t();
     generic_rpc_response.set_error_code(error_code);
@@ -84,9 +84,9 @@ void replier::send_generic_response(
     v.push_back(zmq_response_message);
     v.push_back(payload);
     reply_context& rCtx = *reply_context_;
-    assert(rCtx.clt_connection);
+    assert(rCtx.router_conn);
     assert(!rCtx.replied);  // Should reply only once.
-    rCtx.clt_connection->reply(rCtx.event_id, &v);
+    rCtx.router_conn->reply(rCtx.event_id, &v);
     rCtx.replied = true;
 }
 

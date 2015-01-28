@@ -26,7 +26,7 @@ namespace rpcz {
 class message_vector;
 class rpc_controller;
 
-// Represents a XXXconnection to a server. Thread-safe.
+// Represents a connection to a server (router socket). Thread-safe.
 class dealer_connection {
  public:
   explicit dealer_connection(uint64 dealer_index);
