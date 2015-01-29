@@ -37,11 +37,11 @@ namespace rpcz {
 
 class router_connection;
 class rpc_header;
-struct reply_context;
+struct responder_info;
 
 // responder is copyable.
 // Each request has its own responder, and should reply once.
-// responder can used in callback by copy.  // XXX Need example.
+// responder can be used in callback by copy.  // XXX Need example.
 // responder's copy operator is quick, which only copies a shared_ptr.
 // XXX More comments...
 class RPCZ_API responder {
@@ -63,7 +63,7 @@ class RPCZ_API responder {
             zmq::message_t* payload) const;
 
 private:
-  boost::shared_ptr<reply_context> reply_context_;
+  boost::shared_ptr<responder_info> info_;
 };  // class responder
 
 }  // namespace rpcz

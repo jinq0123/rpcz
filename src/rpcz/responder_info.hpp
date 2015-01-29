@@ -10,16 +10,14 @@ namespace rpcz {
 
 class router_connection;
 
-struct reply_context {
+struct responder_info {
   router_connection* router_conn;
   // TODO: Do not use router_connection pointer, because connection may be deleted.
   std::string event_id;
-  bool replied;  // To assert one reply.
 
-  inline reply_context(router_connection* conn, const std::string& evt_id)
+  inline responder_info(router_connection* conn, const std::string& evt_id)
       : router_conn(conn),
-        event_id(evt_id),
-        replied(false) {
+        event_id(evt_id) {
     assert(conn);
   }
 };

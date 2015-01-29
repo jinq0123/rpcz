@@ -22,26 +22,24 @@
 
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/logging.hpp>  // for CHECK()
-#include <rpcz/reply_context.hpp>
+#include <rpcz/responder_info.hpp>
 #include <rpcz/router_connection.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_header
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
-
-// TODO: Use requester/responser instead of client/server
 
 namespace rpcz {
 
 // TODO: Do not use router_connection pointer, because connection may be deleted.
 responder::responder(router_connection& conn,
                      const std::string& event_id)
-    : reply_context_(new reply_context(&conn, event_id)) { // shared_ptr
+    : info_(new responder_info(&conn, event_id)) { // shared_ptr
 };
 
 responder::~responder() {
 }
 
 void responder::send(const google::protobuf::Message& response) const {
-  assert(reply_context_->router_conn);
+  assert(info_->router_conn);
   int msg_size = response.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
   if (!response.SerializeToArray(payload->data(), msg_size)) {
@@ -55,7 +53,7 @@ void responder::send(const google::protobuf::Message& response) const {
 }
 
 void responder::send(const std::string& response) const {
-  assert(reply_context_->router_conn);
+  assert(info_->router_conn);
   rpc_header rpc_hdr;
   (void)rpc_hdr.mutable_resp_hdr();
   send(rpc_hdr, string_to_message(response));
@@ -63,7 +61,7 @@ void responder::send(const std::string& response) const {
 
 void responder::send_error(int error_code,
     const std::string& error_message/* = "" */) const {
-  assert(reply_context_->router_conn);
+  assert(info_->router_conn);
   rpc_header rpc_hdr;
   rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(resp_hdr);
@@ -86,11 +84,8 @@ void responder::send(const rpc_header& rpc_hdr,
   message_vector v;
   v.push_back(zmq_hdr_msg);
   v.push_back(payload);
-  reply_context& rCtx = *reply_context_;
-  assert(rCtx.router_conn);
-  assert(!rCtx.replied);  // Should reply only once.
-  rCtx.router_conn->reply(rCtx.event_id, &v);
-  rCtx.replied = true;
+  assert(info_->router_conn);
+  info_->router_conn->reply(info_->event_id, &v);
 }
 
 }  // namespace rpcz
