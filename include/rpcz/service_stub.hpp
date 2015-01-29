@@ -17,19 +17,19 @@ class rpc_error;
 
 class service_stub {
  public:
-  inline service_stub(requester_ptr channel,
+  inline service_stub(requester_ptr rqstr,
                       const std::string& service_name) :
-      channel_(channel),
+      requester_(rqstr),
       service_name_(service_name),
       default_timeout_ms_(-1) {}
   inline virtual ~service_stub() {}
 
  public:
-  inline requester_ptr channel() { return channel_; }
+  // XXX inline requester_ptr channel() { return requester_; }
   inline void set_default_timeout_ms(long ms) { default_timeout_ms_ = ms; }
 
  protected:
-  requester_ptr channel_;
+  requester_ptr requester_;
   std::string service_name_;
   long default_timeout_ms_;
 

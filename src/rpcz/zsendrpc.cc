@@ -109,11 +109,11 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  requester_ptr channel = requester::make_shared(endpoint);
+  requester_ptr rqstr = requester::make_shared(endpoint);
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {
-    channel->sync_request(
+    rqstr->sync_request(
         FLAGS_service_name.empty() ? service_name : FLAGS_service_name,
         method_desc, *request, -1, reply);
     std::string out;

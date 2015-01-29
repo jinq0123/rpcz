@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +16,10 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/rpc_channel_impl.hpp>
+#include <rpcz/requester.hpp>
 
+#include <boost/make_shared.hpp>
+#include <rpcz/dealer_connection.hpp>
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/logging.hpp>  // for CHECK_EQ
 #include <rpcz/rpc_controller.hpp>
@@ -27,15 +30,15 @@
 
 namespace rpcz {
 
-rpc_channel_impl::rpc_channel_impl(const dealer_connection& conn)
-    : connection_(conn) {  // copy
+requester::requester(const dealer_connection& conn)
+    : dealer_conn_(new dealer_connection(conn)) {  // shared_ptr
 }
 
-rpc_channel_impl::~rpc_channel_impl() {
+requester::~requester() {
 }
 
 // XXX
-//void rpc_channel_impl::call_method_full(
+//void requester::call_method_full(
 //    const std::string& service_name,
 //    const std::string& method_name,
 //    const ::google::protobuf::Message* request_msg,
@@ -74,7 +77,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 //}
 
 // XXX
-//void rpc_channel_impl::call_method0(const std::string& service_name,
+//void requester::call_method0(const std::string& service_name,
 //                                const std::string& method_name,
 //                                const std::string& request,
 //                                std::string* response,
@@ -91,7 +94,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 //}
 
 // XXX
-//void rpc_channel_impl::call_method(
+//void requester::call_method(
 //    const std::string& service_name,
 //    const google::protobuf::MethodDescriptor* method,
 //    const google::protobuf::Message& request,
@@ -108,7 +111,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 //                 done);
 //}
 
-void rpc_channel_impl::async_request(
+void requester::async_request(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
@@ -138,10 +141,10 @@ void rpc_channel_impl::async_request(
   // rpc_controller deleted in worker_thread_fun().
   // XXX delete on timeout.
   rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
-  connection_.send_request(msg_vector, ctrl);
+  dealer_conn_->send_request(msg_vector, ctrl);
 }
 
-void rpc_channel_impl::sync_request(
+void requester::sync_request(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
@@ -154,6 +157,15 @@ void rpc_channel_impl::sync_request(
   const rpc_error* err = handler.get_rpc_error();
   if (err)
     throw *err;
+}
+
+
+requester_ptr requester::make_shared(const dealer_connection& conn) {
+  return boost::make_shared<requester>(conn);
+}
+
+requester_ptr requester::make_shared(const std::string& endpoint) {
+  return make_shared(dealer_connection(endpoint));
 }
 
 }  // namespace rpcz

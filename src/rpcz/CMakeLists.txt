@@ -27,7 +27,6 @@ set(RPCZ_SOURCES
     requester.cc
     responder.cc
     router_connection.cc
-    rpc_channel_impl.cc
     rpc_controller.cc
     rpc_error.cc
     server.cc
