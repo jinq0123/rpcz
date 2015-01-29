@@ -31,10 +31,10 @@ class message_vector;
 
 class router_connection {
  public:
-  void reply(const std::string& event_id, message_vector* v) const;
+  router_connection(uint64 router_index, const std::string& sender);
 
  public:
-  router_connection(uint64 router_index, const std::string& sender);
+  void reply(const std::string& event_id, message_vector* v) const;
 
  private:
   manager& manager_;

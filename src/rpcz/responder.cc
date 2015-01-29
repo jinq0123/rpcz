@@ -38,7 +38,7 @@ responder::responder(router_connection& conn,
 responder::~responder() {
 }
 
-void responder::send(const google::protobuf::Message& response) const {
+void responder::respond(const google::protobuf::Message& response) const {
   assert(info_->router_conn);
   int msg_size = response.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -49,17 +49,17 @@ void responder::send(const google::protobuf::Message& response) const {
   (void)rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(rpc_hdr.has_resp_hdr());
   BOOST_ASSERT(!rpc_hdr.has_req_hdr());
-  send(rpc_hdr, payload.release());
+  respond(rpc_hdr, payload.release());
 }
 
-void responder::send(const std::string& response) const {
+void responder::respond(const std::string& response) const {
   assert(info_->router_conn);
   rpc_header rpc_hdr;
   (void)rpc_hdr.mutable_resp_hdr();
-  send(rpc_hdr, string_to_message(response));
+  respond(rpc_hdr, string_to_message(response));
 }
 
-void responder::send_error(int error_code,
+void responder::respond_error(int error_code,
     const std::string& error_message/* = "" */) const {
   assert(info_->router_conn);
   rpc_header rpc_hdr;
@@ -70,12 +70,12 @@ void responder::send_error(int error_code,
   if (!error_message.empty()) {
     resp_hdr->set_error_str(error_message);
   }
-  send(rpc_hdr, payload);
+  respond(rpc_hdr, payload);
 }
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void responder::send(const rpc_header& rpc_hdr,
+void responder::respond(const rpc_header& rpc_hdr,
                      zmq::message_t* payload) const {
   size_t msg_size = rpc_hdr.ByteSize();
   zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);

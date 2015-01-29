@@ -32,7 +32,7 @@ class SearchServiceImpl : public SearchService {
     SearchResponse response;
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
-    rspndr.send(response);
+    rspndr.respond(response);
   }
 };
 }  // namespace examples

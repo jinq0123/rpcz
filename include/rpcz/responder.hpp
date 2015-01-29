@@ -50,16 +50,16 @@ class RPCZ_API responder {
   ~responder();
 
  public:
-  // send(protocol::Message) is only for cpp use.
-  void send(const google::protobuf::Message& response) const;
-  void send(const std::string& response) const;
-  void send_error(int error_code,
+  // respond(protocol::Message) is only for cpp use.
+  void respond(const google::protobuf::Message& response) const;
+  void respond(const std::string& response) const;
+  void respond_error(int error_code,
       const std::string& error_message="") const;
 
  private:
   // Sends rpc header and payload.
   // Takes ownership of the provided payload message.
-  void send(const rpc_header& rpc_hdr,
+  void respond(const rpc_header& rpc_hdr,
             zmq::message_t* payload) const;
 
 private:

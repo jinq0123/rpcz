@@ -45,7 +45,7 @@ class delegate_resonder {
   }
   void operator()(const rpc_error* e, const SearchResponse& resp) {
     if (e) return;
-    rspndr_.send(resp);
+    rspndr_.respond(resp);
   }
 
  private:
@@ -67,9 +67,9 @@ class SearchServiceImpl : public SearchService {
       const SearchRequest& request,
       const responder& rspndr) {
     if (request.query() == "foo") {
-      rspndr.send_error(-4, "I don't like foo.");
+      rspndr.respond_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      rspndr.send_error(17, "I don't like bar.");
+      rspndr.respond_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
       backend_->async_Search(request, delegate_resonder(rspndr));
       return;
@@ -83,16 +83,16 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
       if (old_responder_.get())
-        old_responder_->send(SearchResponse());
-      rspndr.send(SearchResponse());
+        old_responder_->respond(SearchResponse());
+      rspndr.respond(SearchResponse());
     } else if (request.query() == "terminate") {
-      rspndr.send(SearchResponse());
+      rspndr.respond(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      rspndr.send(response);
+      rspndr.respond(response);
     }
   }
 
@@ -113,7 +113,7 @@ class BackendSearchServiceImpl : public SearchService {
       const responder& rspndr) {
     SearchResponse response;
     response.add_results("42!");
-    rspndr.send(response);
+    rspndr.respond(response);
   }
 };
 

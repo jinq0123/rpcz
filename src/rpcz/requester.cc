@@ -159,7 +159,6 @@ void requester::sync_request(
     throw *err;
 }
 
-
 requester_ptr requester::make_shared(const dealer_connection& conn) {
   return boost::make_shared<requester>(conn);
 }

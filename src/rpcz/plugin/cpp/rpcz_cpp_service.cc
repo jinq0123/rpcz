@@ -259,7 +259,7 @@ void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
       "void $classname$::$name$(\n"
       "    const $input_type$&,\n"
       "    const ::rpcz::responder& rspndr) {\n"
-      "  rspndr.send_error(\n"
+      "  rspndr.respond_error(\n"
       "      ::rpcz::error_code::METHOD_NOT_IMPLEMENTED,\n"
       "      \"Method $name$() not implemented.\");\n"
       "}\n"

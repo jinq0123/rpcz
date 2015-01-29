@@ -62,7 +62,7 @@ class SearchServiceImpl : public SearchService {
     SearchResponse response;
     response.add_results("The search for " + request.query());
     response.add_results("is great");
-    rspndr.send(response);
+    rspndr.respond(response);
   }
 };
 
