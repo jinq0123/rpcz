@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,15 +32,15 @@
 namespace rpcz {
 
 // TODO: Do not use router_connection pointer, because connection may be deleted.
-replier::replier(router_connection& conn,
+responder::responder(router_connection& conn,
                  const std::string& event_id)
     : reply_context_(new reply_context(&conn, event_id)) { // shared_ptr
 };
 
-replier::~replier() {
+responder::~responder() {
 }
 
-void replier::send(const google::protobuf::Message& response) const {
+void responder::send(const google::protobuf::Message& response) const {
     assert(reply_context_->router_conn);
     int msg_size = response.ByteSize();
     scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -53,14 +54,14 @@ void replier::send(const google::protobuf::Message& response) const {
     send(rpc_hdr, payload.release());
 }
 
-void replier::send(const std::string& response) const {
+void responder::send(const std::string& response) const {
     assert(reply_context_->router_conn);
     rpc_header rpc_hdr;
     (void)rpc_hdr.mutable_resp_hdr();
     send(rpc_hdr, string_to_message(response));
 }
 
-void replier::send_error(int error_code,
+void responder::send_error(int error_code,
         const std::string& error_message/* = "" */) const {
     assert(reply_context_->router_conn);
     rpc_header rpc_hdr;
@@ -76,7 +77,7 @@ void replier::send_error(int error_code,
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void replier::send(const rpc_header& rpc_hdr,
+void responder::send(const rpc_header& rpc_hdr,
                    zmq::message_t* payload) const {
     size_t msg_size = rpc_hdr.ByteSize();
     zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);

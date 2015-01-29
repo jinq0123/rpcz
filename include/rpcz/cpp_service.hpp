@@ -45,13 +45,13 @@ class RPCZ_API cpp_service : public iservice {
   // High-level handler.
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
-                           replier replier_copy) = 0;
+                           responder responder_copy) = 0;
 
  public:
   // Low-level handler of iservice interface.
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                replier replier_copy);
+                                responder responder_copy);
 };  // class cpp_service
 
 }  // namespace rpcz

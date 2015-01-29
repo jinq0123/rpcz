@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,8 +16,8 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_REPLY_SENDER_H
-#define RPCZ_REPLY_SENDER_H
+#ifndef RPCZ_RESPONDER_HPP
+#define RPCZ_RESPONDER_HPP
 
 #include <string>
 #include <boost/shared_ptr.hpp>
@@ -38,15 +39,15 @@ class router_connection;
 class rpc_header;
 struct reply_context;
 
-// replier is copyable.
-// Each request has its own replier, and should reply once.
-// replier can used in callback by copy.  // XXX Need example.
-// replier's copy operator is quick, which only copies a shared_ptr.
+// responder is copyable.
+// Each request has its own responder, and should reply once.
+// responder can used in callback by copy.  // XXX Need example.
+// responder's copy operator is quick, which only copies a shared_ptr.
 // XXX More comments...
-class RPCZ_API replier {
+class RPCZ_API responder {
  public:
-  replier(router_connection& conn, const std::string& event_id);
-  ~replier();
+  responder(router_connection& conn, const std::string& event_id);
+  ~responder();
 
  public:
   // send(protocol::Message) is only for cpp use.
@@ -63,7 +64,7 @@ class RPCZ_API replier {
 
 private:
   boost::shared_ptr<reply_context> reply_context_;
-};  // class replier
+};  // class responder
 
 }  // namespace rpcz
-#endif  // RPCZ_REPLY_SENDER_H
+#endif  // RPCZ_RESPONDER_HPP

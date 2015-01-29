@@ -32,13 +32,13 @@ namespace rpcz {
 
 void cpp_service::dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                replier replier_copy) {
+                                responder responder_copy) {
     const ::google::protobuf::MethodDescriptor* descriptor =
         GetDescriptor()->FindMethodByName(method);
     if (descriptor == NULL) {
       // Invalid method name
       DLOG(INFO) << "Invalid method name: " << method;
-      replier_copy.send_error(error_code::NO_SUCH_METHOD);
+      responder_copy.send_error(error_code::NO_SUCH_METHOD);
       return;
     }
 
@@ -48,10 +48,10 @@ void cpp_service::dispatch_request(const std::string& method,
     if (!request->ParseFromArray(payload, payload_len)) {
       DLOG(INFO) << "Failed to parse request.";
       // Invalid proto;
-      replier_copy.send_error(error_code::INVALID_MESSAGE);
+      responder_copy.send_error(error_code::INVALID_MESSAGE);
       return;
     }
-    call_method(descriptor, *request, replier_copy);
+    call_method(descriptor, *request, responder_copy);
 }  // dispatch_request()
 
 }  // namespace rpcz
