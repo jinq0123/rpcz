@@ -22,9 +22,9 @@ set(RPCZ_SOURCES
     event_id_generator.cc
     manager.cc
     reactor.cc
-    replier.cc
     request_handler.cc
     request_handler_manager.cc
+    responder.cc
     router_connection.cc
     rpc_channel.cc
     rpc_channel_impl.cc

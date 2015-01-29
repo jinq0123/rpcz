@@ -15,7 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/replier.hpp>
+#include <rpcz/responder.hpp>
 
 #include <zmq.hpp>  // for message_t
 

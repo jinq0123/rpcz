@@ -26,7 +26,7 @@
 #include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/common.hpp>  // for scoped_ptr
 #include <rpcz/logging.hpp>  // for INFO
-#include <rpcz/replier.hpp>
+#include <rpcz/responder.hpp>
 
 namespace rpcz {
 

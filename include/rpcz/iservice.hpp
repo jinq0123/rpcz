@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <rpcz/replier.hpp>
+#include <rpcz/responder.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace rpcz {

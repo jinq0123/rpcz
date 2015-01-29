@@ -27,7 +27,7 @@
 #include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
-#include "rpcz/replier.hpp"
+#include "rpcz/responder.hpp"
 #include "rpcz/rpc_channel.hpp"
 #include "rpcz/server.hpp"
 #include "rpcz/sync_event.hpp"
