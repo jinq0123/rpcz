@@ -35,7 +35,7 @@ class message_t;
 namespace rpcz {
 
 class router_connection;
-class rpc_response_header;
+class rpc_header;
 struct reply_context;
 
 // replier is copyable.
@@ -55,11 +55,10 @@ class RPCZ_API replier {
       const std::string& error_message="") const;
 
  private:
-  // Sends the response back.
+  // Sends rpc header and payload.
   // Takes ownership of the provided payload message.
-  void send_generic_response(
-      const rpc_response_header& generic_rpc_response,
-      zmq::message_t* payload) const;
+  void send(const rpc_header& rpc_hdr,
+            zmq::message_t* payload) const;
 
 private:
   boost::shared_ptr<reply_context> reply_context_;

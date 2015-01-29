@@ -46,15 +46,20 @@ inline void rpc_controller::handle_done_response(message_iterator& iter) {
     handle_error(error_code::INVALID_MESSAGE, "");
     return;
   }
-  rpc_response_header generic_response;
+  rpc_header rpc_hdr;
   zmq::message_t& msg_in = iter.next();
-  if (!generic_response.ParseFromArray(msg_in.data(), msg_in.size())) {
+  if (!rpc_hdr.ParseFromArray(msg_in.data(), msg_in.size())) {
     handle_error(error_code::INVALID_MESSAGE, "");
     return;
   }
-  if (generic_response.has_error_code()) {
-    handle_error(generic_response.error_code(),
-        generic_response.error_str());
+  // XXX maybe request...
+  if (!rpc_hdr.has_resp_hdr()) {
+    handle_error(error_code::INVALID_MESSAGE, "No response header.");
+    return;
+  }
+  const rpc_response_header& resp_hdr = rpc_hdr.resp_hdr();
+  if (resp_hdr.has_error_code()) {
+    handle_error(resp_hdr.error_code(), resp_hdr.error_str());
     return;
   }
   if (!iter.has_more()) {

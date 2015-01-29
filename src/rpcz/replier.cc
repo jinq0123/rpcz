@@ -23,7 +23,7 @@
 #include <rpcz/logging.hpp>  // for CHECK()
 #include <rpcz/reply_context.hpp>
 #include <rpcz/router_connection.hpp>
-#include <rpcz/rpcz.pb.h>  // for rpc_response_header
+#include <rpcz/rpcz.pb.h>  // for rpc_header
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
 
 // TODO: Use requester/responser instead of client/server
@@ -41,47 +41,49 @@ replier::~replier() {
 
 void replier::send(const google::protobuf::Message& response) const {
     assert(reply_context_->router_conn);
-    rpc_response_header generic_rpc_response;
     int msg_size = response.ByteSize();
     scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
     if (!response.SerializeToArray(payload->data(), msg_size)) {
       throw invalid_message_error("Invalid response message");
     }
-    send_generic_response(generic_rpc_response,
-                          payload.release());
+    rpc_header rpc_hdr;
+    (void)rpc_hdr.mutable_resp_hdr();
+    BOOST_ASSERT(rpc_hdr.has_resp_hdr());
+    BOOST_ASSERT(!rpc_hdr.has_req_hdr());
+    send(rpc_hdr, payload.release());
 }
 
 void replier::send0(const std::string& response) const {
     assert(reply_context_->router_conn);
-    rpc_response_header generic_rpc_response;
-    send_generic_response(generic_rpc_response,
-                          string_to_message(response));
+    rpc_header rpc_hdr;
+    (void)rpc_hdr.mutable_resp_hdr();
+    send(rpc_hdr, string_to_message(response));
 }
 
 void replier::send_error(int error_code,
         const std::string& error_message/* = "" */) const {
     assert(reply_context_->router_conn);
-    rpc_response_header generic_rpc_response;
+    rpc_header rpc_hdr;
+    rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
+    BOOST_ASSERT(resp_hdr);
     zmq::message_t* payload = new zmq::message_t();
-    generic_rpc_response.set_error_code(error_code);
+    resp_hdr->set_error_code(error_code);
     if (!error_message.empty()) {
-      generic_rpc_response.set_error_str(error_message);
+      resp_hdr->set_error_str(error_message);
     }
-    send_generic_response(generic_rpc_response, payload);
+    send(rpc_hdr, payload);
 }
 
-// Sends the response back.
+// Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void replier::send_generic_response(
-        const rpc_response_header& generic_rpc_response,
-        zmq::message_t* payload) const {
-    size_t msg_size = generic_rpc_response.ByteSize();
-    zmq::message_t* zmq_response_message = new zmq::message_t(msg_size);
-    CHECK(generic_rpc_response.SerializeToArray(
-        zmq_response_message->data(), msg_size));
+void replier::send(const rpc_header& rpc_hdr,
+                   zmq::message_t* payload) const {
+    size_t msg_size = rpc_hdr.ByteSize();
+    zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);
+    CHECK(rpc_hdr.SerializeToArray(zmq_hdr_msg->data(), msg_size));
 
     message_vector v;
-    v.push_back(zmq_response_message);
+    v.push_back(zmq_hdr_msg);
     v.push_back(payload);
     reply_context& rCtx = *reply_context_;
     assert(rCtx.router_conn);
