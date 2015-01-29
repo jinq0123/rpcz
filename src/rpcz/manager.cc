@@ -98,19 +98,6 @@ zmq::socket_t& manager::new_frontend_socket() {
   return *socket;
 }
 
-// XXX move to dealer_connection class
-dealer_connection manager::connect(const std::string& endpoint) {
-  zmq::socket_t& socket = get_frontend_socket();
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, c2b::kConnect, ZMQ_SNDMORE);
-  send_string(&socket, endpoint, 0);
-  zmq::message_t msg;
-  socket.recv(&msg);
-  socket.recv(&msg);
-  uint64 dealer_index = interpret_message<uint64>(msg);
-  return dealer_connection(dealer_index);
-}
-
 void manager::bind(const std::string& endpoint,
     const service_factory_map& factories) {
   zmq::socket_t& socket = get_frontend_socket();

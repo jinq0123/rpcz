@@ -148,16 +148,15 @@ class server_test : public ::testing::Test {
     backend_service_.reset(new BackendSearchServiceImpl);
     backend_server_->register_singleton_service(*backend_service_);
     backend_server_->bind("inproc://myserver.backend");
-    rpcz::manager_ptr mgr = rpcz::manager::get();
     backend_connection_.reset(new dealer_connection(
-        mgr->connect("inproc://myserver.backend")));
+        "inproc://myserver.backend"));
 
     frontend_service_.reset(new SearchServiceImpl(
         new SearchService_Stub(rpc_channel::make_shared(*backend_connection_))));
     frontend_server_->register_singleton_service(*frontend_service_);
     frontend_server_->bind("inproc://myserver.frontend");
     frontend_connection_.reset(new dealer_connection(
-        mgr->connect("inproc://myserver.frontend")));
+        "inproc://myserver.frontend"));
   }
 
 protected:

@@ -27,8 +27,16 @@
 
 namespace rpcz {
 
-dealer_connection::dealer_connection(uint64 dealer_index)
-    : manager_(manager::get()), dealer_index_(dealer_index) {
+dealer_connection::dealer_connection(const std::string& endpoint)
+    : manager_(manager::get()) {
+  zmq::socket_t& socket = manager_->get_frontend_socket();
+  send_empty_message(&socket, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kConnect, ZMQ_SNDMORE);
+  send_string(&socket, endpoint, 0);
+  zmq::message_t msg;
+  socket.recv(&msg);
+  socket.recv(&msg);
+  dealer_index_ = interpret_message<uint64>(msg);
 }
 
 void dealer_connection::send_request(

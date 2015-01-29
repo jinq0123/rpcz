@@ -29,7 +29,8 @@ class rpc_controller;
 // Represents a connection to a server (router socket). Thread-safe.
 class dealer_connection {
  public:
-  explicit dealer_connection(uint64 dealer_index);
+  // Connects to the given endpoint.
+  explicit dealer_connection(const std::string& endpoint);
 
   // Asynchronously sends a request over the dealer socket.
   // request: a vector of messages to be sent. Does not take ownership of the

@@ -61,11 +61,6 @@ class manager : boost::noncopyable {
   // Blocks the current thread until all connections have completed.
   ~manager();
 
-  // connects all worker threads to the given endpoint. On success
-  // this method returns a dealer_connection object that can be used from any thread
-  // to communicate with this endpoint.
-  dealer_connection connect(const std::string& endpoint);
-
   // binds a socket to the given endpoint. 
   void bind(const std::string& endpoint, const service_factory_map& factories);
   // Unbind socket of the given endpoint.

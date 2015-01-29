@@ -106,8 +106,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
   application::set_manager_threads(4);
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
-  manager_ptr mgr = manager::get();
-  dealer_connection conn(mgr->connect("inproc://server.test"));
+  dealer_connection conn("inproc://server.test");
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -164,9 +163,8 @@ TEST_F(manager_test, ManyClientsTest) {
   application::set_manager_threads(4);
 
   boost::thread thread(start_server(context));
-  manager_ptr mgr = manager::get();
 
-  dealer_connection conn(mgr->connect("inproc://server.test"));
+  dealer_connection conn("inproc://server.test");
   boost::thread_group group;
   for (int i = 0; i < 10; ++i) {
     group.add_thread(
