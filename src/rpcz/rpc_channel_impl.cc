@@ -114,13 +114,14 @@ void rpc_channel_impl::async_call(
     const google::protobuf::Message& request,
     const response_message_handler& handler,
     long timeout_ms) {
-  rpc_request_header generic_request;
-  generic_request.set_service(service_name);
-  generic_request.set_method(method->name());
+  rpc_header rpc_hdr;
+  rpc_request_header* req_hdr = rpc_hdr.mutable_req_hdr();
+  req_hdr->set_service(service_name);
+  req_hdr->set_method(method->name());
 
-  size_t msg_size = generic_request.ByteSize();
+  size_t msg_size = rpc_hdr.ByteSize();
   scoped_ptr<zmq::message_t> msg_out(new zmq::message_t(msg_size));
-  CHECK(generic_request.SerializeToArray(msg_out->data(), msg_size));
+  CHECK(rpc_hdr.SerializeToArray(msg_out->data(), msg_size));
 
   scoped_ptr<zmq::message_t> payload_out;
   size_t bytes = request.ByteSize();
