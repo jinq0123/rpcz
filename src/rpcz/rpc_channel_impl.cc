@@ -108,7 +108,7 @@ rpc_channel_impl::~rpc_channel_impl() {
 //                 done);
 //}
 
-void rpc_channel_impl::async_call(
+void rpc_channel_impl::async_request(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
@@ -141,14 +141,14 @@ void rpc_channel_impl::async_call(
   connection_.send_request(msg_vector, ctrl);
 }
 
-void rpc_channel_impl::sync_call(
+void rpc_channel_impl::sync_request(
     const std::string& service_name,
     const google::protobuf::MethodDescriptor* method,
     const google::protobuf::Message& request,
     long timeout_ms,
     google::protobuf::Message* response) {
   sync_call_handler handler(response);
-  async_call(service_name, method, request,
+  async_request(service_name, method, request,
       boost::ref(handler), timeout_ms);
   handler.wait();
   const rpc_error* err = handler.get_rpc_error();

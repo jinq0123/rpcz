@@ -40,14 +40,14 @@ class rpc_channel_impl: public requester {
   //    closure* done);
 
   // only used in cpp? Other language use string request.
-  virtual void async_call(
+  virtual void async_request(
       const std::string& service_name,
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,
       const response_message_handler& msg_handler,
       long timeout_ms);
 
-  virtual void sync_call(
+  virtual void sync_request(
       const std::string& service_name,
       const google::protobuf::MethodDescriptor* method,
       const google::protobuf::Message& request,

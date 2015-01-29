@@ -113,7 +113,7 @@ int run_call(const std::string& endpoint,
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {
-    channel->sync_call(
+    channel->sync_request(
         FLAGS_service_name.empty() ? service_name : FLAGS_service_name,
         method_desc, *request, -1, reply);
     std::string out;

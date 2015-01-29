@@ -49,18 +49,20 @@ class RPCZ_API requester {
   //                        rpc_controller* rpc_controller,
   //                        closure* done) = 0;
 
-  virtual void async_call(const std::string& service_name,
-                          const google::protobuf::MethodDescriptor* method,
-                          const google::protobuf::Message& request,
-                          const response_message_handler& msg_handler,
-                          long timeout_ms) = 0;
+  virtual void async_request(
+      const std::string& service_name,
+      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::Message& request,
+      const response_message_handler& msg_handler,
+      long timeout_ms) = 0;
 
-  virtual void sync_call(const std::string& service_name,
-                         const google::protobuf::MethodDescriptor* method,
-                         const google::protobuf::Message& request,
-                         long timeout_ms,
-                         google::protobuf::Message* response  // out
-                         ) = 0;
+  virtual void sync_request(
+      const std::string& service_name,
+      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::Message& request,
+      long timeout_ms,
+      google::protobuf::Message* response  // out
+      ) = 0;
 
   // DO NOT USE: this method exists only for language bindings and may be
   // removed.
