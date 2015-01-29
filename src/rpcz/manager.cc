@@ -28,7 +28,6 @@
 
 #include <rpcz/application_options.hpp>
 #include <rpcz/broker_thread.hpp>
-#include <rpcz/dealer_connection.hpp>
 #include <rpcz/internal_commands.hpp>  // for kConnect
 #include <rpcz/logging.hpp>
 #include <rpcz/sync_event.hpp>
