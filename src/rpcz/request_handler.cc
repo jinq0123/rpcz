@@ -15,7 +15,7 @@ namespace rpcz {
 
 request_handler::request_handler(uint64 router_index,
                                  const std::string& sender)
-    : client_connection_(router_index, sender) {
+    : router_conn_(router_index, sender) {
 }
 
 request_handler::~request_handler() {
@@ -31,7 +31,7 @@ void request_handler::handle_request(message_iterator& iter) {
   std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
   if (!iter.has_more()) return;
   rpc_header rpc_hdr;
-  replier replier_copy(client_connection_, event_id);
+  replier replier_copy(router_conn_, event_id);
   zmq::message_t& msg = iter.next();
   if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
     // Handle bad rpc.
