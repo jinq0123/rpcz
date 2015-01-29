@@ -16,8 +16,8 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_RPC_CHANNEL_H
-#define RPCZ_RPC_CHANNEL_H
+#ifndef RPCZ_REQUESTER_HPP
+#define RPCZ_REQUESTER_HPP
 
 #include <string>
 #include <set>
@@ -25,7 +25,7 @@
 #include <google/protobuf/stubs/common.h>
 
 #include <rpcz/response_message_handler.hpp>  // for response_message_handler
-#include <rpcz/rpc_channel_ptr.hpp>
+#include <rpcz/requester_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace google {
@@ -72,14 +72,14 @@ class RPCZ_API requester {
   //                         rpc_controller* rpc_controller,
   //                         closure* done) = 0;
 
-  static rpc_channel_ptr make_shared(const dealer_connection& conn);
+  static requester_ptr make_shared(const dealer_connection& conn);
 
   // Creates an requester to the given endpoint.
-  static rpc_channel_ptr make_shared(const std::string& endpoint);
+  static requester_ptr make_shared(const std::string& endpoint);
 
   virtual ~requester() {};
 };  // class requester
 
 }  // namespace rpcz
 
-#endif  // RPCZ_RPC_CHANNEL_H
+#endif  // RPCZ_REQUESTER_HPP

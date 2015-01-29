@@ -109,7 +109,7 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  rpc_channel_ptr channel = requester::make_shared(endpoint);
+  requester_ptr channel = requester::make_shared(endpoint);
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {

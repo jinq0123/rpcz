@@ -8,7 +8,7 @@
 
 #include <string>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
-#include <rpcz/rpc_channel_ptr.hpp>
+#include <rpcz/requester_ptr.hpp>
 
 namespace rpcz {
 
@@ -17,7 +17,7 @@ class rpc_error;
 
 class service_stub {
  public:
-  inline service_stub(rpc_channel_ptr channel,
+  inline service_stub(requester_ptr channel,
                       const std::string& service_name) :
       channel_(channel),
       service_name_(service_name),
@@ -25,11 +25,11 @@ class service_stub {
   inline virtual ~service_stub() {}
 
  public:
-  inline rpc_channel_ptr channel() { return channel_; }
+  inline requester_ptr channel() { return channel_; }
   inline void set_default_timeout_ms(long ms) { default_timeout_ms_ = ms; }
 
  protected:
-  rpc_channel_ptr channel_;
+  requester_ptr channel_;
   std::string service_name_;
   long default_timeout_ms_;
 

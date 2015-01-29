@@ -5,11 +5,11 @@
 
 namespace rpcz {
 
-rpc_channel_ptr requester::make_shared(const dealer_connection& conn) {
+requester_ptr requester::make_shared(const dealer_connection& conn) {
   return boost::make_shared<rpc_channel_impl>(conn);
 }
 
-rpc_channel_ptr requester::make_shared(const std::string& endpoint) {
+requester_ptr requester::make_shared(const std::string& endpoint) {
   return make_shared(dealer_connection(endpoint));
 }
 
