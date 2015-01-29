@@ -237,7 +237,7 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
     "                 $classname$::descriptor()->name()) {}\n"
     "$classname$_Stub::$classname$_Stub(\n"
     "    const ::std::string& endpoint)\n"
-    "  : service_stub(::rpcz::rpc_channel::make_shared(endpoint),\n"
+    "  : service_stub(::rpcz::requester::make_shared(endpoint),\n"
     "                 $classname$::descriptor()->name()) {}\n"
     "$classname$_Stub::~$classname$_Stub() {}\n"
     "\n");

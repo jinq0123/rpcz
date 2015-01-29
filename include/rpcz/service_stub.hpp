@@ -12,7 +12,7 @@
 
 namespace rpcz {
 
-class rpc_channel;
+class requester;
 class rpc_error;
 
 class service_stub {

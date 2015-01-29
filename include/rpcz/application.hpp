@@ -27,7 +27,7 @@ class context_t;
 }  // namespace zmq
 
 namespace rpcz {
-class rpc_channel;
+class requester;
 
 // rpcz::application is a simple interface that helps setting up a common
 // RPCZ client or server application.

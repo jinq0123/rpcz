@@ -24,7 +24,7 @@
 
 #include <rpcz/application.hpp>
 #include <rpcz/common.hpp>  // for scoped_ptr
-#include <rpcz/rpc_channel.hpp>
+#include <rpcz/requester.hpp>
 #include <rpcz/rpc_error.hpp>
 
 using google::protobuf::DynamicMessageFactory;
@@ -109,7 +109,7 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  rpc_channel_ptr channel = rpc_channel::make_shared(endpoint);
+  rpc_channel_ptr channel = requester::make_shared(endpoint);
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {

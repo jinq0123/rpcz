@@ -21,7 +21,7 @@
 #include <rpcz/application.hpp>
 #include <rpcz/callback.hpp>
 #include <rpcz/responder.hpp>
-#include <rpcz/rpc_channel.hpp>
+#include <rpcz/requester.hpp>
 #include <rpcz/server.hpp>
 
 #endif

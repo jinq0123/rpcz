@@ -24,9 +24,9 @@ set(RPCZ_SOURCES
     reactor.cc
     request_handler.cc
     request_handler_manager.cc
+    requester.cc
     responder.cc
     router_connection.cc
-    rpc_channel.cc
     rpc_channel_impl.cc
     rpc_controller.cc
     rpc_error.cc

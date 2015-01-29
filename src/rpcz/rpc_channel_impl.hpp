@@ -18,13 +18,13 @@
 #define RPCZ_RPC_CHANNEL_IMPL_H
 
 #include <rpcz/dealer_connection.hpp>
-#include <rpcz/rpc_channel.hpp>
+#include <rpcz/requester.hpp>
 
 namespace rpcz {
 
 class closure;
 
-class rpc_channel_impl: public rpc_channel {
+class rpc_channel_impl: public requester {
  public:
   rpc_channel_impl(const dealer_connection& conn);
 

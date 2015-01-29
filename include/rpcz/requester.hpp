@@ -39,7 +39,7 @@ namespace rpcz {
 class closure;
 class dealer_connection;
 
-class RPCZ_API rpc_channel {
+class RPCZ_API requester {
  public:
   // DEL
   //virtual void call_method(const std::string& service_name,
@@ -74,11 +74,11 @@ class RPCZ_API rpc_channel {
 
   static rpc_channel_ptr make_shared(const dealer_connection& conn);
 
-  // Creates an rpc_channel to the given endpoint.
+  // Creates an requester to the given endpoint.
   static rpc_channel_ptr make_shared(const std::string& endpoint);
 
-  virtual ~rpc_channel() {};
-};  // class rpc_channel
+  virtual ~requester() {};
+};  // class requester
 
 }  // namespace rpcz
 

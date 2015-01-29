@@ -7,8 +7,8 @@
 
 namespace rpcz {
 
-class rpc_channel;
-typedef boost::shared_ptr<rpc_channel> rpc_channel_ptr;
+class requester;
+typedef boost::shared_ptr<requester> rpc_channel_ptr;
 
 }  // namespace rpcz
 

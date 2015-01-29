@@ -73,7 +73,7 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "}  // namespace google\n"
     "namespace rpcz {\n"
     "class responder;\n"
-    "class rpc_channel;\n"
+    "class requester;\n"
     "class rpc_error;\n"
     "}  // namespace rpcz\n"
     "\n"
