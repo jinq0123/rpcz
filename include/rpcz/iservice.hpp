@@ -32,7 +32,7 @@ class RPCZ_API iservice {
   // It is exposed for all language bindings.
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                responder responder_copy) = 0;
+                                const responder& rspndr) = 0;
 };
 
 }  // namespace rpcz

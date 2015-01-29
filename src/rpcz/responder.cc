@@ -33,7 +33,7 @@ namespace rpcz {
 
 // TODO: Do not use router_connection pointer, because connection may be deleted.
 responder::responder(router_connection& conn,
-                 const std::string& event_id)
+                     const std::string& event_id)
     : reply_context_(new reply_context(&conn, event_id)) { // shared_ptr
 };
 
@@ -41,56 +41,56 @@ responder::~responder() {
 }
 
 void responder::send(const google::protobuf::Message& response) const {
-    assert(reply_context_->router_conn);
-    int msg_size = response.ByteSize();
-    scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
-    if (!response.SerializeToArray(payload->data(), msg_size)) {
-      throw invalid_message_error("Invalid response message");
-    }
-    rpc_header rpc_hdr;
-    (void)rpc_hdr.mutable_resp_hdr();
-    BOOST_ASSERT(rpc_hdr.has_resp_hdr());
-    BOOST_ASSERT(!rpc_hdr.has_req_hdr());
-    send(rpc_hdr, payload.release());
+  assert(reply_context_->router_conn);
+  int msg_size = response.ByteSize();
+  scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
+  if (!response.SerializeToArray(payload->data(), msg_size)) {
+    throw invalid_message_error("Invalid response message");
+  }
+  rpc_header rpc_hdr;
+  (void)rpc_hdr.mutable_resp_hdr();
+  BOOST_ASSERT(rpc_hdr.has_resp_hdr());
+  BOOST_ASSERT(!rpc_hdr.has_req_hdr());
+  send(rpc_hdr, payload.release());
 }
 
 void responder::send(const std::string& response) const {
-    assert(reply_context_->router_conn);
-    rpc_header rpc_hdr;
-    (void)rpc_hdr.mutable_resp_hdr();
-    send(rpc_hdr, string_to_message(response));
+  assert(reply_context_->router_conn);
+  rpc_header rpc_hdr;
+  (void)rpc_hdr.mutable_resp_hdr();
+  send(rpc_hdr, string_to_message(response));
 }
 
 void responder::send_error(int error_code,
-        const std::string& error_message/* = "" */) const {
-    assert(reply_context_->router_conn);
-    rpc_header rpc_hdr;
-    rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
-    BOOST_ASSERT(resp_hdr);
-    zmq::message_t* payload = new zmq::message_t();
-    resp_hdr->set_error_code(error_code);
-    if (!error_message.empty()) {
-      resp_hdr->set_error_str(error_message);
-    }
-    send(rpc_hdr, payload);
+    const std::string& error_message/* = "" */) const {
+  assert(reply_context_->router_conn);
+  rpc_header rpc_hdr;
+  rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
+  BOOST_ASSERT(resp_hdr);
+  zmq::message_t* payload = new zmq::message_t();
+  resp_hdr->set_error_code(error_code);
+  if (!error_message.empty()) {
+    resp_hdr->set_error_str(error_message);
+  }
+  send(rpc_hdr, payload);
 }
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
 void responder::send(const rpc_header& rpc_hdr,
-                   zmq::message_t* payload) const {
-    size_t msg_size = rpc_hdr.ByteSize();
-    zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);
-    CHECK(rpc_hdr.SerializeToArray(zmq_hdr_msg->data(), msg_size));
+                     zmq::message_t* payload) const {
+  size_t msg_size = rpc_hdr.ByteSize();
+  zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);
+  CHECK(rpc_hdr.SerializeToArray(zmq_hdr_msg->data(), msg_size));
 
-    message_vector v;
-    v.push_back(zmq_hdr_msg);
-    v.push_back(payload);
-    reply_context& rCtx = *reply_context_;
-    assert(rCtx.router_conn);
-    assert(!rCtx.replied);  // Should reply only once.
-    rCtx.router_conn->reply(rCtx.event_id, &v);
-    rCtx.replied = true;
+  message_vector v;
+  v.push_back(zmq_hdr_msg);
+  v.push_back(payload);
+  reply_context& rCtx = *reply_context_;
+  assert(rCtx.router_conn);
+  assert(!rCtx.replied);  // Should reply only once.
+  rCtx.router_conn->reply(rCtx.event_id, &v);
+  rCtx.replied = true;
 }
 
 }  // namespace rpcz

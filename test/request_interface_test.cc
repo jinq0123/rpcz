@@ -51,7 +51,7 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      responder responder_copy) {
+      const responder& rspndr) {
     LOG(INFO) << "Search()";
 
     if (request.query() == "timeout") {
@@ -62,7 +62,7 @@ class SearchServiceImpl : public SearchService {
     SearchResponse response;
     response.add_results("The search for " + request.query());
     response.add_results("is great");
-    responder_copy.send(response);
+    rspndr.send(response);
   }
 };
 

@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,28 +31,30 @@
 
 namespace rpcz {
 
-void cpp_service::dispatch_request(const std::string& method,
-                                const void* payload, size_t payload_len,
-                                responder responder_copy) {
-    const ::google::protobuf::MethodDescriptor* descriptor =
-        GetDescriptor()->FindMethodByName(method);
-    if (descriptor == NULL) {
-      // Invalid method name
-      DLOG(INFO) << "Invalid method name: " << method;
-      responder_copy.send_error(error_code::NO_SUCH_METHOD);
-      return;
-    }
+void cpp_service::dispatch_request(
+    const std::string& method,
+    const void* payload,
+    size_t payload_len,
+    const responder& rspndr) {
+  const ::google::protobuf::MethodDescriptor* descriptor =
+      GetDescriptor()->FindMethodByName(method);
+  if (descriptor == NULL) {
+    // Invalid method name
+    DLOG(INFO) << "Invalid method name: " << method;
+    rspndr.send_error(error_code::NO_SUCH_METHOD);
+    return;
+  }
 
-    scoped_ptr<google::protobuf::Message> request;
-    request.reset(CHECK_NOTNULL(
-        GetRequestPrototype(descriptor).New()));
-    if (!request->ParseFromArray(payload, payload_len)) {
-      DLOG(INFO) << "Failed to parse request.";
-      // Invalid proto;
-      responder_copy.send_error(error_code::INVALID_MESSAGE);
-      return;
-    }
-    call_method(descriptor, *request, responder_copy);
+  scoped_ptr<google::protobuf::Message> request;
+  request.reset(CHECK_NOTNULL(
+      GetRequestPrototype(descriptor).New()));
+  if (!request->ParseFromArray(payload, payload_len)) {
+    DLOG(INFO) << "Failed to parse request.";
+    // Invalid proto;
+    rspndr.send_error(error_code::INVALID_MESSAGE);
+    return;
+  }
+  call_method(descriptor, *request, rspndr);
 }  // dispatch_request()
 
 }  // namespace rpcz

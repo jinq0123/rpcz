@@ -40,16 +40,16 @@ namespace rpcz {
 
 class delegate_resonder {
  public:
-  explicit delegate_resonder(const responder& responder) :
-      responder_(responder) {  // copy
+  explicit delegate_resonder(const responder& rspndr) :
+      rspndr_(rspndr) {  // copy
   }
   void operator()(const rpc_error* e, const SearchResponse& resp) {
     if (e) return;
-    responder_.send(resp);
+    rspndr_.send(resp);
   }
 
  private:
-  responder responder_;
+  responder rspndr_;  // responder copy
 };
 
 class SearchServiceImpl : public SearchService {
@@ -65,34 +65,34 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      responder responder_copy) {
+      const responder& rspndr) {
     if (request.query() == "foo") {
-      responder_copy.send_error(-4, "I don't like foo.");
+      rspndr.send_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      responder_copy.send_error(17, "I don't like bar.");
+      rspndr.send_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      backend_->async_Search(request, delegate_resonder(responder_copy));
+      backend_->async_Search(request, delegate_resonder(rspndr));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      old_responder_.reset(new responder(responder_copy));
+      old_responder_.reset(new responder(rspndr));
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
       if (old_responder_.get())
         old_responder_->send(SearchResponse());
-      responder_copy.send(SearchResponse());
+      rspndr.send(SearchResponse());
     } else if (request.query() == "terminate") {
-      responder_copy.send(SearchResponse());
+      rspndr.send(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      responder_copy.send(response);
+      rspndr.send(response);
     }
   }
 
@@ -110,10 +110,10 @@ class BackendSearchServiceImpl : public SearchService {
  public:
   virtual void Search(
       const SearchRequest&,
-      responder responder_copy) {
+      const responder& rspndr) {
     SearchResponse response;
     response.add_results("42!");
-    responder_copy.send(response);
+    rspndr.send(response);
   }
 };
 
