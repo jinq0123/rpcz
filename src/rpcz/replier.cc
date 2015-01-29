@@ -53,7 +53,7 @@ void replier::send(const google::protobuf::Message& response) const {
     send(rpc_hdr, payload.release());
 }
 
-void replier::send0(const std::string& response) const {
+void replier::send(const std::string& response) const {
     assert(reply_context_->router_conn);
     rpc_header rpc_hdr;
     (void)rpc_hdr.mutable_resp_hdr();

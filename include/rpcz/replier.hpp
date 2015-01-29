@@ -49,8 +49,9 @@ class RPCZ_API replier {
   ~replier();
 
  public:
+  // send(protocol::Message) is only for cpp use.
   void send(const google::protobuf::Message& response) const;
-  void send0(const std::string& response) const;
+  void send(const std::string& response) const;
   void send_error(int error_code,
       const std::string& error_message="") const;
 
