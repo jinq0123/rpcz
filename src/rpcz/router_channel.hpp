@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,35 +16,20 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_CLIENT_CONNECTION_H
-#define RPCZ_CLIENT_CONNECTION_H
+#ifndef RPCZ_ROUTER_CHANNEL_HPP
+#define RPCZ_ROUTER_CHANNEL_HPP
 
 #include <rpcz/common.hpp>  // for uint64
-#include <rpcz/ichannel.hpp>
+#include <rpcz/zmq_channel.hpp>
 
 namespace rpcz {
 
 class manager;
 class message_vector;
 
-class router_channel : public ichannel {
+class router_channel : public zmq_channel {
  public:
   router_channel(uint64 router_index, const std::string& sender);
-
- public:
-  virtual void request(
-      const google::protobuf::MethodDescriptor& method,
-      const google::protobuf::Message& request,
-      const response_message_handler& msg_handler,
-      long timeout_ms) { /* XXX */ };
-
- public:
-  virtual void respond(const std::string& event_id,
-      const google::protobuf::Message& response) { /* XXX */ };
-  virtual void respond_error(
-      const std::string& event_id,
-      int error_code,
-      const std::string& error_message="") { /* XXX */ };
 
  public:
   void reply(const std::string& event_id, message_vector* v) const;
@@ -56,4 +42,4 @@ class router_channel : public ichannel {
 
 }  // namespace rpcz
 
-#endif  // RPCZ_CLIENT_CONNECTION_H
+#endif  // RPCZ_ROUTER_CHANNEL_HPP

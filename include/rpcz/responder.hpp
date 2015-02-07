@@ -20,19 +20,15 @@
 #define RPCZ_RESPONDER_HPP
 
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
 #include <rpcz/channel_ptr.hpp>
+#include <rpcz/ichannel.hpp>
 
 namespace google {
 namespace protobuf {
 class Message;
 }  // namespace protobuf
 }  // namespace google
-
-namespace zmq {
-class message_t;
-}  // namespace zmq
 
 namespace rpcz {
 
@@ -45,21 +41,24 @@ class rpc_header;
 // XXX More comments...
 class RPCZ_API responder {
  public:
-  responder(const channel_ptr& channel, const std::string& event_id);
-  ~responder();
+  responder(const channel_ptr& channel, const std::string& event_id)
+      : channel_(channel), event_id_(event_id) {
+    BOOST_ASSERT(channel);
+  }
+  ~responder() {}
 
  public:
   // respond(protocol::Message) is only for cpp use.
-  void respond(const google::protobuf::Message& response) const;
-  void respond(const std::string& response) const;
+  void respond(const google::protobuf::Message& response) const {
+    channel_->respond(event_id_, response);
+  }
+  //void respond(const std::string& response) const {
+  //  channel_->respond(event_id_, response);
+  //}
   void respond_error(int error_code,
-      const std::string& error_message="") const;
-
- private:
-  // Sends rpc header and payload.
-  // Takes ownership of the provided payload message.
-  void respond(const rpc_header& rpc_hdr,
-            zmq::message_t* payload) const;
+      const std::string& error_message="") const {
+    channel_->respond_error(event_id_, error_code, error_message);
+  }
 
 private:
   const channel_ptr channel_;

@@ -26,6 +26,8 @@
 #include <rpcz/rpcz.pb.h>  // for rpc_header
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
 
+#if 0
+
 namespace rpcz {
 
 responder::responder(const channel_ptr& channel,
@@ -85,3 +87,4 @@ void responder::respond(const rpc_header& rpc_hdr,
 }
 
 }  // namespace rpcz
+#endif

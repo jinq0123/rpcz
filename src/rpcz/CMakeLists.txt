@@ -37,8 +37,10 @@ set(RPCZ_SOURCES
     sync_event.cc
     sync_requester.cc
     worker_thread_fun.cc
+    zmq_channel.cc
     zmq_utils.cc
     ${PROTO_SOURCES})
+
 file(GLOB RPCZ_HEADERS *.hpp)
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${Boost_CHRONO_LIBRARIES}

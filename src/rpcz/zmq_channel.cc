@@ -1,0 +1,118 @@
+// Licensed under the Apache License, Version 2.0.
+// Author: Jin Qing (http://blog.csdn.net/jq0123)
+// Zmq channel. Base class of dealer_channel and router_channel.
+
+#include <rpcz/zmq_channel.hpp>
+
+#include <zmq.hpp>
+
+#include <rpcz/internal_commands.hpp>
+#include <rpcz/manager.hpp>
+#include <rpcz/zmq_utils.hpp>
+#include <rpcz/rpcz.pb.h>  // for rpc_header
+#include <rpcz/invalid_message_error.hpp>
+#include <rpcz/logging.hpp>  // for CHECK()
+#include <rpcz/rpc_controller.hpp>
+
+namespace rpcz {
+
+void zmq_channel::request(
+    const google::protobuf::MethodDescriptor& method,
+    const google::protobuf::Message& request,
+    const response_message_handler& handler,
+    long timeout_ms) {
+  rpc_header rpc_hdr;
+  rpc_request_header* req_hdr = rpc_hdr.mutable_req_hdr();
+  req_hdr->set_service(method.service()->name());
+  req_hdr->set_method(method.name());
+
+  size_t msg_size = rpc_hdr.ByteSize();
+  scoped_ptr<zmq::message_t> msg_out(new zmq::message_t(msg_size));
+  CHECK(rpc_hdr.SerializeToArray(msg_out->data(), msg_size));
+
+  scoped_ptr<zmq::message_t> payload_out;
+  size_t bytes = request.ByteSize();
+  payload_out.reset(new zmq::message_t(bytes));
+  if (!request.SerializeToArray(payload_out->data(), bytes)) {
+    throw invalid_message_error("Request serialization failed.");  // XXX
+  }
+
+  message_vector msg_vector;
+  msg_vector.push_back(msg_out.release());
+  msg_vector.push_back(payload_out.release());
+
+  // rpc_controller will be deleted on response or timeout.
+  // rpc_controller deleted in worker_thread_fun().
+  // XXX delete on timeout.
+  rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
+  // XXX dealer_conn_->send_request(msg_vector, ctrl);
+}
+
+// XXX change event_id to int64
+
+void zmq_channel::respond(const std::string& event_id,
+    const google::protobuf::Message& response) {
+  int msg_size = response.ByteSize();
+  scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
+  if (!response.SerializeToArray(payload->data(), msg_size)) {
+    throw invalid_message_error("Invalid response message");
+  }
+  rpc_header rpc_hdr;
+  (void)rpc_hdr.mutable_resp_hdr();
+  BOOST_ASSERT(rpc_hdr.has_resp_hdr());
+  BOOST_ASSERT(!rpc_hdr.has_req_hdr());
+  respond(rpc_hdr, payload.release());
+}
+
+// XXX for language binding
+//void zmq_channel::respond(const std::string& event_id,
+//    const std::string& response) {
+//  rpc_header rpc_hdr;
+//  (void)rpc_hdr.mutable_resp_hdr();
+//  respond(rpc_hdr, string_to_message(response));
+//}
+
+void zmq_channel::respond_error(
+    const std::string& event_id,
+    int error_code,
+    const std::string& error_message/* = "" */) {
+  rpc_header rpc_hdr;
+  rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
+  BOOST_ASSERT(resp_hdr);
+  zmq::message_t* payload = new zmq::message_t();
+  resp_hdr->set_error_code(error_code);
+  if (!error_message.empty()) {
+    resp_hdr->set_error_str(error_message);
+  }
+  respond(rpc_hdr, payload);
+}
+
+// Sends rpc header and payload.
+// Takes ownership of the provided payload message.
+void zmq_channel::respond(const rpc_header& rpc_hdr,
+                          zmq::message_t* payload) const {
+  size_t msg_size = rpc_hdr.ByteSize();
+  zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);
+  CHECK(rpc_hdr.SerializeToArray(zmq_hdr_msg->data(), msg_size));
+
+  message_vector v;
+  v.push_back(zmq_hdr_msg);
+  v.push_back(payload);
+  // XXX channel_->reply(event_id_, &v);
+}
+
+#if 0
+void zmq_channel::reply(const std::string& event_id, 
+                              message_vector* v) const {
+  zmq::socket_t& socket = manager_.get_frontend_socket();
+  send_empty_message(&socket, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
+  send_uint64(&socket, router_index_, ZMQ_SNDMORE);
+  send_string(&socket, sender_, ZMQ_SNDMORE);
+  send_empty_message(&socket, ZMQ_SNDMORE);
+  send_string(&socket, event_id, ZMQ_SNDMORE);
+  write_vector_to_socket(&socket, *v);
+}
+#endif
+
+}  // namespace rpcz
