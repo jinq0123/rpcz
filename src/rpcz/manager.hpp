@@ -37,7 +37,6 @@ class socket_t;
 namespace rpcz {
 class router_connection;
 class closure;
-class connection_thread_context;  // XXX rename
 class message_iterator;
 class sync_event;
 
