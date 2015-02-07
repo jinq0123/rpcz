@@ -233,12 +233,10 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
   printer->Print(vars_,
     "$classname$_Stub::$classname$_Stub(\n"
     "    ::rpcz::requester_ptr rqstr)\n"
-    "  : service_stub(rqstr,\n"
-    "                 $classname$::descriptor()->name()) {}\n"
+    "  : service_stub(rqstr) {}\n"
     "$classname$_Stub::$classname$_Stub(\n"
     "    const ::std::string& endpoint)\n"
-    "  : service_stub(::rpcz::requester::make_shared(endpoint),\n"
-    "                 $classname$::descriptor()->name()) {}\n"
+    "  : service_stub(::rpcz::requester::make_shared(endpoint)) {}\n"
     "$classname$_Stub::~$classname$_Stub() {}\n"
     "\n");
 
@@ -363,8 +361,8 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler,\n"
     "    long timeout_ms) {\n"
-    "  requester_->async_request(service_name_,\n"
-    "      $classname$::descriptor()->method($index$),\n"
+    "  requester_->async_request(\n"
+    "      *$classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler),\n"
     "      timeout_ms);\n"
@@ -374,8 +372,8 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    long timeout_ms) {\n"
     "  // optimized for empty handler\n"
-    "  requester_->async_request(service_name_,\n"
-    "      $classname$::descriptor()->method($index$),\n"
+    "  requester_->async_request(\n"
+    "      *$classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      rpcz::response_message_handler(),\n"
     "      timeout_ms);\n"
@@ -387,8 +385,8 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    long timeout_ms,\n"
     "    $output_type$* response) {\n"
-    "  requester_->sync_request(service_name_,\n"
-    "      $classname$::descriptor()->method($index$),\n"
+    "  requester_->sync_request(\n"
+    "      *$classname$::descriptor()->method($index$),\n"
     "      request, timeout_ms, response);\n"
     "}\n");
   printer->Print(sub_vars,

@@ -6,7 +6,6 @@
 #ifndef RPCZ_SERVICE_STUB_HPP
 #define RPCZ_SERVICE_STUB_HPP
 
-#include <string>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
 #include <rpcz/requester_ptr.hpp>
 
@@ -17,10 +16,8 @@ class rpc_error;
 
 class service_stub {
  public:
-  inline service_stub(requester_ptr rqstr,
-                      const std::string& service_name) :
+  inline explicit service_stub(requester_ptr rqstr) :
       requester_(rqstr),
-      service_name_(service_name),
       default_timeout_ms_(-1) {}
   inline virtual ~service_stub() {}
 
@@ -30,7 +27,6 @@ class service_stub {
 
  protected:
   requester_ptr requester_;
-  std::string service_name_;
   long default_timeout_ms_;
 
  private:

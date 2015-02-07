@@ -55,15 +55,13 @@ class RPCZ_API requester {
 
   // only used in cpp? Other language use string request.
   void async_request(
-      const std::string& service_name,
-      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::MethodDescriptor& method,
       const google::protobuf::Message& request,
       const response_message_handler& msg_handler,
       long timeout_ms);
 
   void sync_request(
-      const std::string& service_name,
-      const google::protobuf::MethodDescriptor* method,
+      const google::protobuf::MethodDescriptor& method,
       const google::protobuf::Message& request,
       long timeout_ms,
       google::protobuf::Message* response  // out

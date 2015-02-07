@@ -112,15 +112,14 @@ requester::~requester() {
 //}
 
 void requester::async_request(
-    const std::string& service_name,
-    const google::protobuf::MethodDescriptor* method,
+    const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& request,
     const response_message_handler& handler,
     long timeout_ms) {
   rpc_header rpc_hdr;
   rpc_request_header* req_hdr = rpc_hdr.mutable_req_hdr();
-  req_hdr->set_service(service_name);
-  req_hdr->set_method(method->name());
+  req_hdr->set_service(method.service()->name());
+  req_hdr->set_method(method.name());
 
   size_t msg_size = rpc_hdr.ByteSize();
   scoped_ptr<zmq::message_t> msg_out(new zmq::message_t(msg_size));
@@ -145,13 +144,12 @@ void requester::async_request(
 }
 
 void requester::sync_request(
-    const std::string& service_name,
-    const google::protobuf::MethodDescriptor* method,
+    const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& request,
     long timeout_ms,
     google::protobuf::Message* response) {
   sync_call_handler handler(response);
-  async_request(service_name, method, request,
+  async_request(method, request,
       boost::ref(handler), timeout_ms);
   handler.wait();
   const rpc_error* err = handler.get_rpc_error();
