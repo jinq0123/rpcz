@@ -17,9 +17,7 @@
 
 #include <iostream>
 
-#include "cpp/search.pb.h"
 #include "cpp/search.rpcz.h"
-#include "rpcz/rpcz.hpp"
 
 using namespace std;
 

@@ -22,18 +22,12 @@
 #include <gtest/gtest.h>
 #include <zmq.hpp>
 
-#include "rpcz/application.hpp"
-#include "rpcz/application_error_code.hpp"
+#include "proto/search.rpcz.h"
+
 #include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
-#include "rpcz/responder.hpp"
-#include "rpcz/requester.hpp"
-#include "rpcz/server.hpp"
 #include "rpcz/sync_event.hpp"
-
-#include "proto/search.pb.h"
-#include "proto/search.rpcz.h"
 
 using namespace std;
 

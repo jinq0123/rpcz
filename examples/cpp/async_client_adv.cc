@@ -7,10 +7,8 @@
 #include <iostream>
 
 #include <boost/bind.hpp>
-#include "cpp/search.pb.h"
+
 #include "cpp/search.rpcz.h"
-#include "rpcz/rpc_error.hpp"
-#include "rpcz/rpcz.hpp"
 
 using namespace std;
 

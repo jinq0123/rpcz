@@ -15,8 +15,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 
 #include <iostream>
-#include "rpcz/rpcz.hpp"
-#include "cpp/search.pb.h"
+
 #include "cpp/search.rpcz.h"
 
 using namespace std;
