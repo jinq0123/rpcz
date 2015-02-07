@@ -20,7 +20,7 @@
 
 #include <string>
 
-#include <rpcz/channel_ptr.hpp>
+#include <rpcz/responder.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace rpcz {
@@ -32,7 +32,7 @@ class RPCZ_API iservice {
   // It is exposed for all language bindings.
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                const channel_ptr& channel) = 0;
+                                const responder& rspndr) = 0;
 };
 
 }  // namespace rpcz

@@ -16,8 +16,8 @@ class mono_state_service : public iservice {
 
  public:
   inline virtual void dispatch_request(const std::string& method,
-      const void* payload, size_t payload_len, const channel_ptr& channel) {
-    service_.dispatch_request(method, payload, payload_len, channel);
+      const void* payload, size_t payload_len, const responder& rspndr) {
+    service_.dispatch_request(method, payload, payload_len, rspndr);
   }
 
  private:

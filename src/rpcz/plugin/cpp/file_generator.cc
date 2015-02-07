@@ -69,6 +69,11 @@ void FileGenerator::GenerateHeader(io::Printer* printer) {
     "class MethodDescriptor;\n"
     "}  // namespace protobuf\n"
     "}  // namespace google\n"
+    "namespace rpcz {\n"
+    "class responder;\n"
+    "class requester;\n"
+    "class rpc_error;\n"
+    "}  // namespace rpcz\n"
     "\n"
     ,
     "filename", file_->name(),

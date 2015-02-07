@@ -38,7 +38,7 @@ responder::responder(router_connection& conn,
 responder::~responder() {
 }
 
-void responder::respond(const google::protobuf::Message& response) {
+void responder::respond(const google::protobuf::Message& response) const {
   assert(info_->router_conn);
   int msg_size = response.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -52,15 +52,15 @@ void responder::respond(const google::protobuf::Message& response) {
   respond(rpc_hdr, payload.release());
 }
 
-//void responder::respond(const std::string& response) {
-//  assert(info_->router_conn);
-//  rpc_header rpc_hdr;
-//  (void)rpc_hdr.mutable_resp_hdr();
-//  respond(rpc_hdr, string_to_message(response));
-//}
+void responder::respond(const std::string& response) const {
+  assert(info_->router_conn);
+  rpc_header rpc_hdr;
+  (void)rpc_hdr.mutable_resp_hdr();
+  respond(rpc_hdr, string_to_message(response));
+}
 
 void responder::respond_error(int error_code,
-    const std::string& error_message/* = "" */) {
+    const std::string& error_message/* = "" */) const {
   assert(info_->router_conn);
   rpc_header rpc_hdr;
   rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
