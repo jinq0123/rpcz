@@ -143,11 +143,11 @@ void requester::request(
   dealer_conn_->send_request(msg_vector, ctrl);
 }
 
-requester_ptr requester::make_shared(const dealer_connection& conn) {
+channel_ptr requester::make_shared(const dealer_connection& conn) {
   return boost::make_shared<requester>(conn);
 }
 
-requester_ptr requester::make_shared(const std::string& endpoint) {
+channel_ptr requester::make_shared(const std::string& endpoint) {
   return make_shared(dealer_connection(endpoint));
 }
 

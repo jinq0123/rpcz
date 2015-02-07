@@ -24,9 +24,9 @@
 
 #include <google/protobuf/stubs/common.h>
 
+#include <rpcz/channel_ptr.hpp>
 #include <rpcz/ichannel.hpp>
 #include <rpcz/response_message_handler.hpp>  // for response_message_handler
-#include <rpcz/requester_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace google {
@@ -71,10 +71,10 @@ class RPCZ_API requester : public ichannel {
   //                         rpc_controller* rpc_controller,
   //                         closure* done) = 0;
 
-  static requester_ptr make_shared(const dealer_connection& conn);
+  static channel_ptr make_shared(const dealer_connection& conn);
 
   // Creates an requester to the given endpoint.
-  static requester_ptr make_shared(const std::string& endpoint);
+  static channel_ptr make_shared(const std::string& endpoint);
 
  public:
   virtual void respond(const google::protobuf::Message& response) {};
