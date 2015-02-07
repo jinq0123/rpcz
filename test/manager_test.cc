@@ -32,7 +32,7 @@
 #include "rpcz/callback.hpp"
 #include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
-#include "rpcz/router_connection.hpp"
+#include "rpcz/router_channel.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"

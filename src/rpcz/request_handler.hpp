@@ -5,7 +5,7 @@
 
 #include <map>
 #include <rpcz/common.hpp>  // for uint64
-#include <rpcz/router_connection.hpp>
+#include <rpcz/router_channel.hpp>
 
 namespace rpcz {
 

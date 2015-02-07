@@ -1,7 +1,7 @@
 // Router connection.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/router_connection.hpp>
+#include <rpcz/router_channel.hpp>
 
 #include <zmq.hpp>
 
