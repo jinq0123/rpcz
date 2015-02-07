@@ -21,6 +21,8 @@
 
 #include <string>
 #include <boost/shared_ptr.hpp>
+
+#include <rpcz/ichannel.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace google {
@@ -44,17 +46,24 @@ struct responder_info;
 // responder can be used in callback by copy.  // XXX Need example.
 // responder's copy operator is quick, which only copies a shared_ptr.
 // XXX More comments...
-class RPCZ_API responder {
+class RPCZ_API responder : public ichannel {
  public:
   responder(router_connection& conn, const std::string& event_id);
   ~responder();
 
  public:
   // respond(protocol::Message) is only for cpp use.
-  void respond(const google::protobuf::Message& response) const;
-  void respond(const std::string& response) const;
-  void respond_error(int error_code,
-      const std::string& error_message="") const;
+  virtual void respond(const google::protobuf::Message& response);
+  // rirtual void respond(const std::string& response);
+  virtual void respond_error(int error_code,
+      const std::string& error_message="");
+
+ public:
+  virtual void request(
+      const google::protobuf::MethodDescriptor& method,
+      const google::protobuf::Message& request,
+      const response_message_handler& msg_handler,
+      long timeout_ms) {};
 
  private:
   // Sends rpc header and payload.

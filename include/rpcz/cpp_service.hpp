@@ -18,6 +18,7 @@
 #ifndef RPCZ_CPP_SERVICE_H
 #define RPCZ_CPP_SERVICE_H
 
+#include <rpcz/channel_ptr.hpp>
 #include <rpcz/iservice.hpp>
 #include <rpcz/rpcz_api.hpp>
 
@@ -45,13 +46,13 @@ class RPCZ_API cpp_service : public iservice {
   // High-level handler.
   virtual void call_method(const google::protobuf::MethodDescriptor* method,
                            const google::protobuf::Message& request,
-                           const responder& rspndr) = 0;
+                           const channel_ptr& channel) = 0;
 
  public:
   // Low-level handler of iservice interface.
   virtual void dispatch_request(const std::string& method,
                                 const void* payload, size_t payload_len,
-                                const responder& rspndr);
+                                const channel_ptr& channel);
 };  // class cpp_service
 
 }  // namespace rpcz

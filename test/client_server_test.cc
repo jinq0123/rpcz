@@ -35,16 +35,16 @@ namespace rpcz {
 
 class delegate_resonder {
  public:
-  explicit delegate_resonder(const responder& rspndr) :
-      rspndr_(rspndr) {  // copy
+  explicit delegate_resonder(const channel_ptr& channel) :
+      channel_(channel) {  // copy
   }
   void operator()(const rpc_error* e, const SearchResponse& resp) {
     if (e) return;
-    rspndr_.respond(resp);
+    channel_->respond(resp);
   }
 
  private:
-  responder rspndr_;  // responder copy
+  channel_ptr channel_;
 };
 
 class SearchServiceImpl : public SearchService {
@@ -60,34 +60,34 @@ class SearchServiceImpl : public SearchService {
 
   virtual void Search(
       const SearchRequest& request,
-      const responder& rspndr) {
+      const channel_ptr& channel) {
     if (request.query() == "foo") {
-      rspndr.respond_error(-4, "I don't like foo.");
+      channel->respond_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      rspndr.respond_error(17, "I don't like bar.");
+      channel->respond_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      backend_->async_Search(request, delegate_resonder(rspndr));
+      backend_->async_Search(request, delegate_resonder(channel));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      old_responder_.reset(new responder(rspndr));
+      old_channel_ = channel;
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
-      if (old_responder_.get())
-        old_responder_->respond(SearchResponse());
-      rspndr.respond(SearchResponse());
+      if (old_channel_)
+        old_channel_->respond(SearchResponse());
+      channel->respond(SearchResponse());
     } else if (request.query() == "terminate") {
-      rspndr.respond(SearchResponse());
+      channel->respond(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      rspndr.respond(response);
+      channel->respond(response);
     }
   }
 
@@ -96,7 +96,7 @@ class SearchServiceImpl : public SearchService {
  private:
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
-  scoped_ptr<responder> old_responder_;
+  channel_ptr old_channel_;
   manager_ptr cm_;
 };
 
@@ -105,10 +105,10 @@ class BackendSearchServiceImpl : public SearchService {
  public:
   virtual void Search(
       const SearchRequest&,
-      const responder& rspndr) {
+      const channel_ptr& channel) {
     SearchResponse response;
     response.add_results("42!");
-    rspndr.respond(response);
+    channel->respond(response);
   }
 };
 
