@@ -23,6 +23,7 @@
 #include <rpcz/application.hpp>
 #include <rpcz/application_error_code.hpp>
 #include <rpcz/callback.hpp>
+#include <rpcz/channel_ptr.hpp>
 #include <rpcz/common.hpp>
 #include <rpcz/cpp_handler_wrapper.hpp>
 #include <rpcz/cpp_service.hpp>
@@ -40,5 +41,6 @@
 #include <rpcz/service_factory.hpp>
 #include <rpcz/service_factory_ptr.hpp>
 #include <rpcz/service_stub.hpp>
+#include <rpcz/sync_requester.hpp>
 
 #endif  // RPCZ_RPCZ_HPP

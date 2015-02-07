@@ -24,6 +24,7 @@
 
 #include <google/protobuf/stubs/common.h>
 
+#include <rpcz/ichannel.hpp>
 #include <rpcz/response_message_handler.hpp>  // for response_message_handler
 #include <rpcz/requester_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
@@ -36,10 +37,10 @@ class MethodDescriptor;
 }  // namespace google
 
 namespace rpcz {
-class closure;
+
 class dealer_connection;
 
-class RPCZ_API requester {
+class RPCZ_API requester : public ichannel {
  public:
   explicit requester(const dealer_connection& conn);
   ~requester();
@@ -54,18 +55,11 @@ class RPCZ_API requester {
   //                        closure* done) = 0;
 
   // only used in cpp? Other language use string request.
-  void async_request(
+  virtual void request(
       const google::protobuf::MethodDescriptor& method,
       const google::protobuf::Message& request,
       const response_message_handler& msg_handler,
       long timeout_ms);
-
-  void sync_request(
-      const google::protobuf::MethodDescriptor& method,
-      const google::protobuf::Message& request,
-      long timeout_ms,
-      google::protobuf::Message* response  // out
-      );
 
   // DO NOT USE: this method exists only for language bindings and may be
   // removed.
@@ -82,7 +76,13 @@ class RPCZ_API requester {
   // Creates an requester to the given endpoint.
   static requester_ptr make_shared(const std::string& endpoint);
 
-private:
+ public:
+  virtual void respond(const google::protobuf::Message& response) {};
+  // for language binding: virtual void respond(const std::string& response) = 0;
+  virtual void respond_error(int error_code,
+      const std::string& error_message="") {};
+
+ private:
   // Use ptr to hide dealer_connection.hpp
   boost::shared_ptr<dealer_connection> dealer_conn_;
 };  // class requester

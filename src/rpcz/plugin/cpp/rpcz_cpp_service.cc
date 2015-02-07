@@ -103,7 +103,7 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(vars_,
-    "explicit $classname$_Stub(::rpcz::requester_ptr rqstr);\n"
+    "explicit $classname$_Stub(::rpcz::channel_ptr channel);\n"
     "explicit $classname$_Stub(const ::std::string& endpoint);  // like: \"tcp://a.com:5566\"\n"
     "virtual ~$classname$_Stub();\n"
     "\n");
@@ -232,8 +232,8 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
   // Generate stub implementation.
   printer->Print(vars_,
     "$classname$_Stub::$classname$_Stub(\n"
-    "    ::rpcz::requester_ptr rqstr)\n"
-    "  : service_stub(rqstr) {}\n"
+    "    ::rpcz::channel_ptr channel)\n"
+    "  : service_stub(channel) {}\n"
     "$classname$_Stub::$classname$_Stub(\n"
     "    const ::std::string& endpoint)\n"
     "  : service_stub(::rpcz::requester::make_shared(endpoint)) {}\n"
@@ -361,7 +361,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    const $name$_Handler& handler,\n"
     "    long timeout_ms) {\n"
-    "  requester_->async_request(\n"
+    "  channel_->request(\n"
     "      *$classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      ::rpcz::cpp_handler_wrapper<$output_type$>(handler),\n"
@@ -372,7 +372,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    long timeout_ms) {\n"
     "  // optimized for empty handler\n"
-    "  requester_->async_request(\n"
+    "  channel_->request(\n"
     "      *$classname$::descriptor()->method($index$),\n"
     "      request,\n"
     "      rpcz::response_message_handler(),\n"
@@ -385,7 +385,7 @@ void ServiceGenerator::GenerateOneStubMethod(
     "    const $input_type$& request,\n"
     "    long timeout_ms,\n"
     "    $output_type$* response) {\n"
-    "  requester_->sync_request(\n"
+    "  ::rpcz::sync_requester(channel_).request(\n"
     "      *$classname$::descriptor()->method($index$),\n"
     "      request, timeout_ms, response);\n"
     "}\n");

@@ -111,7 +111,7 @@ requester::~requester() {
 //                 done);
 //}
 
-void requester::async_request(
+void requester::request(
     const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& request,
     const response_message_handler& handler,
@@ -141,20 +141,6 @@ void requester::async_request(
   // XXX delete on timeout.
   rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
   dealer_conn_->send_request(msg_vector, ctrl);
-}
-
-void requester::sync_request(
-    const google::protobuf::MethodDescriptor& method,
-    const google::protobuf::Message& request,
-    long timeout_ms,
-    google::protobuf::Message* response) {
-  sync_call_handler handler(response);
-  async_request(method, request,
-      boost::ref(handler), timeout_ms);
-  handler.wait();
-  const rpc_error* err = handler.get_rpc_error();
-  if (err)
-    throw *err;
 }
 
 requester_ptr requester::make_shared(const dealer_connection& conn) {

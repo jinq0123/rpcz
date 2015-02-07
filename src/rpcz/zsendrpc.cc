@@ -26,6 +26,7 @@
 #include <rpcz/common.hpp>  // for scoped_ptr
 #include <rpcz/requester.hpp>
 #include <rpcz/rpc_error.hpp>
+#include <rpcz/sync_requester.hpp>
 
 using google::protobuf::DynamicMessageFactory;
 using google::protobuf::FileDescriptor;
@@ -112,7 +113,7 @@ int run_call(const std::string& endpoint,
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {
-    rqstr->sync_request(
+    sync_requester(rqstr).request(
         *method_desc, *request, -1, reply);
     std::string out;
     ::TextFormat::PrintToString(*reply, &out);
