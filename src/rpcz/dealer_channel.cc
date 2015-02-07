@@ -16,7 +16,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/requester.hpp>
+#include <rpcz/dealer_channel.hpp>
 
 #include <boost/make_shared.hpp>
 #include <rpcz/dealer_connection.hpp>

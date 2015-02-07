@@ -27,7 +27,7 @@
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/sync_event.hpp"
-#include "rpcz/requester.hpp"
+#include "rpcz/dealer_channel.hpp"
 
 using namespace std;
 
