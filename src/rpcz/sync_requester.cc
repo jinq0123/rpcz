@@ -10,7 +10,7 @@
 
 namespace rpcz {
 
-sync_requester::sync_requester(channel_ptr channel)
+sync_requester::sync_requester(const channel_ptr& channel)
     : channel_(channel) {
   BOOST_ASSERT(channel);
 }

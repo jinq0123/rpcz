@@ -103,7 +103,7 @@ void ServiceGenerator::GenerateStubDefinition(io::Printer* printer) {
   printer->Indent();
 
   printer->Print(vars_,
-    "explicit $classname$_Stub(::rpcz::channel_ptr channel);\n"
+    "explicit $classname$_Stub(const ::rpcz::channel_ptr& channel);\n"
     "explicit $classname$_Stub(const ::std::string& endpoint);  // like: \"tcp://a.com:5566\"\n"
     "virtual ~$classname$_Stub();\n"
     "\n");
@@ -232,7 +232,7 @@ void ServiceGenerator::GenerateImplementation(io::Printer* printer) {
   // Generate stub implementation.
   printer->Print(vars_,
     "$classname$_Stub::$classname$_Stub(\n"
-    "    ::rpcz::channel_ptr channel)\n"
+    "    const ::rpcz::channel_ptr& channel)\n"
     "  : service_stub(channel) {}\n"
     "$classname$_Stub::$classname$_Stub(\n"
     "    const ::std::string& endpoint)\n"

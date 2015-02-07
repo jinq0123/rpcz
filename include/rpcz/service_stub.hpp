@@ -15,8 +15,8 @@ namespace rpcz {
 
 class RPCZ_API service_stub {
  public:
-  inline explicit service_stub(channel_ptr channel) :
-      channel_(channel),
+  inline explicit service_stub(const channel_ptr& channel) :
+      channel_(channel),  // copy
       default_timeout_ms_(-1) {
     BOOST_ASSERT(channel);
   }
