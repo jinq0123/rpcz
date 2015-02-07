@@ -11,14 +11,14 @@
 
 namespace rpcz {
 
-router_connection::router_connection(uint64 router_index,
+router_channel::router_channel(uint64 router_index,
                                      const std::string& sender)
     : manager_(*manager::get()),
       router_index_(router_index),
       sender_(sender) {
 };
 
-void router_connection::reply(const std::string& event_id, 
+void router_channel::reply(const std::string& event_id, 
                               message_vector* v) const {
   zmq::socket_t& socket = manager_.get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);

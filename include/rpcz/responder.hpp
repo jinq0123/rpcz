@@ -22,6 +22,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
+#include <rpcz/channel_ptr.hpp>
 
 namespace google {
 namespace protobuf {
@@ -35,9 +36,7 @@ class message_t;
 
 namespace rpcz {
 
-class router_connection;
 class rpc_header;
-struct responder_info;
 
 // responder is copyable.
 // Each request has its own responder, and should reply once.
@@ -46,7 +45,7 @@ struct responder_info;
 // XXX More comments...
 class RPCZ_API responder {
  public:
-  responder(router_connection& conn, const std::string& event_id);
+  responder(const channel_ptr& channel, const std::string& event_id);
   ~responder();
 
  public:
@@ -63,7 +62,8 @@ class RPCZ_API responder {
             zmq::message_t* payload) const;
 
 private:
-  boost::shared_ptr<responder_info> info_;
+  const channel_ptr channel_;
+  const std::string event_id_;
 };  // class responder
 
 }  // namespace rpcz

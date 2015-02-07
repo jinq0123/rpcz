@@ -5,7 +5,7 @@
 
 #include <map>
 #include <rpcz/common.hpp>  // for uint64
-#include <rpcz/router_channel.hpp>
+#include <rpcz/channel_ptr.hpp>
 
 namespace rpcz {
 
@@ -35,7 +35,7 @@ class request_handler {
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
-  router_connection router_conn_;
+  channel_ptr router_channel_;
 };
 
 }  // namespace rpcz

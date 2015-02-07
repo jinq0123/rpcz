@@ -18,20 +18,32 @@
 #ifndef RPCZ_CLIENT_CONNECTION_H
 #define RPCZ_CLIENT_CONNECTION_H
 
-#include <rpcz/common.hpp>
-
-namespace zmq {
-class context_t;
-}  // namespace zmq
+#include <rpcz/common.hpp>  // for uint64
+#include <rpcz/ichannel.hpp>
 
 namespace rpcz {
 
 class manager;
 class message_vector;
 
-class router_connection {
+class router_channel : public ichannel {
  public:
-  router_connection(uint64 router_index, const std::string& sender);
+  router_channel(uint64 router_index, const std::string& sender);
+
+ public:
+  virtual void request(
+      const google::protobuf::MethodDescriptor& method,
+      const google::protobuf::Message& request,
+      const response_message_handler& msg_handler,
+      long timeout_ms) { /* XXX */ };
+
+ public:
+  virtual void respond(const std::string& event_id,
+      const google::protobuf::Message& response) { /* XXX */ };
+  virtual void respond_error(
+      const std::string& event_id,
+      int error_code,
+      const std::string& error_message="") { /* XXX */ };
 
  public:
   void reply(const std::string& event_id, message_vector* v) const;

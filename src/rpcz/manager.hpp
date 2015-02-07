@@ -35,9 +35,7 @@ class socket_t;
 }  // namespace zmq
 
 namespace rpcz {
-class router_connection;
 class closure;
-class message_iterator;
 class sync_event;
 
 // A manager is a multi-threaded asynchronous system for communication

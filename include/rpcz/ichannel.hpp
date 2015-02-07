@@ -37,9 +37,12 @@ class RPCZ_API ichannel {
 
  public:
   // respond(protocol::Message) is only for cpp use.
-  virtual void respond(const google::protobuf::Message& response) = 0;
+  virtual void respond(const std::string& event_id,
+      const google::protobuf::Message& response) = 0;
   // for language binding: virtual void respond(const std::string& response) = 0;
-  virtual void respond_error(int error_code,
+  virtual void respond_error(
+      const std::string& event_id,
+      int error_code,
       const std::string& error_message="") = 0;
 };
 

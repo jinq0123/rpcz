@@ -3,18 +3,21 @@
 #include <rpcz/request_handler.hpp>
 
 #include <boost/foreach.hpp>
+
 #include <rpcz/application_error_code.hpp>  // for error_code
 #include <rpcz/iservice.hpp>  // for dispatch_request()
 #include <rpcz/logging.hpp>
 #include <rpcz/responder.hpp>
+#include <rpcz/router_channel.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator
 
 namespace rpcz {
 
+// XXX should ctr from channel ptr
 request_handler::request_handler(uint64 router_index,
                                  const std::string& sender)
-    : router_conn_(router_index, sender) {
+    : router_channel_(new router_channel(router_index, sender)) {  // shared_ptr
 }
 
 request_handler::~request_handler() {
@@ -30,7 +33,7 @@ void request_handler::handle_request(message_iterator& iter) {
   std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
   if (!iter.has_more()) return;
   rpc_header rpc_hdr;
-  responder rspndr(router_conn_, event_id);
+  responder rspndr(router_channel_, event_id);
   zmq::message_t& msg = iter.next();
   if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
     // Handle bad rpc.
