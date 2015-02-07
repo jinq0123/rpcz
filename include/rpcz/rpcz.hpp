@@ -27,6 +27,7 @@
 #include <rpcz/cpp_handler_wrapper.hpp>
 #include <rpcz/cpp_service.hpp>
 #include <rpcz/default_service_factory.hpp>
+#include <rpcz/ichannel.hpp>
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/iservice.hpp>
 #include <rpcz/requester.hpp>
