@@ -28,6 +28,7 @@
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/sync_event.hpp"
+#include "rpcz/requester.hpp"
 
 using namespace std;
 

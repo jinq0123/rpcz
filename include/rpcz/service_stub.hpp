@@ -9,19 +9,18 @@
 #include <boost/assert.hpp>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
 #include <rpcz/channel_ptr.hpp>
+#include <rpcz/rpcz_api.hpp>
 
 namespace rpcz {
 
-class requester;
-class rpc_error;
-
-class service_stub {
+class RPCZ_API service_stub {
  public:
   inline explicit service_stub(channel_ptr channel) :
       channel_(channel),
       default_timeout_ms_(-1) {
     BOOST_ASSERT(channel);
   }
+  explicit service_stub(const std::string& endpoint);
   inline virtual ~service_stub() {}
 
  public:

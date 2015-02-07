@@ -31,7 +31,6 @@
 #include <rpcz/ichannel.hpp>
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/iservice.hpp>
-#include <rpcz/requester.hpp>
 #include <rpcz/responder.hpp>
 #include <rpcz/response_message_handler.hpp>
 #include <rpcz/rpcz_api.hpp>

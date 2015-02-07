@@ -31,6 +31,7 @@ set(RPCZ_SOURCES
     rpc_error.cc
     server.cc
     server_impl.cc
+    service_stub.cc
     singleton_service_factory.cc
     sync_call_handler.cc
     sync_event.cc
