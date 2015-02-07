@@ -3,7 +3,7 @@
 
 #include <rpcz/service_stub.hpp>
 
-#include <rpcz/dealer_channel.hpp>
+#include <rpcz/requester.hpp>
 
 namespace rpcz {
 

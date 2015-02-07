@@ -24,7 +24,7 @@
 
 #include <rpcz/application.hpp>
 #include <rpcz/common.hpp>  // for scoped_ptr
-#include <rpcz/dealer_channel.hpp>
+#include <rpcz/requester.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/sync_requester.hpp>
 
