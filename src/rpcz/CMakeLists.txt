@@ -18,14 +18,14 @@ set(RPCZ_SOURCES
     broker_thread.cc
     clock.cc
     cpp_service.cc
+    dealer_channel.cc
     dealer_connection.cc
     event_id_generator.cc
     manager.cc
     reactor.cc
     request_handler.cc
     request_handler_manager.cc
-    requester.cc
-    responder.cc
+    router_channel.cc
     router_connection.cc
     rpc_controller.cc
     rpc_error.cc
@@ -39,6 +39,7 @@ set(RPCZ_SOURCES
     worker_thread_fun.cc
     zmq_utils.cc
     ${PROTO_SOURCES})
+
 file(GLOB RPCZ_HEADERS *.hpp)
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${Boost_CHRONO_LIBRARIES}
