@@ -24,7 +24,7 @@
 
 #include <rpcz/application.hpp>
 #include <rpcz/common.hpp>  // for scoped_ptr
-#include <rpcz/zmq_channel.hpp>
+#include <rpcz/connection.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/sync_requester.hpp>
 

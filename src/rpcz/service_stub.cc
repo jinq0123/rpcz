@@ -3,7 +3,7 @@
 
 #include <rpcz/service_stub.hpp>
 
-#include <rpcz/zmq_channel.hpp>
+#include <rpcz/connection.hpp>
 
 namespace rpcz {
 

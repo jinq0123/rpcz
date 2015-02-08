@@ -28,7 +28,7 @@
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/requester.hpp"
-#include "rpcz/zmq_channel.hpp"
+#include "rpcz/connection.hpp"
 
 using namespace std;
 

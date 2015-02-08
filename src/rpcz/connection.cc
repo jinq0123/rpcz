@@ -2,7 +2,7 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Zmq channel. Base class of dealer_channel and router_channel.
 
-#include <rpcz/zmq_channel.hpp>
+#include <rpcz/connection.hpp>
 
 #include <zmq.hpp>
 

@@ -17,6 +17,7 @@ set(RPCZ_SOURCES
     assert_application_error_code.cc
     broker_thread.cc
     clock.cc
+    connection.cc
     cpp_service.cc
     event_id_generator.cc
     manager.cc
@@ -35,7 +36,6 @@ set(RPCZ_SOURCES
     sync_event.cc
     sync_requester.cc
     worker_thread_fun.cc
-    zmq_channel.cc
     zmq_utils.cc
     ${PROTO_SOURCES})
 
