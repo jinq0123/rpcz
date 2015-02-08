@@ -44,13 +44,11 @@ connection::connection(const std::string& endpoint)
   BOOST_ASSERT(manager_);
 }
 
-// XXX make them non-virtual and const
-
 void connection::request(
     const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& req,
     const response_message_handler& handler,
-    long timeout_ms) {
+    long timeout_ms) const {
   rpc_header rpc_hdr;
   rpc_request_header* req_hdr = rpc_hdr.mutable_req_hdr();
   req_hdr->set_service(method.service()->name());
@@ -81,7 +79,7 @@ void connection::request(
 // XXX change event_id to int64
 
 void connection::respond(const std::string& event_id,
-    const google::protobuf::Message& resp) {
+    const google::protobuf::Message& resp) const {
   int msg_size = resp.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
   if (!resp.SerializeToArray(payload->data(), msg_size)) {
@@ -105,7 +103,7 @@ void connection::respond(const std::string& event_id,
 void connection::respond_error(
     const std::string& event_id,
     int error_code,
-    const std::string& error_message/* = "" */) {
+    const std::string& error_message/* = "" */) const {
   rpc_header rpc_hdr;
   rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(resp_hdr);
@@ -148,6 +146,7 @@ void connection::respond(
 }
 
 // XXX Use reply instead of respond... like kReply
+// XXX use message_vector&
 
 void connection::respond(const std::string& event_id,
                           message_vector* v) const {

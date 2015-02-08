@@ -35,19 +35,19 @@ class RPCZ_API connection {
   explicit connection(const std::string& endpoint);
 
  public:
-  virtual void request(
+  void request(
       const google::protobuf::MethodDescriptor& method,
       const google::protobuf::Message& req,
       const response_message_handler& msg_handler,
-      long timeout_ms);
+      long timeout_ms) const;
 
  public:
-  virtual void respond(const std::string& event_id,
-      const google::protobuf::Message& resp);
-  virtual void respond_error(
+  void respond(const std::string& event_id,
+      const google::protobuf::Message& resp) const;
+  void respond_error(
       const std::string& event_id,
       int error_code,
-      const std::string& error_message="");
+      const std::string& error_message="") const;
 
  private:
   // Asynchronously sends a request over the connection.
