@@ -31,7 +31,6 @@
 #include "rpcz/application_error_code.hpp"
 #include "rpcz/callback.hpp"
 #include "rpcz/manager.hpp"
-#include "rpcz/router_channel.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"

@@ -8,9 +8,9 @@
 #include <rpcz/iservice.hpp>  // for dispatch_request()
 #include <rpcz/logging.hpp>
 #include <rpcz/responder.hpp>
-#include <rpcz/router_channel.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator
+#include <rpcz/zmq_channel.hpp>
 
 namespace rpcz {
 
