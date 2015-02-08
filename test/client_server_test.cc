@@ -71,13 +71,13 @@ class SearchServiceImpl : public SearchService {
       // We "lose" the request. We are going to reply only when we get a request
       // for the query "delayed".
       boost::unique_lock<boost::mutex> lock(mu_);
-      old_responder_.reset(new replier(rep));
+      old_replier_.reset(new replier(rep));
       timeout_request_received.signal();
       return;
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
-      if (old_responder_.get())
-        old_responder_->respond(SearchResponse());
+      if (old_replier_.get())
+        old_replier_->respond(SearchResponse());
       rep.respond(SearchResponse());
     } else if (request.query() == "terminate") {
       rep.respond(SearchResponse());
@@ -95,7 +95,7 @@ class SearchServiceImpl : public SearchService {
  private:
   scoped_ptr<SearchService_Stub> backend_;
   boost::mutex mu_;
-  scoped_ptr<replier> old_responder_;
+  scoped_ptr<replier> old_replier_;
   manager_ptr cm_;
 };
 
