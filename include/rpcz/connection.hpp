@@ -1,9 +1,9 @@
 // Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
-// Zmq channel. Base class of dealer_channel and router_channel.
+// Zmq connection. Zmq router or dealer.
 
-#ifndef RPCZ_ZMQ_CHANNEL_HPP
-#define RPCZ_ZMQ_CHANNEL_HPP
+#ifndef RPCZ_CONNECTION_HPP
+#define RPCZ_CONNECTION_HPP
 
 #include <boost/shared_ptr.hpp>
 
@@ -75,4 +75,4 @@ class RPCZ_API connection {
 };
 
 }  // namespace rpcz
-#endif  // RPCZ_CLIENT_CONNECTION_H
+#endif  // RPCZ_CONNECTION_HPP

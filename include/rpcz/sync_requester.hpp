@@ -20,7 +20,7 @@ namespace rpcz {
 
 class RPCZ_API sync_requester {
  public:
-  explicit sync_requester(const connection_ptr& channel);
+  explicit sync_requester(const connection_ptr& conn);
   ~sync_requester();
 
  public:
@@ -33,7 +33,7 @@ class RPCZ_API sync_requester {
       );
 
  private:
-  connection_ptr channel_;
+  connection_ptr conn_;
 };  // class sync_requester
 
 }  // namespace rpcz

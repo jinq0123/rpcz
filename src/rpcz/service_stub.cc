@@ -8,9 +8,9 @@
 namespace rpcz {
 
 service_stub::service_stub(const std::string& endpoint)
-    : channel_(new connection(endpoint)),  // shared_ptr
+    : conn_(new connection(endpoint)),  // shared_ptr
       default_timeout_ms_(-1) {
-  BOOST_ASSERT(channel_);
+  BOOST_ASSERT(conn_);
 }
 
 }  // namespace rpcz

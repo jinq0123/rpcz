@@ -15,20 +15,20 @@ namespace rpcz {
 
 class RPCZ_API service_stub {
  public:
-  inline explicit service_stub(const connection_ptr& channel) :
-      channel_(channel),  // copy
+  inline explicit service_stub(const connection_ptr& conn) :
+      conn_(conn),  // copy
       default_timeout_ms_(-1) {
-    BOOST_ASSERT(channel);
+    BOOST_ASSERT(conn);
   }
   explicit service_stub(const std::string& endpoint);
   inline virtual ~service_stub() {}
 
  public:
-  inline connection_ptr get_channel_ptr() const { return channel_; }
+  inline connection_ptr get_connection_ptr() const { return conn_; }
   inline void set_default_timeout_ms(long ms) { default_timeout_ms_ = ms; }
 
  protected:
-  connection_ptr channel_;
+  connection_ptr conn_;
   long default_timeout_ms_;
 
  private:

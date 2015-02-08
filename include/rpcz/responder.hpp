@@ -41,27 +41,27 @@ class rpc_header;
 // XXX More comments...
 class RPCZ_API responder {
  public:
-  responder(const connection_ptr& channel, const std::string& event_id)
-      : channel_(channel), event_id_(event_id) {
-    BOOST_ASSERT(channel);
+  responder(const connection_ptr& conn, const std::string& event_id)
+      : conn_(conn), event_id_(event_id) {
+    BOOST_ASSERT(conn);
   }
   ~responder() {}
 
  public:
   // respond(protocol::Message) is only for cpp use.
   void respond(const google::protobuf::Message& response) const {
-    channel_->respond(event_id_, response);
+    conn_->respond(event_id_, response);
   }
   //void respond(const std::string& response) const {
-  //  channel_->respond(event_id_, response);
+  //  conn_->respond(event_id_, response);
   //}
   void respond_error(int error_code,
       const std::string& error_message="") const {
-    channel_->respond_error(event_id_, error_code, error_message);
+    conn_->respond_error(event_id_, error_code, error_message);
   }
 
 private:
-  const connection_ptr channel_;
+  const connection_ptr conn_;
   const std::string event_id_;
 };  // class responder
 

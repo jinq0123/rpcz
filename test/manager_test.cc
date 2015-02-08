@@ -106,7 +106,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
   application::set_manager_threads(4);
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
-  connection_ptr channel(new connection("inproc://server.test"));
+  connection_ptr conn(new connection("inproc://server.test"));
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -118,7 +118,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
     }
   } hdl;
 
-  channel->request(*request, new rpc_controller(boost::ref(hdl), 0));
+  conn->request(*request, new rpc_controller(boost::ref(hdl), 0));
   hdl.event.wait();
 }
 #endif
@@ -147,7 +147,7 @@ class barrier_handler {
 };
 
 #if 0  // XXX
-void SendManyMessages(const connection_ptr& channel, int thread_id) {
+void SendManyMessages(const connection_ptr& conn, int thread_id) {
   boost::ptr_vector<message_vector> requests;
   const int request_count = 100;
   barrier_handler barrier;
@@ -168,7 +168,7 @@ TEST_F(manager_test, ManyClientsTest) {
 
   boost::thread thread(start_server(context));
 
-  connection_ptr channel(new connection("inproc://server.test"));
+  connection_ptr conn(new connection("inproc://server.test"));
   boost::thread_group group;
   for (int i = 0; i < 10; ++i) {
     group.add_thread(

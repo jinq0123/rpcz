@@ -1,6 +1,6 @@
 // Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
-// Zmq channel. Base class of dealer_channel and router_channel.
+// Zmq connection. Zmq router or dealer.
 
 #include <rpcz/connection.hpp>
 
@@ -117,7 +117,7 @@ void connection::respond_error(
   respond(event_id, rpc_hdr, payload);
 }
 
-// XXX request on router channel.
+// XXX request on router conn.
 void connection::request(
     message_vector& data,
     rpc_controller* ctrl) const {

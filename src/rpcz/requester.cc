@@ -30,8 +30,8 @@
 
 namespace rpcz {
 
-requester::requester(const connection_ptr& channel)
-    : channel_(channel) {  // copy
+requester::requester(const connection_ptr& conn)
+    : conn_(conn) {  // copy
 }
 
 requester::~requester() {
@@ -116,8 +116,8 @@ void requester::request(
     const google::protobuf::Message& req,
     const response_message_handler& handler,
     long timeout_ms) {
-  BOOST_ASSERT(channel_);
-  channel_->request(method, req, handler, timeout_ms);
+  BOOST_ASSERT(conn_);
+  conn_->request(method, req, handler, timeout_ms);
 }
 
 //void requester::request(
@@ -153,12 +153,12 @@ void requester::request(
 //}
 
 // DEL
-//connection_ptr requester::make_shared(const connection_ptr& channel) {
-//  BOOST_ASSERT(channel);
-//  return boost::make_shared<requester>(channel);
+//connection_ptr requester::make_shared(const connection_ptr& conn) {
+//  BOOST_ASSERT(conn);
+//  return boost::make_shared<requester>(conn);
 //}
 //
-//// XXX Zmq_channel::connect(endpoint) to create a channel
+//// XXX Zmq_channel::connect(endpoint) to create a conn
 //
 //connection_ptr requester::make_shared(const std::string& endpoint) {
 //  return boost::make_shared<requester>(

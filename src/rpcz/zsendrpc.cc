@@ -109,11 +109,11 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  connection_ptr channel(new connection(endpoint));  // shared_ptr
+  connection_ptr conn(new connection(endpoint));  // shared_ptr
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {
-    sync_requester(channel).request(
+    sync_requester(conn).request(
         *method_desc, *request, -1, reply);
     std::string out;
     ::TextFormat::PrintToString(*reply, &out);

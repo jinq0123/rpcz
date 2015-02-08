@@ -39,7 +39,7 @@ namespace rpcz {
 
 class RPCZ_API requester {
  public:
-  explicit requester(const connection_ptr& channel);
+  explicit requester(const connection_ptr& conn);
   ~requester();
 
  public:
@@ -69,7 +69,7 @@ class RPCZ_API requester {
   //                         closure* done) = 0;
 
   // XXX
-  //static connection_ptr make_shared(const connection_ptr& channel);
+  //static connection_ptr make_shared(const connection_ptr& conn);
 
   //// Creates an requester to the given endpoint.
   //static connection_ptr make_shared(const std::string& endpoint);
@@ -84,7 +84,7 @@ class RPCZ_API requester {
       const std::string& error_message="") {};
 
  private:
-  connection_ptr channel_;
+  connection_ptr conn_;
 };  // class requester
 
 }  // namespace rpcz

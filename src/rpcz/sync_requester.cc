@@ -9,9 +9,9 @@
 
 namespace rpcz {
 
-sync_requester::sync_requester(const connection_ptr& channel)
-    : channel_(channel) {
-  BOOST_ASSERT(channel);
+sync_requester::sync_requester(const connection_ptr& conn)
+    : conn_(conn) {
+  BOOST_ASSERT(conn);
 }
 
 sync_requester::~sync_requester() {
@@ -23,7 +23,7 @@ void sync_requester::request(
     long timeout_ms,
     google::protobuf::Message* response) {
   sync_call_handler handler(response);
-  channel_->request(method, request,
+  conn_->request(method, request,
       boost::ref(handler), timeout_ms);
   handler.wait();
   const rpc_error* err = handler.get_rpc_error();
