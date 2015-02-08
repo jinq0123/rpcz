@@ -23,11 +23,11 @@
 
 #include "proto/search.rpcz.h"
 
-#include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/requester.hpp"
+#include "rpcz/zmq_channel.hpp"
 
 using namespace std;
 
@@ -142,22 +142,22 @@ class server_test : public ::testing::Test {
     backend_service_.reset(new BackendSearchServiceImpl);
     backend_server_->register_singleton_service(*backend_service_);
     backend_server_->bind("inproc://myserver.backend");
-    backend_connection_.reset(new dealer_connection(
+    backend_connection_.reset(new zmq_channel(
         "inproc://myserver.backend"));
 
     frontend_service_.reset(new SearchServiceImpl(
-        new SearchService_Stub(requester::make_shared(*backend_connection_))));
+        new SearchService_Stub(requester::make_shared(backend_connection_))));
     frontend_server_->register_singleton_service(*frontend_service_);
     frontend_server_->bind("inproc://myserver.frontend");
-    frontend_connection_.reset(new dealer_connection(
+    frontend_connection_.reset(new zmq_channel(
         "inproc://myserver.frontend"));
   }
 
 protected:
   // destruct in reversed order
   scoped_ptr<zmq::context_t> context_;  // destruct last
-  scoped_ptr<dealer_connection> frontend_connection_;
-  scoped_ptr<dealer_connection> backend_connection_;
+  channel_ptr frontend_connection_;
+  channel_ptr backend_connection_;
   scoped_ptr<SearchServiceImpl> frontend_service_;
   scoped_ptr<BackendSearchServiceImpl> backend_service_;
   // Server must destruct before service. (Or unregister services before destruct.)
@@ -166,7 +166,7 @@ protected:
 };
 
 TEST_F(server_test, SimpleRequest) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("happiness");
   SearchResponse response = stub.Search(request);
@@ -175,7 +175,7 @@ TEST_F(server_test, SimpleRequest) {
 }
 
 TEST_F(server_test, SimpleRequestAsync) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("happiness");
 
@@ -193,7 +193,7 @@ TEST_F(server_test, SimpleRequestAsync) {
 }
 
 TEST_F(server_test, SimpleRequestWithError) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("foo");
   try {
@@ -205,7 +205,7 @@ TEST_F(server_test, SimpleRequestWithError) {
 }
 
 TEST_F(server_test, SimpleRequestWithTimeout) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("timeout");
   try {
@@ -219,7 +219,7 @@ TEST_F(server_test, SimpleRequestWithTimeout) {
 }
 
 TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("timeout");
 
@@ -240,7 +240,7 @@ TEST_F(server_test, SimpleRequestWithTimeoutAsync) {
 }
 
 TEST_F(server_test, DelegatedRequest) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("delegate");
   SearchResponse response = stub.Search(request);
@@ -248,7 +248,7 @@ TEST_F(server_test, DelegatedRequest) {
 }
 
 TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   SearchResponse response;
   request.set_query("foo");
@@ -261,7 +261,7 @@ TEST_F(server_test, EasyBlockingRequestRaisesExceptions) {
 }
 
 TEST_F(server_test, EasyBlockingRequestWithTimeout) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   SearchResponse response;
   request.set_query("timeout");
@@ -279,7 +279,7 @@ TEST_F(server_test, EasyBlockingRequestWithTimeout) {
 }
 
 TEST_F(server_test, ConnectionManagerTermination) {
-  SearchService_Stub stub(requester::make_shared(*frontend_connection_));
+  SearchService_Stub stub(requester::make_shared(frontend_connection_));
   SearchRequest request;
   request.set_query("terminate");
   try {

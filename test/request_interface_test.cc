@@ -24,7 +24,6 @@
 
 #include "proto/search.rpcz.h"
 
-#include "rpcz/dealer_connection.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/sync_event.hpp"

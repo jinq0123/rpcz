@@ -18,7 +18,6 @@ set(RPCZ_SOURCES
     broker_thread.cc
     clock.cc
     cpp_service.cc
-    dealer_connection.cc
     event_id_generator.cc
     manager.cc
     reactor.cc

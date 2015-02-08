@@ -38,8 +38,6 @@ class MethodDescriptor;
 
 namespace rpcz {
 
-class dealer_connection;
-
 class RPCZ_API requester : public ichannel {
  public:
   explicit requester(const channel_ptr& channel);
@@ -57,7 +55,7 @@ class RPCZ_API requester : public ichannel {
   // only used in cpp? Other language use string request.
   virtual void request(
       const google::protobuf::MethodDescriptor& method,
-      const google::protobuf::Message& request,
+      const google::protobuf::Message& req,
       const response_message_handler& msg_handler,
       long timeout_ms);
 

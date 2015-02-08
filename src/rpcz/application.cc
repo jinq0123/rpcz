@@ -21,7 +21,6 @@
 #include <zmq.hpp>
 
 #include <rpcz/application_options.hpp>
-#include <rpcz/dealer_connection.hpp>
 #include <rpcz/manager.hpp>
 #include <rpcz/requester.hpp>
 #include <rpcz/server.hpp>
