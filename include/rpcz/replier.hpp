@@ -20,7 +20,7 @@
 #define RPCZ_REPLIER_HPP
 
 #include <string>
-#include <rpcz/connection.hpp>
+#include <rpcz/connection.hpp>  // for reply()
 #include <rpcz/connection_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
 
@@ -46,16 +46,16 @@ class RPCZ_API replier {
   ~replier() {}
 
  public:
-  // respond(protocol::Message) is only for cpp use.
-  void respond(const google::protobuf::Message& response) const {
-    conn_->respond(event_id_, response);
+  // reply(protocol::Message) is only for cpp use.
+  void reply(const google::protobuf::Message& response) const {
+    conn_->reply(event_id_, response);
   }
-  //void respond(const std::string& response) const {
-  //  conn_->respond(event_id_, response);
+  //void reply(const std::string& response) const {
+  //  conn_->reply(event_id_, response);
   //}
-  void respond_error(int error_code,
+  void reply_error(int error_code,
       const std::string& error_message="") const {
-    conn_->respond_error(event_id_, error_code, error_message);
+    conn_->reply_error(event_id_, error_code, error_message);
   }
 
 private:

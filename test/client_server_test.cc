@@ -35,15 +35,15 @@ namespace rpcz {
 class delegate_resonder {
  public:
   explicit delegate_resonder(const replier& rep) :
-      rspndr_(rep) {  // copy
+      replier_(rep) {  // copy
   }
   void operator()(const rpc_error* e, const SearchResponse& resp) {
     if (e) return;
-    rspndr_.respond(resp);
+    replier_.reply(resp);
   }
 
  private:
-  replier rspndr_;  // replier copy
+  replier replier_;  // replier copy
 };
 
 class SearchServiceImpl : public SearchService {
@@ -61,9 +61,9 @@ class SearchServiceImpl : public SearchService {
       const SearchRequest& request,
       const replier& rep) {
     if (request.query() == "foo") {
-      rep.respond_error(-4, "I don't like foo.");
+      rep.reply_error(-4, "I don't like foo.");
     } else if (request.query() == "bar") {
-      rep.respond_error(17, "I don't like bar.");
+      rep.reply_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
       backend_->async_Search(request, delegate_resonder(rep));
       return;
@@ -77,16 +77,16 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "delayed") {
       boost::unique_lock<boost::mutex> lock(mu_);
       if (old_replier_.get())
-        old_replier_->respond(SearchResponse());
-      rep.respond(SearchResponse());
+        old_replier_->reply(SearchResponse());
+      rep.reply(SearchResponse());
     } else if (request.query() == "terminate") {
-      rep.respond(SearchResponse());
+      rep.reply(SearchResponse());
       cm_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
       response.add_results("is great");
-      rep.respond(response);
+      rep.reply(response);
     }
   }
 
@@ -107,7 +107,7 @@ class BackendSearchServiceImpl : public SearchService {
       const replier& rep) {
     SearchResponse response;
     response.add_results("42!");
-    rep.respond(response);
+    rep.reply(response);
   }
 };
 

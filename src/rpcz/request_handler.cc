@@ -39,7 +39,7 @@ void request_handler::handle_request(message_iterator& iter) {
   if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
     // Handle bad rpc.
     DLOG(INFO) << "Received bad header.";
-    rep.respond_error(error_code::INVALID_HEADER, "Invalid rpc_header.");
+    rep.reply_error(error_code::INVALID_HEADER, "Invalid rpc_header.");
     return;
   }
   if (!iter.has_more()) return;
@@ -52,7 +52,7 @@ void request_handler::handle_request(message_iterator& iter) {
     // Handle invalid service.
     std::string error_str = "Invalid service: " + req_hdr.service();
     DLOG(INFO) << error_str;
-    rep.respond_error(error_code::NO_SUCH_SERVICE, error_str);
+    rep.reply_error(error_code::NO_SUCH_SERVICE, error_str);
     return;
   }
   rpcz::iservice* svc = service_it->second;

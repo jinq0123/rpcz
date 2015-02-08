@@ -42,15 +42,15 @@ class RPCZ_API connection {
       long timeout_ms) const;
 
  public:
-  void respond(const std::string& event_id,
+  void reply(const std::string& event_id,
       const google::protobuf::Message& resp) const;
-  void respond_error(
+  void reply_error(
       const std::string& event_id,
       int error_code,
       const std::string& error_message="") const;
 
  private:
-  // Asynchronously sends a request over the connection.
+  // Asynchronously request over the connection.
   // date: a vector of messages to be sent. Does not take ownership of the
   //       data. The vector has to live valid at least until the request
   //       completes. It can be safely de-allocated inside the provided
@@ -62,10 +62,10 @@ class RPCZ_API connection {
  private:
   // Sends rpc header and payload.
   // Takes ownership of the provided payload message.
-  void respond(const std::string& event_id,
+  void reply(const std::string& event_id,
       const rpc_header& rpc_hdr,
       zmq::message_t* payload) const;
-  void respond(const std::string& event_id, message_vector* v) const;
+  void reply(const std::string& event_id, message_vector* v) const;
 
  private:
   boost::shared_ptr<manager> manager_;

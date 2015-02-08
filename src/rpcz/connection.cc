@@ -78,7 +78,7 @@ void connection::request(
 
 // XXX change event_id to int64
 
-void connection::respond(const std::string& event_id,
+void connection::reply(const std::string& event_id,
     const google::protobuf::Message& resp) const {
   int msg_size = resp.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -89,18 +89,18 @@ void connection::respond(const std::string& event_id,
   (void)rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(rpc_hdr.has_resp_hdr());
   BOOST_ASSERT(!rpc_hdr.has_req_hdr());
-  respond(event_id, rpc_hdr, payload.release());
+  reply(event_id, rpc_hdr, payload.release());
 }
 
 // XXX for language binding
-//void connection::respond(const std::string& event_id,
+//void connection::reply(const std::string& event_id,
 //    const std::string& response) {
 //  rpc_header rpc_hdr;
 //  (void)rpc_hdr.mutable_resp_hdr();
-//  respond(rpc_hdr, string_to_message(response));
+//  reply(rpc_hdr, string_to_message(response));
 //}
 
-void connection::respond_error(
+void connection::reply_error(
     const std::string& event_id,
     int error_code,
     const std::string& error_message/* = "" */) const {
@@ -112,7 +112,7 @@ void connection::respond_error(
   if (!error_message.empty()) {
     resp_hdr->set_error_str(error_message);
   }
-  respond(event_id, rpc_hdr, payload);
+  reply(event_id, rpc_hdr, payload);
 }
 
 // XXX request on router conn.
@@ -131,7 +131,7 @@ void connection::request(
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void connection::respond(
+void connection::reply(
     const std::string& event_id,
     const rpc_header& rpc_hdr,
     zmq::message_t* payload) const {
@@ -142,19 +142,19 @@ void connection::respond(
   message_vector v;
   v.push_back(zmq_hdr_msg);
   v.push_back(payload);
-  respond(event_id, &v);
+  reply(event_id, &v);
 }
 
-// XXX Use reply instead of respond... like kReply
+// XXX Use reply instead of reply... like kReply
 // XXX use message_vector&
 
-void connection::respond(const std::string& event_id,
+void connection::reply(const std::string& event_id,
                           message_vector* v) const {
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
   send_uint64(&socket, index_, ZMQ_SNDMORE);
-  // XXX respond to dealer...
+  // XXX reply to dealer...
   send_string(&socket, sender_, ZMQ_SNDMORE);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_string(&socket, event_id, ZMQ_SNDMORE);
