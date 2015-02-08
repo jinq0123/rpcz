@@ -142,14 +142,11 @@ void connection::reply(
   message_vector v;
   v.push_back(zmq_hdr_msg);
   v.push_back(payload);
-  reply(event_id, &v);
+  reply(event_id, v);
 }
 
-// XXX Use reply instead of reply... like kReply
-// XXX use message_vector&
-
 void connection::reply(const std::string& event_id,
-                          message_vector* v) const {
+                       message_vector& data) const {
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
@@ -158,7 +155,7 @@ void connection::reply(const std::string& event_id,
   send_string(&socket, sender_, ZMQ_SNDMORE);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_string(&socket, event_id, ZMQ_SNDMORE);
-  write_vector_to_socket(&socket, *v);
+  write_vector_to_socket(&socket, data);
 }
 
 }  // namespace rpcz

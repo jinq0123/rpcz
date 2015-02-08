@@ -50,11 +50,8 @@ class RPCZ_API connection {
       const std::string& error_message="") const;
 
  private:
-  // Asynchronously request over the connection.
-  // date: a vector of messages to be sent. Does not take ownership of the
-  //       data. The vector has to live valid at least until the request
-  //       completes. It can be safely de-allocated inside the provided
-  //       closure or after remote_response->wait() returns.
+  // Request over the connection.
+  // date: a vector of messages to be sent.
   // ctrl: controller to run handler on one of the worker threads
   //       when a response arrives or timeout expires.
   void request(message_vector& data, rpc_controller* ctrl) const;
@@ -65,7 +62,7 @@ class RPCZ_API connection {
   void reply(const std::string& event_id,
       const rpc_header& rpc_hdr,
       zmq::message_t* payload) const;
-  void reply(const std::string& event_id, message_vector* v) const;
+  void reply(const std::string& event_id, message_vector& data) const;
 
  private:
   boost::shared_ptr<manager> manager_;
