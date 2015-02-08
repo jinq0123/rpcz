@@ -27,7 +27,7 @@ zmq_channel::zmq_channel(uint64 router_index,
 
 void zmq_channel::request(
     const google::protobuf::MethodDescriptor& method,
-    const google::protobuf::Message& request,
+    const google::protobuf::Message& req,
     const response_message_handler& handler,
     long timeout_ms) {
   rpc_header rpc_hdr;
@@ -40,9 +40,9 @@ void zmq_channel::request(
   CHECK(rpc_hdr.SerializeToArray(msg_out->data(), msg_size));
 
   scoped_ptr<zmq::message_t> payload_out;
-  size_t bytes = request.ByteSize();
+  size_t bytes = req.ByteSize();
   payload_out.reset(new zmq::message_t(bytes));
-  if (!request.SerializeToArray(payload_out->data(), bytes)) {
+  if (!req.SerializeToArray(payload_out->data(), bytes)) {
     throw invalid_message_error("Request serialization failed.");  // XXX
   }
 
@@ -54,16 +54,16 @@ void zmq_channel::request(
   // rpc_controller deleted in worker_thread_fun().
   // XXX delete on timeout.
   rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
-  // XXX dealer_conn_->send_request(msg_vector, ctrl);
+  request(msg_vector, ctrl);
 }
 
 // XXX change event_id to int64
 
 void zmq_channel::respond(const std::string& event_id,
-    const google::protobuf::Message& response) {
-  int msg_size = response.ByteSize();
+    const google::protobuf::Message& resp) {
+  int msg_size = resp.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
-  if (!response.SerializeToArray(payload->data(), msg_size)) {
+  if (!resp.SerializeToArray(payload->data(), msg_size)) {
     throw invalid_message_error("Invalid response message");
   }
   rpc_header rpc_hdr;
@@ -94,6 +94,20 @@ void zmq_channel::respond_error(
     resp_hdr->set_error_str(error_message);
   }
   respond(rpc_hdr, payload);
+}
+
+// XXX request on router channel.
+void zmq_channel::request(
+    message_vector& messages,
+    rpc_controller* ctrl) {
+  BOOST_ASSERT(ctrl);
+  zmq::socket_t& socket = manager_->get_frontend_socket();
+  send_empty_message(&socket, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kRequest, ZMQ_SNDMORE);
+  send_uint64(&socket, index_, ZMQ_SNDMORE);
+  // XXX need sender for router... store in controller?
+  send_pointer(&socket, ctrl, ZMQ_SNDMORE);
+  write_vector_to_socket(&socket, messages);
 }
 
 // Sends rpc header and payload.

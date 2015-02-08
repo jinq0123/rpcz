@@ -15,8 +15,8 @@ class message_t;
 
 namespace rpcz {
 
-class manager;
 class message_vector;
+class rpc_controller;
 class rpc_header;
 
 class zmq_channel : public ichannel {
@@ -26,19 +26,28 @@ class zmq_channel : public ichannel {
  public:
   virtual void request(
       const google::protobuf::MethodDescriptor& method,
-      const google::protobuf::Message& request,
+      const google::protobuf::Message& req,
       const response_message_handler& msg_handler,
       long timeout_ms);
 
  public:
   virtual void respond(const std::string& event_id,
-      const google::protobuf::Message& response);
+      const google::protobuf::Message& resp);
   virtual void respond_error(
       const std::string& event_id,
       int error_code,
       const std::string& error_message="");
 
- public:
+ private:
+  // Asynchronously sends a request over the dealer socket.
+  // request: a vector of messages to be sent. Does not take ownership of the
+  //          request. The vector has to live valid at least until the request
+  //          completes. It can be safely de-allocated inside the provided
+  //          closure or after remote_response->wait() returns.
+  // ctrl: controller to run handler on one of the worker threads
+  //       when a response arrives or timeout expires.
+  void request(message_vector& messages, rpc_controller* ctrl);
+
   // XXX void reply(const std::string& event_id, message_vector* v) const;
 
  private:
