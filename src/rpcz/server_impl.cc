@@ -24,15 +24,15 @@
 namespace rpcz {
 
 server_impl::server_impl()
-  : manager_ptr_(manager::get()),
+  : manager_(manager::get()),
     binding_(false) {
-  assert(manager_ptr_);
+  assert(manager_);
 }
 
 server_impl::~server_impl() {
   // unbind first
   BOOST_FOREACH(const bind_endpoint_set::value_type& v, endpoints_)
-    manager_ptr_->unbind(v);
+    manager_->unbind(v);
   endpoints_.clear();
 }
 
@@ -48,7 +48,7 @@ void server_impl::bind(const std::string& endpoint) {
   // Record endpoints for unbind later. (Server can multi bind.)
   if (!endpoints_.insert(endpoint).second)
     return;  // already bound
-  manager_ptr_->bind(endpoint, service_factory_map_);
+  manager_->bind(endpoint, service_factory_map_);
 }
 
 }  // namespace rpcz

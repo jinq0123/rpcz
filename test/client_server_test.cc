@@ -49,9 +49,9 @@ class delegate_resonder {
 class SearchServiceImpl : public SearchService {
  public:
   // Will take ownership of backend.
-  SearchServiceImpl(SearchService_Stub* backend)
+  SearchServiceImpl(connection_ptr backend)
       : backend_(backend), 
-        cm_(manager::get()) {
+        manager_(manager::get()) {
   }
 
   ~SearchServiceImpl() {
@@ -65,7 +65,7 @@ class SearchServiceImpl : public SearchService {
     } else if (request.query() == "bar") {
       rep.reply_error(17, "I don't like bar.");
     } else if (request.query() == "delegate") {
-      backend_->async_Search(request, delegate_resonder(rep));
+      backend_.async_Search(request, delegate_resonder(rep));
       return;
     } else if (request.query() == "timeout") {
       // We "lose" the request. We are going to reply only when we get a request
@@ -81,7 +81,7 @@ class SearchServiceImpl : public SearchService {
       rep.reply(SearchResponse());
     } else if (request.query() == "terminate") {
       rep.reply(SearchResponse());
-      cm_->terminate();
+      manager_->terminate();
     } else {
       SearchResponse response;
       response.add_results("The search for " + request.query());
@@ -93,10 +93,10 @@ class SearchServiceImpl : public SearchService {
   rpcz::sync_event timeout_request_received;
 
  private:
-  scoped_ptr<SearchService_Stub> backend_;
+  SearchService_Stub backend_;
   boost::mutex mu_;
   scoped_ptr<replier> old_replier_;
-  manager_ptr cm_;
+  manager_ptr manager_;
 };
 
 // For handling complex delegated queries.
@@ -144,8 +144,7 @@ class server_test : public ::testing::Test {
     backend_connection_.reset(new connection(
         "inproc://myserver.backend"));
 
-    frontend_service_.reset(new SearchServiceImpl(
-        new SearchService_Stub(backend_connection_)));
+    frontend_service_.reset(new SearchServiceImpl(backend_connection_));
     frontend_server_->register_singleton_service(*frontend_service_);
     frontend_server_->bind("inproc://myserver.frontend");
     frontend_connection_.reset(new connection(
