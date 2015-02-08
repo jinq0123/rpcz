@@ -25,12 +25,12 @@ namespace examples {
 class SearchServiceImpl : public SearchService {
   virtual void Search(
       const SearchRequest& request,
-      const rpcz::responder& rspndr) {
+      const rpcz::replier& rep) {
     cout << "Got request for '" << request.query() << "'" << endl;
     SearchResponse response;
     response.add_results("result1 for " + request.query());
     response.add_results("this is result2");
-    rspndr.respond(response);
+    rep.respond(response);
   }
 };
 }  // namespace examples

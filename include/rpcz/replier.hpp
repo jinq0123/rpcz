@@ -16,13 +16,13 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_RESPONDER_HPP
-#define RPCZ_RESPONDER_HPP
+#ifndef RPCZ_REPLIER_HPP
+#define RPCZ_REPLIER_HPP
 
 #include <string>
-#include <rpcz/rpcz_api.hpp>
+#include <rpcz/connection.hpp>
 #include <rpcz/connection_ptr.hpp>
-#include "connection.hpp"  // XXX
+#include <rpcz/rpcz_api.hpp>
 
 namespace google {
 namespace protobuf {
@@ -32,20 +32,18 @@ class Message;
 
 namespace rpcz {
 
-class rpc_header;
-
-// responder is copyable.
-// Each request has its own responder, and should reply once.
-// responder can be used in callback by copy.  // XXX Need example.
-// responder's copy operator is quick, which only copies a shared_ptr.
+// replier is copyable.
+// Each request has its own replier, and should reply once.
+// replier can be used in callback by copy.  // XXX Need example.
+// replier's copy operator is quick, which only copies a shared_ptr.
 // XXX More comments...
-class RPCZ_API responder {
+class RPCZ_API replier {
  public:
-  responder(const connection_ptr& conn, const std::string& event_id)
+  replier(const connection_ptr& conn, const std::string& event_id)
       : conn_(conn), event_id_(event_id) {
     BOOST_ASSERT(conn);
   }
-  ~responder() {}
+  ~replier() {}
 
  public:
   // respond(protocol::Message) is only for cpp use.
@@ -63,7 +61,7 @@ class RPCZ_API responder {
 private:
   const connection_ptr conn_;
   const std::string event_id_;
-};  // class responder
+};  // class replier
 
 }  // namespace rpcz
-#endif  // RPCZ_RESPONDER_HPP
+#endif  // RPCZ_REPLIER_HPP

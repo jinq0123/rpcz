@@ -80,7 +80,7 @@ void ServiceGenerator::GenerateInterface(io::Printer* printer) {
     "const ::google::protobuf::ServiceDescriptor* GetDescriptor();\n"
     "void call_method(const ::google::protobuf::MethodDescriptor* method,\n"
     "                 const ::google::protobuf::Message& request,\n"
-    "                 const ::rpcz::responder& rspndr);\n"
+    "                 const ::rpcz::replier& rep);\n"
     "const ::google::protobuf::Message& GetRequestPrototype(\n"
     "  const ::google::protobuf::MethodDescriptor* method) const;\n"
     "const ::google::protobuf::Message& GetResponsePrototype(\n"
@@ -191,7 +191,7 @@ void ServiceGenerator::GenerateOneMethodSignature(
   printer->Print(sub_vars,
       "$virtual$void $name$(\n"
       "    const $input_type$& request,\n"
-      "    const ::rpcz::responder& rspndr);\n");
+      "    const ::rpcz::replier& rep);\n");
 }
 
 // ===================================================================
@@ -256,8 +256,8 @@ void ServiceGenerator::GenerateNotImplementedMethods(io::Printer* printer) {
     printer->Print(sub_vars,
       "void $classname$::$name$(\n"
       "    const $input_type$&,\n"
-      "    const ::rpcz::responder& rspndr) {\n"
-      "  rspndr.respond_error(\n"
+      "    const ::rpcz::replier& rep) {\n"
+      "  rep.respond_error(\n"
       "      ::rpcz::error_code::METHOD_NOT_IMPLEMENTED,\n"
       "      \"Method $name$() not implemented.\");\n"
       "}\n"
@@ -270,7 +270,7 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
     "void $classname$::call_method(\n"
     "    const ::google::protobuf::MethodDescriptor* method,\n"
     "    const ::google::protobuf::Message& request,\n"
-    "    const ::rpcz::responder& rspndr) {\n"
+    "    const ::rpcz::replier& rep) {\n"
     "  GOOGLE_DCHECK_EQ(method->service(), $classname$_descriptor_);\n"
     "  switch(method->index()) {\n");
 
@@ -288,7 +288,7 @@ void ServiceGenerator::GenerateCallMethod(io::Printer* printer) {
       "    case $index$:\n"
       "      $name$(\n"
       "          *::google::protobuf::down_cast<const $input_type$*>(&request),\n"
-      "          rspndr);\n"
+      "          rep);\n"
       "      break;\n");
   }
 

@@ -35,13 +35,13 @@ void cpp_service::dispatch_request(
     const std::string& method,
     const void* payload,
     size_t payload_len,
-    const responder& rspndr) {
+    const replier& rep) {
   const ::google::protobuf::MethodDescriptor* descriptor =
       GetDescriptor()->FindMethodByName(method);
   if (descriptor == NULL) {
     // Invalid method name
     DLOG(INFO) << "Invalid method name: " << method;
-    rspndr.respond_error(error_code::NO_SUCH_METHOD);
+    rep.respond_error(error_code::NO_SUCH_METHOD);
     return;
   }
 
@@ -51,10 +51,10 @@ void cpp_service::dispatch_request(
   if (!request->ParseFromArray(payload, payload_len)) {
     DLOG(INFO) << "Failed to parse request.";
     // Invalid proto;
-    rspndr.respond_error(error_code::INVALID_MESSAGE);
+    rep.respond_error(error_code::INVALID_MESSAGE);
     return;
   }
-  call_method(descriptor, *request, rspndr);
+  call_method(descriptor, *request, rep);
 }  // dispatch_request()
 
 }  // namespace rpcz
