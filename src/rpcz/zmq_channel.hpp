@@ -6,6 +6,8 @@
 #define RPCZ_ZMQ_CHANNEL_HPP
 
 #include <rpcz/ichannel.hpp>
+#include "manager_ptr.hpp"  // XXX
+#include <rpcz/common.hpp>
 
 namespace zmq {
 class message_t;
@@ -18,6 +20,9 @@ class message_vector;
 class rpc_header;
 
 class zmq_channel : public ichannel {
+ public:
+  zmq_channel(uint64 router_index, const std::string& sender);
+
  public:
   virtual void request(
       const google::protobuf::MethodDescriptor& method,
@@ -42,7 +47,11 @@ class zmq_channel : public ichannel {
   void respond(const rpc_header& rpc_hdr,
                zmq::message_t* payload) const;
 
-
+ private:
+  manager_ptr manager_;
+  const bool is_router_;  // ZMQ_ROUTER or ZMQ_DEALER
+  const uint64 index_;  // router or dealer index
+  const std::string sender_;  // Zmq sender id. Empty for dealer type.
 };
 
 }  // namespace rpcz

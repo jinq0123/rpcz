@@ -22,6 +22,8 @@
 #include <rpcz/common.hpp>  // for uint64
 #include <rpcz/zmq_channel.hpp>
 
+#if 0  // XXX
+
 namespace rpcz {
 
 class manager;
@@ -41,5 +43,6 @@ class router_channel : public zmq_channel {
 };
 
 }  // namespace rpcz
+#endif
 
 #endif  // RPCZ_ROUTER_CHANNEL_HPP

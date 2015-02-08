@@ -16,6 +16,15 @@
 
 namespace rpcz {
 
+zmq_channel::zmq_channel(uint64 router_index,
+                         const std::string& sender)
+    : manager_(manager::get()),
+      is_router_(true),
+      index_(router_index),
+      sender_(sender) {
+  BOOST_ASSERT(manager_);
+};
+
 void zmq_channel::request(
     const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& request,

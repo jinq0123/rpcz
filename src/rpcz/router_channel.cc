@@ -9,6 +9,8 @@
 #include <rpcz/manager.hpp>
 #include <rpcz/zmq_utils.hpp>
 
+#if 0
+
 namespace rpcz {
 
 router_channel::router_channel(uint64 router_index,
@@ -31,3 +33,4 @@ void router_channel::reply(const std::string& event_id,
 }
 
 }  // namespace rpcz
+#endif

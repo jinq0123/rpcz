@@ -15,9 +15,10 @@
 namespace rpcz {
 
 // XXX should ctr from channel ptr
+// XXX use dealer channel
 request_handler::request_handler(uint64 router_index,
                                  const std::string& sender)
-    : router_channel_(new router_channel(router_index, sender)) {  // shared_ptr
+    : channel_(new zmq_channel(router_index, sender)) {  // shared_ptr
 }
 
 request_handler::~request_handler() {
@@ -33,7 +34,7 @@ void request_handler::handle_request(message_iterator& iter) {
   std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
   if (!iter.has_more()) return;
   rpc_header rpc_hdr;
-  responder rspndr(router_channel_, event_id);
+  responder rspndr(channel_, event_id);
   zmq::message_t& msg = iter.next();
   if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
     // Handle bad rpc.

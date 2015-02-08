@@ -35,7 +35,7 @@ class request_handler {
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
-  channel_ptr router_channel_;
+  channel_ptr channel_;
 };
 
 }  // namespace rpcz
