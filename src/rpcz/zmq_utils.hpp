@@ -63,6 +63,9 @@ class message_vector {
   inline zmq::message_t& operator[](int index) {
     return data_[index];
   }
+  inline const zmq::message_t& operator[](int index) const {
+    return data_[index];
+  }
 
   inline size_t size() const { return data_.size(); }
 

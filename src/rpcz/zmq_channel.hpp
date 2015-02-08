@@ -46,15 +46,15 @@ class zmq_channel : public ichannel {
   //          closure or after remote_response->wait() returns.
   // ctrl: controller to run handler on one of the worker threads
   //       when a response arrives or timeout expires.
-  void request(message_vector& messages, rpc_controller* ctrl);
-
-  // XXX void reply(const std::string& event_id, message_vector* v) const;
+  void request(message_vector& data, rpc_controller* ctrl) const;
 
  private:
   // Sends rpc header and payload.
   // Takes ownership of the provided payload message.
-  void respond(const rpc_header& rpc_hdr,
-               zmq::message_t* payload) const;
+  void respond(const std::string& event_id,
+      const rpc_header& rpc_hdr,
+      zmq::message_t* payload) const;
+  void respond(const std::string& event_id, message_vector* v) const;
 
  private:
   manager_ptr manager_;

@@ -25,6 +25,8 @@ zmq_channel::zmq_channel(uint64 router_index,
   BOOST_ASSERT(manager_);
 };
 
+// XXX make them non-virtual and const
+
 void zmq_channel::request(
     const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& req,
@@ -70,7 +72,7 @@ void zmq_channel::respond(const std::string& event_id,
   (void)rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(rpc_hdr.has_resp_hdr());
   BOOST_ASSERT(!rpc_hdr.has_req_hdr());
-  respond(rpc_hdr, payload.release());
+  respond(event_id, rpc_hdr, payload.release());
 }
 
 // XXX for language binding
@@ -93,13 +95,13 @@ void zmq_channel::respond_error(
   if (!error_message.empty()) {
     resp_hdr->set_error_str(error_message);
   }
-  respond(rpc_hdr, payload);
+  respond(event_id, rpc_hdr, payload);
 }
 
 // XXX request on router channel.
 void zmq_channel::request(
-    message_vector& messages,
-    rpc_controller* ctrl) {
+    message_vector& data,
+    rpc_controller* ctrl) const {
   BOOST_ASSERT(ctrl);
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
@@ -107,13 +109,15 @@ void zmq_channel::request(
   send_uint64(&socket, index_, ZMQ_SNDMORE);
   // XXX need sender for router... store in controller?
   send_pointer(&socket, ctrl, ZMQ_SNDMORE);
-  write_vector_to_socket(&socket, messages);
+  write_vector_to_socket(&socket, data);
 }
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void zmq_channel::respond(const rpc_header& rpc_hdr,
-                          zmq::message_t* payload) const {
+void zmq_channel::respond(
+    const std::string& event_id,
+    const rpc_header& rpc_hdr,
+    zmq::message_t* payload) const {
   size_t msg_size = rpc_hdr.ByteSize();
   zmq::message_t* zmq_hdr_msg = new zmq::message_t(msg_size);
   CHECK(rpc_hdr.SerializeToArray(zmq_hdr_msg->data(), msg_size));
@@ -121,21 +125,22 @@ void zmq_channel::respond(const rpc_header& rpc_hdr,
   message_vector v;
   v.push_back(zmq_hdr_msg);
   v.push_back(payload);
-  // XXX channel_->reply(event_id_, &v);
+  respond(event_id, &v);
 }
 
-#if 0
-void zmq_channel::reply(const std::string& event_id, 
-                              message_vector* v) const {
-  zmq::socket_t& socket = manager_.get_frontend_socket();
+// XXX Use reply instead of respond... like kReply
+
+void zmq_channel::respond(const std::string& event_id,
+                          message_vector* v) const {
+  zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
-  send_uint64(&socket, router_index_, ZMQ_SNDMORE);
+  send_uint64(&socket, index_, ZMQ_SNDMORE);
+  // XXX respond to dealer...
   send_string(&socket, sender_, ZMQ_SNDMORE);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_string(&socket, event_id, ZMQ_SNDMORE);
   write_vector_to_socket(&socket, *v);
 }
-#endif
 
 }  // namespace rpcz
