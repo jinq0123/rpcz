@@ -5,8 +5,6 @@
 #ifndef RPCZ_CONNECTION_HPP
 #define RPCZ_CONNECTION_HPP
 
-#include <boost/shared_ptr.hpp>
-
 #include <rpcz/common.hpp>
 #include <rpcz/rpcz_api.hpp>
 #include <rpcz/response_message_handler.hpp>
@@ -24,7 +22,6 @@ class message_t;
 
 namespace rpcz {
 
-class manager;
 class message_vector;
 class rpc_controller;
 class rpc_header;
@@ -68,7 +65,6 @@ class RPCZ_API connection {
   void reply(const std::string& event_id, message_vector& data) const;
 
  private:
-  boost::shared_ptr<manager> manager_;
   const bool is_router_;  // ZMQ_ROUTER or ZMQ_DEALER
   const uint64 index_;  // router or dealer index
   const std::string sender_;  // Zmq sender id. Empty for dealer type.

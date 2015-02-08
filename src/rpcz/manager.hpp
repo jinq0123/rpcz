@@ -38,10 +38,7 @@ namespace rpcz {
 class closure;
 class sync_event;
 
-// A manager is a multi-threaded asynchronous system for communication
-// over ZeroMQ sockets.
-// A manager can connect to a remote server:
-//      manager::get()->connect("tcp://localhost:5557");
+// A manager is a multi-threaded asynchronous system for communication over ZeroMQ sockets.
 // manager is thread-safe.
 // manager is singleton.
 class manager : boost::noncopyable {

@@ -111,6 +111,7 @@ message_vector* create_quit_request() {
 TEST_F(manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
+  manager_ptr mgr = manager::get();
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
   connection_ptr conn(new connection("inproc://server.test"));
@@ -168,6 +169,7 @@ void SendManyMessages(const connection_ptr& conn, int thread_id) {
 TEST_F(manager_test, ManyClientsTest) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
+  manager_ptr mgr = manager::get();
 
   boost::thread thread(start_server(context));
 
