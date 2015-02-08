@@ -7,9 +7,16 @@
 
 #include <boost/shared_ptr.hpp>
 
-#include <rpcz/ichannel.hpp>
 #include <rpcz/common.hpp>
 #include <rpcz/rpcz_api.hpp>
+#include <rpcz/response_message_handler.hpp>
+
+namespace google {
+namespace protobuf {
+class Message;
+class MethodDescriptor;
+}  // namespace protobuf
+}  // namespace google
 
 namespace zmq {
 class message_t;
@@ -22,10 +29,10 @@ class message_vector;
 class rpc_controller;
 class rpc_header;
 
-class RPCZ_API zmq_channel : public ichannel {
+class RPCZ_API connection {
  public:
-  zmq_channel(uint64 router_index, const std::string& sender);
-  explicit zmq_channel(const std::string& endpoint);
+  connection(uint64 router_index, const std::string& sender);
+  explicit connection(const std::string& endpoint);
 
  public:
   virtual void request(
@@ -43,11 +50,11 @@ class RPCZ_API zmq_channel : public ichannel {
       const std::string& error_message="");
 
  private:
-  // Asynchronously sends a request over the dealer socket.
-  // request: a vector of messages to be sent. Does not take ownership of the
-  //          request. The vector has to live valid at least until the request
-  //          completes. It can be safely de-allocated inside the provided
-  //          closure or after remote_response->wait() returns.
+  // Asynchronously sends a request over the connection.
+  // date: a vector of messages to be sent. Does not take ownership of the
+  //       data. The vector has to live valid at least until the request
+  //       completes. It can be safely de-allocated inside the provided
+  //       closure or after remote_response->wait() returns.
   // ctrl: controller to run handler on one of the worker threads
   //       when a response arrives or timeout expires.
   void request(message_vector& data, rpc_controller* ctrl) const;

@@ -16,7 +16,7 @@
 
 namespace rpcz {
 
-zmq_channel::zmq_channel(uint64 router_index,
+connection::connection(uint64 router_index,
                          const std::string& sender)
     : manager_(manager::get()),
       is_router_(true),
@@ -37,7 +37,7 @@ static uint64 connect(const std::string& endpoint) {
   return interpret_message<uint64>(msg);
 }
 
-zmq_channel::zmq_channel(const std::string& endpoint)
+connection::connection(const std::string& endpoint)
     : manager_(manager::get()),
       is_router_(false),
       index_(connect(endpoint)) {
@@ -46,7 +46,7 @@ zmq_channel::zmq_channel(const std::string& endpoint)
 
 // XXX make them non-virtual and const
 
-void zmq_channel::request(
+void connection::request(
     const google::protobuf::MethodDescriptor& method,
     const google::protobuf::Message& req,
     const response_message_handler& handler,
@@ -80,7 +80,7 @@ void zmq_channel::request(
 
 // XXX change event_id to int64
 
-void zmq_channel::respond(const std::string& event_id,
+void connection::respond(const std::string& event_id,
     const google::protobuf::Message& resp) {
   int msg_size = resp.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -95,14 +95,14 @@ void zmq_channel::respond(const std::string& event_id,
 }
 
 // XXX for language binding
-//void zmq_channel::respond(const std::string& event_id,
+//void connection::respond(const std::string& event_id,
 //    const std::string& response) {
 //  rpc_header rpc_hdr;
 //  (void)rpc_hdr.mutable_resp_hdr();
 //  respond(rpc_hdr, string_to_message(response));
 //}
 
-void zmq_channel::respond_error(
+void connection::respond_error(
     const std::string& event_id,
     int error_code,
     const std::string& error_message/* = "" */) {
@@ -118,7 +118,7 @@ void zmq_channel::respond_error(
 }
 
 // XXX request on router channel.
-void zmq_channel::request(
+void connection::request(
     message_vector& data,
     rpc_controller* ctrl) const {
   BOOST_ASSERT(ctrl);
@@ -133,7 +133,7 @@ void zmq_channel::request(
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void zmq_channel::respond(
+void connection::respond(
     const std::string& event_id,
     const rpc_header& rpc_hdr,
     zmq::message_t* payload) const {
@@ -149,7 +149,7 @@ void zmq_channel::respond(
 
 // XXX Use reply instead of respond... like kReply
 
-void zmq_channel::respond(const std::string& event_id,
+void connection::respond(const std::string& event_id,
                           message_vector* v) const {
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);

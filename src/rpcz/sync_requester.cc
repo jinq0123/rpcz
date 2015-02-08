@@ -4,13 +4,12 @@
 
 #include <rpcz/sync_requester.hpp>
 
-#include <rpcz/ichannel.hpp>
-#include <rpcz/rpc_error.hpp>
+#include <rpcz/connection.hpp>
 #include <rpcz/sync_call_handler.hpp>
 
 namespace rpcz {
 
-sync_requester::sync_requester(const channel_ptr& channel)
+sync_requester::sync_requester(const connection_ptr& channel)
     : channel_(channel) {
   BOOST_ASSERT(channel);
 }

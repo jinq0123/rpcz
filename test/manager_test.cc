@@ -35,7 +35,7 @@
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
-#include "rpcz/channel_ptr.hpp"
+#include "rpcz/connection_ptr.hpp"
 
 namespace rpcz {
 
@@ -106,7 +106,7 @@ TEST_F(manager_test, TestTimeoutAsync) {
   application::set_manager_threads(4);
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
-  channel_ptr channel(new zmq_channel("inproc://server.test"));
+  connection_ptr channel(new connection("inproc://server.test"));
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -147,7 +147,7 @@ class barrier_handler {
 };
 
 #if 0  // XXX
-void SendManyMessages(const channel_ptr& channel, int thread_id) {
+void SendManyMessages(const connection_ptr& channel, int thread_id) {
   boost::ptr_vector<message_vector> requests;
   const int request_count = 100;
   barrier_handler barrier;
@@ -168,7 +168,7 @@ TEST_F(manager_test, ManyClientsTest) {
 
   boost::thread thread(start_server(context));
 
-  channel_ptr channel(new zmq_channel("inproc://server.test"));
+  connection_ptr channel(new connection("inproc://server.test"));
   boost::thread_group group;
   for (int i = 0; i < 10; ++i) {
     group.add_thread(

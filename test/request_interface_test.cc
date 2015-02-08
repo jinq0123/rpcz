@@ -27,7 +27,6 @@
 #include "rpcz/manager.hpp"
 #include "rpcz/manager_ptr.hpp"
 #include "rpcz/sync_event.hpp"
-#include "rpcz/requester.hpp"
 #include "rpcz/connection.hpp"
 
 using namespace std;
@@ -90,14 +89,14 @@ class server_test : public ::testing::Test {
     service_.reset(new SearchServiceImpl);
     server_->register_singleton_service(*service_);
     server_->bind("inproc://myserver.frontend");
-    connection_.reset(new zmq_channel(
+    connection_.reset(new connection(
         "inproc://myserver.frontend"));
   }
 
 protected:
   // destruct in reversed order
   scoped_ptr<zmq::context_t> context_;  // destruct last
-  channel_ptr connection_;
+  connection_ptr connection_;
   scoped_ptr<SearchServiceImpl> service_;
   // Server must destruct before service. (Or unregister services before destruct.)
   scoped_ptr<server> server_;
@@ -135,7 +134,7 @@ Ordered as the declaration in search.rpcz.h.
 
 TEST_F(server_test, AsyncRequestWithTimeout) {
   LOG(INFO) << "AsyncRequestWithTimeout";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("timeout");
   handler hdl;
@@ -149,7 +148,7 @@ TEST_F(server_test, AsyncRequestWithTimeout) {
 
 TEST_F(server_test, AsyncRequest) {
   LOG(INFO) << "AsyncRequest";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("stone");
   handler hdl;
@@ -163,7 +162,7 @@ TEST_F(server_test, AsyncRequest) {
 
 TEST_F(server_test, AsyncOnewayRequest) {
   LOG(INFO) << "AsyncOnewayRequest";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("rocket");
   stub.async_Search(request, 0/*ms*/);
@@ -180,7 +179,7 @@ TEST_F(server_test, AsyncOnewayRequest) {
 
 TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
   LOG(INFO) << "AsyncOnewayRequestDefaultMs";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("robot");
   stub.async_Search(request);
@@ -194,7 +193,7 @@ TEST_F(server_test, AsyncOnewayRequestDefaultMs) {
 
 TEST_F(server_test, SyncRequest) {
   LOG(INFO) << "SyncRequest";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("student");
   SearchResponse response;
@@ -205,7 +204,7 @@ TEST_F(server_test, SyncRequest) {
 
 TEST_F(server_test, SyncRequestDefaultMs) {
   LOG(INFO) << "SyncRequestDefaultMs";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("stupid");
   SearchResponse response;
@@ -216,7 +215,7 @@ TEST_F(server_test, SyncRequestDefaultMs) {
 
 TEST_F(server_test, SyncRequestReturn) {
   LOG(INFO) << "SyncRequestReturn";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("spool");
   SearchResponse response = stub.Search(request, 5000/*ms*/);
@@ -226,7 +225,7 @@ TEST_F(server_test, SyncRequestReturn) {
 
 TEST_F(server_test, SyncRequestReturnDefaultMs) {
   LOG(INFO) << "SyncRequestReturnDefaultMs";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   request.set_query("star");
   SearchResponse response = stub.Search(request);
@@ -238,7 +237,7 @@ TEST_F(server_test, SyncRequestReturnDefaultMs) {
 
 TEST_F(server_test, SetDefaulTimeoutMs) {
   LOG(INFO) << "SetDefaulDeadlineMs";
-  SearchService_Stub stub(requester::make_shared(connection_));
+  SearchService_Stub stub(connection_);
   SearchRequest request;
   SearchResponse response;
   request.set_query("timeout");

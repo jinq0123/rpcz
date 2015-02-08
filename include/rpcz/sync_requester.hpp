@@ -1,12 +1,12 @@
 // Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Synchronized rpc requester.
-// Usage: sync_requester(channel_ptr).request(...);
+// Usage: sync_requester(connection_ptr).request(...);
 
 #ifndef RPCZ_SYNC_REQUESTER_HPP
 #define RPCZ_SYNC_REQUESTER_HPP
 
-#include <rpcz/channel_ptr.hpp>
+#include <rpcz/connection_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace google {
@@ -20,7 +20,7 @@ namespace rpcz {
 
 class RPCZ_API sync_requester {
  public:
-  explicit sync_requester(const channel_ptr& channel);
+  explicit sync_requester(const connection_ptr& channel);
   ~sync_requester();
 
  public:
@@ -33,7 +33,7 @@ class RPCZ_API sync_requester {
       );
 
  private:
-  channel_ptr channel_;
+  connection_ptr channel_;
 };  // class sync_requester
 
 }  // namespace rpcz

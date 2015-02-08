@@ -30,7 +30,7 @@
 
 namespace rpcz {
 
-requester::requester(const channel_ptr& channel)
+requester::requester(const connection_ptr& channel)
     : channel_(channel) {  // copy
 }
 
@@ -152,16 +152,17 @@ void requester::request(
 //  dealer_conn_->send_request(msg_vector, ctrl);
 //}
 
-channel_ptr requester::make_shared(const channel_ptr& channel) {
-  BOOST_ASSERT(channel);
-  return boost::make_shared<requester>(channel);
-}
-
-// XXX Zmq_channel::connect(endpoint) to create a channel
-
-channel_ptr requester::make_shared(const std::string& endpoint) {
-  return boost::make_shared<requester>(
-      boost::make_shared<zmq_channel>(endpoint));
-}
+// DEL
+//connection_ptr requester::make_shared(const connection_ptr& channel) {
+//  BOOST_ASSERT(channel);
+//  return boost::make_shared<requester>(channel);
+//}
+//
+//// XXX Zmq_channel::connect(endpoint) to create a channel
+//
+//connection_ptr requester::make_shared(const std::string& endpoint) {
+//  return boost::make_shared<requester>(
+//      boost::make_shared<connection>(endpoint));
+//}
 
 }  // namespace rpcz

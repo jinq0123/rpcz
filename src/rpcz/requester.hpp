@@ -24,8 +24,7 @@
 
 #include <google/protobuf/stubs/common.h>
 
-#include <rpcz/channel_ptr.hpp>
-#include <rpcz/ichannel.hpp>
+#include <rpcz/connection_ptr.hpp>
 #include <rpcz/response_message_handler.hpp>  // for response_message_handler
 #include <rpcz/rpcz_api.hpp>
 
@@ -38,9 +37,9 @@ class MethodDescriptor;
 
 namespace rpcz {
 
-class RPCZ_API requester : public ichannel {
+class RPCZ_API requester {
  public:
-  explicit requester(const channel_ptr& channel);
+  explicit requester(const connection_ptr& channel);
   ~requester();
 
  public:
@@ -69,10 +68,11 @@ class RPCZ_API requester : public ichannel {
   //                         rpc_controller* rpc_controller,
   //                         closure* done) = 0;
 
-  static channel_ptr make_shared(const channel_ptr& channel);
+  // XXX
+  //static connection_ptr make_shared(const connection_ptr& channel);
 
-  // Creates an requester to the given endpoint.
-  static channel_ptr make_shared(const std::string& endpoint);
+  //// Creates an requester to the given endpoint.
+  //static connection_ptr make_shared(const std::string& endpoint);
 
  public:
   virtual void respond(const std::string& event_id,
@@ -84,7 +84,7 @@ class RPCZ_API requester : public ichannel {
       const std::string& error_message="") {};
 
  private:
-  channel_ptr channel_;
+  connection_ptr channel_;
 };  // class requester
 
 }  // namespace rpcz

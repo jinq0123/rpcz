@@ -109,7 +109,7 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  channel_ptr channel(new zmq_channel(endpoint));  // shared_ptr
+  connection_ptr channel(new connection(endpoint));  // shared_ptr
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {

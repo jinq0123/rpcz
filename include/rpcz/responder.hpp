@@ -21,8 +21,8 @@
 
 #include <string>
 #include <rpcz/rpcz_api.hpp>
-#include <rpcz/channel_ptr.hpp>
-#include <rpcz/ichannel.hpp>
+#include <rpcz/connection_ptr.hpp>
+#include "connection.hpp"  // XXX
 
 namespace google {
 namespace protobuf {
@@ -41,7 +41,7 @@ class rpc_header;
 // XXX More comments...
 class RPCZ_API responder {
  public:
-  responder(const channel_ptr& channel, const std::string& event_id)
+  responder(const connection_ptr& channel, const std::string& event_id)
       : channel_(channel), event_id_(event_id) {
     BOOST_ASSERT(channel);
   }
@@ -61,7 +61,7 @@ class RPCZ_API responder {
   }
 
 private:
-  const channel_ptr channel_;
+  const connection_ptr channel_;
   const std::string event_id_;
 };  // class responder
 

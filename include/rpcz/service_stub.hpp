@@ -8,14 +8,14 @@
 
 #include <boost/assert.hpp>
 #include <google/protobuf/stubs/common.h>  // for GOOGLE_DISALLOW_EVIL_CONSTRUCTORS()
-#include <rpcz/channel_ptr.hpp>
+#include <rpcz/connection_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
 
 namespace rpcz {
 
 class RPCZ_API service_stub {
  public:
-  inline explicit service_stub(const channel_ptr& channel) :
+  inline explicit service_stub(const connection_ptr& channel) :
       channel_(channel),  // copy
       default_timeout_ms_(-1) {
     BOOST_ASSERT(channel);
@@ -24,11 +24,11 @@ class RPCZ_API service_stub {
   inline virtual ~service_stub() {}
 
  public:
-  inline channel_ptr get_channel_ptr() const { return channel_; }
+  inline connection_ptr get_channel_ptr() const { return channel_; }
   inline void set_default_timeout_ms(long ms) { default_timeout_ms_ = ms; }
 
  protected:
-  channel_ptr channel_;
+  connection_ptr channel_;
   long default_timeout_ms_;
 
  private:

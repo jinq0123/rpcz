@@ -18,7 +18,7 @@ namespace rpcz {
 // XXX use dealer channel
 request_handler::request_handler(uint64 router_index,
                                  const std::string& sender)
-    : channel_(new zmq_channel(router_index, sender)) {  // shared_ptr
+    : channel_(new connection(router_index, sender)) {  // shared_ptr
 }
 
 request_handler::~request_handler() {
