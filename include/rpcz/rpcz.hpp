@@ -31,7 +31,7 @@
 #include <rpcz/default_service_factory.hpp>
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/iservice.hpp>
-#include <rpcz/responder.hpp>
+#include <rpcz/replier.hpp>
 #include <rpcz/response_message_handler.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/rpcz_api.hpp>
