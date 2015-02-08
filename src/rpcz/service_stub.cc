@@ -3,12 +3,12 @@
 
 #include <rpcz/service_stub.hpp>
 
-#include <rpcz/requester.hpp>
+#include <rpcz/zmq_channel.hpp>
 
 namespace rpcz {
 
 service_stub::service_stub(const std::string& endpoint)
-    : channel_(requester::make_shared(endpoint)),
+    : channel_(new zmq_channel(endpoint)),  // shared_ptr
       default_timeout_ms_(-1) {
   BOOST_ASSERT(channel_);
 }

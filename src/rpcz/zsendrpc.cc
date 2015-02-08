@@ -24,7 +24,7 @@
 
 #include <rpcz/application.hpp>
 #include <rpcz/common.hpp>  // for scoped_ptr
-#include <rpcz/requester.hpp>
+#include <rpcz/zmq_channel.hpp>
 #include <rpcz/rpc_error.hpp>
 #include <rpcz/sync_requester.hpp>
 
@@ -109,11 +109,11 @@ int run_call(const std::string& endpoint,
     return -1;
   }
 
-  channel_ptr rqstr = requester::make_shared(endpoint);
+  channel_ptr channel(new zmq_channel(endpoint));  // shared_ptr
   ::Message *reply = factory.GetPrototype(
       method_desc->output_type())->New();
   try {
-    sync_requester(rqstr).request(
+    sync_requester(channel).request(
         *method_desc, *request, -1, reply);
     std::string out;
     ::TextFormat::PrintToString(*reply, &out);

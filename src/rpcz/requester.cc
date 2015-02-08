@@ -26,7 +26,7 @@
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/sync_call_handler.hpp>
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
-#include "zmq_channel.hpp"  // XXX
+#include <rpcz/zmq_channel.hpp>
 
 namespace rpcz {
 
