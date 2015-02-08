@@ -53,8 +53,11 @@ class RPCZ_API connection {
   // Request over the connection.
   // date: a vector of messages to be sent.
   // ctrl: controller to run handler on one of the worker threads
-  //       when a response arrives or timeout expires.
+  //       when a response arrives or timeout expires. Takes the
+  //       ownership of ctrl.
   void request(message_vector& data, rpc_controller* ctrl) const;
+  friend void request_connection(connection& conn,
+      message_vector& data, rpc_controller* ctrl);  // for unit test
 
  private:
   // Sends rpc header and payload.

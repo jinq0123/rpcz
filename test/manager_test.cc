@@ -30,12 +30,13 @@
 #include "rpcz/application.hpp"
 #include "rpcz/application_error_code.hpp"
 #include "rpcz/callback.hpp"
+#include "rpcz/connection.hpp"
+#include "rpcz/connection_ptr.hpp"
 #include "rpcz/manager.hpp"
 #include "rpcz/rpc_controller.hpp"
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
-#include "rpcz/connection_ptr.hpp"
 
 namespace rpcz {
 
@@ -51,6 +52,13 @@ class manager_test : public ::testing::Test {
  protected:
   zmq::context_t context;
 };
+
+// friend function of connection.
+void request_connection(connection& conn,
+    message_vector& data, rpc_controller* ctrl)
+{
+    conn.request(data, ctrl);
+}
 
 TEST_F(manager_test, TestStartsAndFinishes) {
   ASSERT_TRUE(manager::is_destroyed());
@@ -100,7 +108,6 @@ message_vector* create_quit_request() {
   return request;
 }
 
-#if 0  // XXX
 TEST_F(manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
@@ -118,10 +125,9 @@ TEST_F(manager_test, TestTimeoutAsync) {
     }
   } hdl;
 
-  conn->request(*request, new rpc_controller(boost::ref(hdl), 0));
+  request_connection(*conn, *request, new rpc_controller(boost::ref(hdl), 0));
   hdl.event.wait();
 }
-#endif
 
 class barrier_handler {
  public:
@@ -146,7 +152,6 @@ class barrier_handler {
   int count_;
 };
 
-#if 0  // XXX
 void SendManyMessages(const connection_ptr& conn, int thread_id) {
   boost::ptr_vector<message_vector> requests;
   const int request_count = 100;
@@ -155,13 +160,11 @@ void SendManyMessages(const connection_ptr& conn, int thread_id) {
     message_vector* request = create_simple_request(
         thread_id * request_count * 17 + i);
     requests.push_back(request);
-    conn.send_request(*request, new rpc_controller(boost::ref(barrier), -1));
+    request_connection(*conn, *request, new rpc_controller(boost::ref(barrier), -1));
   }
   barrier.wait(request_count);
 }
-#endif
 
-#if 0  // XXX
 TEST_F(manager_test, ManyClientsTest) {
   ASSERT_TRUE(manager::is_destroyed());
   application::set_manager_threads(4);
@@ -183,11 +186,10 @@ TEST_F(manager_test, ManyClientsTest) {
       event.signal();
     }
   } hdl;
-  conn.send_request(*request, new rpc_controller(boost::ref(hdl), -1));
+  request_connection(*conn, *request, new rpc_controller(boost::ref(hdl), -1));
   hdl.event.wait();
   thread.join();
 }
-#endif
 
 TEST_F(manager_test, TestUnbind) {
   ASSERT_TRUE(manager::is_destroyed());

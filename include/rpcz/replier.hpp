@@ -35,7 +35,7 @@ namespace rpcz {
 // replier is copyable.
 // Each request has its own replier, and should reply once.
 // replier can be used in callback by copy.  // XXX Need example.
-// replier's copy operator is quick, which only copies a shared_ptr.
+// replier's copy operator is quick.
 // XXX More comments...
 class RPCZ_API replier {
  public:
