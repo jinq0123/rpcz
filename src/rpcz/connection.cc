@@ -18,9 +18,11 @@ namespace rpcz {
 
 connection::connection(uint64 router_index,
                          const std::string& sender)
-    : is_router_(true),
+    : manager_(manager::get()),
+      is_router_(true),
       index_(router_index),
       sender_(sender) {
+  BOOST_ASSERT(manager_);
 };
 
 // XXX block? exception?
@@ -38,8 +40,10 @@ static uint64 connect(const std::string& endpoint) {
 }
 
 connection::connection(const std::string& endpoint)
-    : is_router_(false),
+    : manager_(manager::get()),
+      is_router_(false),
       index_(connect(endpoint)) {
+  BOOST_ASSERT(manager_);
 }
 
 void connection::request(
@@ -118,9 +122,7 @@ void connection::request(
     message_vector& data,
     rpc_controller* ctrl) const {
   BOOST_ASSERT(ctrl);
-  manager_ptr mgr = manager::get();
-  BOOST_ASSERT(mgr);
-  zmq::socket_t& socket = mgr->get_frontend_socket();
+  zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kRequest, ZMQ_SNDMORE);
   send_uint64(&socket, index_, ZMQ_SNDMORE);
@@ -147,9 +149,7 @@ void connection::reply(
 
 void connection::reply(const std::string& event_id,
                        message_vector& data) const {
-  manager_ptr mgr = manager::get();
-  BOOST_ASSERT(mgr);
-  zmq::socket_t& socket = mgr->get_frontend_socket();
+  zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
   send_uint64(&socket, index_, ZMQ_SNDMORE);
