@@ -22,6 +22,7 @@ class rpc_header;
 class zmq_channel : public ichannel {
  public:
   zmq_channel(uint64 router_index, const std::string& sender);
+  explicit zmq_channel(const std::string& endpoint);
 
  public:
   virtual void request(

@@ -25,7 +25,8 @@
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/zmq_utils.hpp>
 
-namespace rpcz {
+#if 0
+namespace rpcz_XXX {
 
 dealer_connection::dealer_connection(const std::string& endpoint)
     : manager_(manager::get()) {
@@ -52,3 +53,4 @@ void dealer_connection::send_request(
 }
 
 }  // namespace rpcz
+#endif

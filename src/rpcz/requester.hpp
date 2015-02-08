@@ -42,7 +42,7 @@ class dealer_connection;
 
 class RPCZ_API requester : public ichannel {
  public:
-  explicit requester(const dealer_connection& conn);
+  explicit requester(const channel_ptr& channel);
   ~requester();
 
  public:
@@ -71,7 +71,7 @@ class RPCZ_API requester : public ichannel {
   //                         rpc_controller* rpc_controller,
   //                         closure* done) = 0;
 
-  static channel_ptr make_shared(const dealer_connection& conn);
+  static channel_ptr make_shared(const channel_ptr& channel);
 
   // Creates an requester to the given endpoint.
   static channel_ptr make_shared(const std::string& endpoint);
@@ -86,8 +86,7 @@ class RPCZ_API requester : public ichannel {
       const std::string& error_message="") {};
 
  private:
-  // Use ptr to hide dealer_connection.hpp
-  boost::shared_ptr<dealer_connection> dealer_conn_;
+  channel_ptr channel_;
 };  // class requester
 
 }  // namespace rpcz

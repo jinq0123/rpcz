@@ -25,6 +25,25 @@ zmq_channel::zmq_channel(uint64 router_index,
   BOOST_ASSERT(manager_);
 };
 
+// XXX block? exception?
+static uint64 connect(const std::string& endpoint) {
+  zmq::socket_t& socket = manager::get()->get_frontend_socket();
+  send_empty_message(&socket, ZMQ_SNDMORE);
+  send_char(&socket, c2b::kConnect, ZMQ_SNDMORE);
+  send_string(&socket, endpoint, 0);
+  zmq::message_t msg;
+  socket.recv(&msg);
+  socket.recv(&msg);
+  return interpret_message<uint64>(msg);
+}
+
+zmq_channel::zmq_channel(const std::string& endpoint)
+    : manager_(manager::get()),
+      is_router_(false),
+      index_(connect(endpoint)) {
+  BOOST_ASSERT(manager_);
+}
+
 // XXX make them non-virtual and const
 
 void zmq_channel::request(

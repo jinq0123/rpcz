@@ -22,7 +22,8 @@
 #include <rpcz/common.hpp>
 #include <rpcz/manager_ptr.hpp>
 
-namespace rpcz {
+#if 0
+namespace rpcz_XXX {
 class message_vector;
 class rpc_controller;
 
@@ -47,5 +48,5 @@ class dealer_connection {
 };
 
 }  // namespace rpcz
-
+#endif
 #endif  // RPCZ_CONNECTION_H

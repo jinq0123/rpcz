@@ -27,11 +27,12 @@
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/sync_call_handler.hpp>
 #include <rpcz/zmq_utils.hpp>  // for string_to_message()
+#include "zmq_channel.hpp"  // XXX
 
 namespace rpcz {
 
-requester::requester(const dealer_connection& conn)
-    : dealer_conn_(new dealer_connection(conn)) {  // shared_ptr
+requester::requester(const channel_ptr& channel)
+    : channel_(channel) {  // copy
 }
 
 requester::~requester() {
@@ -143,12 +144,16 @@ void requester::request(
   dealer_conn_->send_request(msg_vector, ctrl);
 }
 
-channel_ptr requester::make_shared(const dealer_connection& conn) {
-  return boost::make_shared<requester>(conn);
+channel_ptr requester::make_shared(const channel_ptr& channel) {
+  BOOST_ASSERT(channel);
+  return boost::make_shared<requester>(channel);
 }
 
+// XXX Zmq_channel::connect(endpoint) to create a channel
+
 channel_ptr requester::make_shared(const std::string& endpoint) {
-  return make_shared(dealer_connection(endpoint));
+  return boost::make_shared<requester>(
+      boost::make_shared<zmq_channel>(endpoint));
 }
 
 }  // namespace rpcz
