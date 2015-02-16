@@ -5,7 +5,8 @@
 
 #include <map>
 #include <rpcz/common.hpp>  // for uint64
-#include <rpcz/connection_ptr.hpp>
+// XXX #include <rpcz/connection_ptr.hpp>
+#include <rpcz/connection.hpp>
 
 namespace rpcz {
 
@@ -35,7 +36,10 @@ class request_handler {
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
-  connection_ptr conn_;
+  // XXX Use connection_ptr instead of connection_info_ptr
+  //     after deletion on disconnection is implemented.
+  // XXX connection_ptr conn_;
+  connection_info_ptr conn_info_;
 };
 
 }  // namespace rpcz

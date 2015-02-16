@@ -11,15 +11,20 @@
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator
 #include <rpcz/connection.hpp>
+#include <rpcz/connection_info.hpp>
 
 namespace rpcz {
 
 // XXX should ctr from conn ptr
 // XXX use dealer conn
 request_handler::request_handler(uint64 router_index,
-                                 const std::string& sender)
-    : conn_(new connection(router_index, sender)) {  // shared_ptr
+                                 const std::string& sender) {
+  conn_info_.reset(new connection_info);
+  conn_info_->is_router = true;
+  conn_info_->index = router_index;
+  conn_info_->sender = sender;
 }
+// XXX : conn_(new connection(router_index, sender)) {  // shared_ptr
 
 request_handler::~request_handler() {
   // Delete proto_rpc_service pointers.
@@ -34,7 +39,8 @@ void request_handler::handle_request(message_iterator& iter) {
   std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
   if (!iter.has_more()) return;
   rpc_header rpc_hdr;
-  replier rep(conn_, event_id);
+  connection_ptr conn(new connection(conn_info_));  // shared_ptr
+  replier rep(conn, event_id);
   zmq::message_t& msg = iter.next();
   if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
     // Handle bad rpc.

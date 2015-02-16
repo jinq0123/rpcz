@@ -28,11 +28,16 @@ class manager;
 class message_vector;
 class rpc_controller;
 class rpc_header;
+struct connection_info;
+
+typedef boost::shared_ptr<connection_info> connection_info_ptr;
 
 class RPCZ_API connection {
  public:
   connection(uint64 router_index, const std::string& sender);
   explicit connection(const std::string& endpoint);
+  explicit connection(const connection_info_ptr& info);
+  ~connection();
 
  public:
   void request(
@@ -68,10 +73,13 @@ class RPCZ_API connection {
   void reply(const std::string& event_id, message_vector& data) const;
 
  private:
+  void init(bool is_router, uint64 index, const std::string& sender="");
+  void init_dealer(const std::string& endpoint);
+  void init_router(uint64 router_index, const std::string& sender);
+
+ private:
   boost::shared_ptr<manager> manager_;  // connection need worker threads
-  const bool is_router_;  // ZMQ_ROUTER or ZMQ_DEALER
-  const uint64 index_;  // router or dealer index
-  const std::string sender_;  // Zmq sender id. Empty for dealer type.
+  connection_info_ptr info_;
 };
 
 }  // namespace rpcz

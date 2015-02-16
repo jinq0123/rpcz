@@ -81,7 +81,8 @@ class server_test : public ::testing::Test {
     service_.reset();
     connection_.reset();
 
-    EXPECT_TRUE(manager::is_destroyed());
+    while (!manager::is_destroyed())
+        ;
     context_.reset();
   }
 

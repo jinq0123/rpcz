@@ -6,24 +6,16 @@
 
 #include <zmq.hpp>
 
+#include <rpcz/connection_info.hpp>
 #include <rpcz/internal_commands.hpp>
-#include <rpcz/manager.hpp>
-#include <rpcz/zmq_utils.hpp>
-#include <rpcz/rpcz.pb.h>  // for rpc_header
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/logging.hpp>  // for CHECK()
+#include <rpcz/manager.hpp>
 #include <rpcz/rpc_controller.hpp>
+#include <rpcz/rpcz.pb.h>  // for rpc_header
+#include <rpcz/zmq_utils.hpp>
 
 namespace rpcz {
-
-connection::connection(uint64 router_index,
-                         const std::string& sender)
-    : manager_(manager::get()),
-      is_router_(true),
-      index_(router_index),
-      sender_(sender) {
-  BOOST_ASSERT(manager_);
-};
 
 // XXX block? exception?
 static uint64 connect(const std::string& endpoint) {
@@ -39,11 +31,25 @@ static uint64 connect(const std::string& endpoint) {
   return interpret_message<uint64>(msg);
 }
 
-connection::connection(const std::string& endpoint)
+connection::connection(uint64 router_index,
+                       const std::string& sender) {
+  init_router(router_index, sender);
+  BOOST_ASSERT(manager_ && info_);
+};
+
+connection::connection(const std::string& endpoint) {
+  init_dealer(endpoint);
+  BOOST_ASSERT(manager_ && info_);
+}
+
+connection::connection(const connection_info_ptr& info)
     : manager_(manager::get()),
-      is_router_(false),
-      index_(connect(endpoint)) {
+      info_(info) {
+  BOOST_ASSERT(info);
   BOOST_ASSERT(manager_);
+}
+
+connection::~connection() {
 }
 
 void connection::request(
@@ -125,7 +131,7 @@ void connection::request(
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kRequest, ZMQ_SNDMORE);
-  send_uint64(&socket, index_, ZMQ_SNDMORE);
+  send_uint64(&socket, info_->index, ZMQ_SNDMORE);
   // XXX need sender for router... store in controller?
   send_pointer(&socket, ctrl, ZMQ_SNDMORE);
   write_vector_to_socket(&socket, data);
@@ -152,12 +158,32 @@ void connection::reply(const std::string& event_id,
   zmq::socket_t& socket = manager_->get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
-  send_uint64(&socket, index_, ZMQ_SNDMORE);
+  const connection_info& info = *info_;
+  send_uint64(&socket, info.index, ZMQ_SNDMORE);
   // XXX reply to dealer...
-  send_string(&socket, sender_, ZMQ_SNDMORE);
+  send_string(&socket, info.sender, ZMQ_SNDMORE);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_string(&socket, event_id, ZMQ_SNDMORE);
   write_vector_to_socket(&socket, data);
+}
+
+void connection::init(bool is_router,
+    uint64 index, const std::string& sender/*=""*/) {
+  manager_ = manager::get();
+  info_.reset(new connection_info);
+  info_->is_router = is_router;
+  info_->index = index;
+  info_->sender = sender;
+}
+
+
+void connection::init_dealer(const std::string& endpoint) {
+  uint64 dealer_index = connect(endpoint);
+  init(false/*is_router*/, dealer_index);
+}
+
+void connection::init_router(uint64 router_index, const std::string& sender) {
+  init(true/*is_router*/, router_index, sender);
 }
 
 }  // namespace rpcz

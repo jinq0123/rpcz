@@ -132,7 +132,8 @@ class server_test : public ::testing::Test {
     frontend_connection_.reset();
     backend_connection_.reset();
 
-    EXPECT_TRUE(manager::is_destroyed());
+    while (!manager::is_destroyed())
+        ;
     context_.reset();
   }
 
