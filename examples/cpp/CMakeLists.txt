@@ -27,3 +27,5 @@ set_property(TARGET sync_client      PROPERTY FOLDER "Examples")
 set_property(TARGET async_client     PROPERTY FOLDER "Examples")
 set_property(TARGET example_server   PROPERTY FOLDER "Examples")
 set_property(TARGET async_client_adv PROPERTY FOLDER "Examples")
+
+add_subdirectory(full_duplex)

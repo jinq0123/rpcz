@@ -58,6 +58,9 @@ class RPCZ_API replier {
     conn_->reply_error(event_id_, error_code, error_message);
   }
 
+ public:
+  connection_ptr get_connection_ptr() const { return conn_; }
+
 private:
   const connection_ptr conn_;
   const std::string event_id_;

@@ -220,6 +220,7 @@ void broker_thread::handle_router_socket(uint64 router_index,
   message_iterator iter(*router_sockets_[router_index]);
   std::string sender(message_to_string(iter.next()));
   if (iter.next().size() != 0) return;
+  // XXX request_handler_manager_ is binded to router. Rename it to router_handler_manager?
   request_handler* handler = request_handler_manager_
       .get_handler(sender, *factories, router_index);
   assert(NULL != handler);
