@@ -48,7 +48,6 @@ class delegate_resonder {
 
 class SearchServiceImpl : public SearchService {
  public:
-  // Will take ownership of backend.
   SearchServiceImpl(connection_ptr backend)
       : backend_(backend), 
         manager_(manager::get()) {
