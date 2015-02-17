@@ -61,7 +61,7 @@ manager::manager()
   frontend_socket->bind(frontend_endpoint_.c_str());
   int nthreads = options.get_worker_threads();
   assert(nthreads > 0);
-  // XXX delete workers and rename broker_thread to worker_thread...
+  // XXX delete workers and rename broker_thread to worker_thread
   for (int i = 0; i < nthreads; ++i) {
     worker_threads_.add_thread(new boost::thread(worker_thread_fun,
         boost::ref(*context_), frontend_endpoint_));
