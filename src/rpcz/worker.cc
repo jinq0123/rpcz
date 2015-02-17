@@ -96,7 +96,16 @@ void worker::handle_dealer_data(message_iterator& iter) {
 }
 
 void worker::handle_timeout(message_iterator& iter) {
-    // XXX
+  uint64 event_id = interpret_message<uint64>(iter.next());
+  // XXX
+  //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
+  //if (response_iter == remote_response_map_.end()) {
+  //  return;
+  //}
+  //rpc_controller* ctrl = response_iter->second;
+  //BOOST_ASSERT(ctrl);
+  //ctrl->set_timeout_expired();  XXX ->timeout()
+  //remote_response_map_.erase(response_iter);
 }
 
 }  // namespace rpcz

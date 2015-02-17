@@ -250,19 +250,11 @@ void broker_thread::handle_dealer_socket(zmq::socket_t* socket) {
 }
 
 void broker_thread::handle_timeout(uint64 event_id) {
-  // XXX
-  //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
-  //if (response_iter == remote_response_map_.end()) {
-  //  return;
-  //}
-  //rpc_controller* ctrl = response_iter->second;
-  //BOOST_ASSERT(ctrl);
-  //ctrl->set_timeout_expired();
   begin_worker_command(b2w::kHandleTimeout);
   send_uint64(frontend_socket_, event_id, 0);
-  //remote_response_map_.erase(response_iter);
 }
 
+// XXX move into worker function.
 inline void broker_thread::send_request(message_iterator& iter) {
   uint64 dealer_index = interpret_message<uint64>(iter.next());
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
