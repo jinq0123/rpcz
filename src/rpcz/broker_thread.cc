@@ -260,7 +260,7 @@ inline void broker_thread::send_request(message_iterator& iter) {
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
-  uint64 event_id = event_id_generator_.get_next();
+  uint64 event_id = 0;  // event_id_generator_.get_next();  // XXX
   remote_response_map_[event_id] = ctrl;
   int64 timeout_ms = ctrl->get_timeout_ms();
   if (-1 != timeout_ms) {
@@ -272,6 +272,7 @@ inline void broker_thread::send_request(message_iterator& iter) {
   BOOST_ASSERT(socket);
   send_string(socket, "", ZMQ_SNDMORE);
   send_uint64(socket, event_id, ZMQ_SNDMORE);
+  // XXX no event_id
   forward_messages(iter, *socket);
 }
 

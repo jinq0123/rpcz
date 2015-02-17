@@ -19,6 +19,7 @@
 #define RPCZ_EVENT_ID_GENERATOR_H
 
 #include <boost/noncopyable.hpp>
+#include <boost/thread.hpp>  // for mutex
 #include <rpcz/common.hpp>
 
 namespace rpcz {
@@ -28,17 +29,20 @@ namespace detail {
 const uint64 kLargePrime = (1ULL << 63) - 165;
 const uint64 kGenerator = 2;
 
+// thread-safe.  XXX change it to atomic_uint64...
 class event_id_generator : boost::noncopyable {
  public:
   event_id_generator();
 
   inline uint64 get_next() {
+    boost::unique_lock<boost::mutex> lock(mu_);
     state_ = (state_ * kGenerator) % kLargePrime;
     return state_;
   }
 
  private:
   uint64 state_;
+  boost::mutex mu_;
 };  // class event_id_generator
 
 }  // namespace detail

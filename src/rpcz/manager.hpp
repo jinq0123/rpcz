@@ -25,6 +25,7 @@
 #include <boost/weak_ptr.hpp>
 
 #include <rpcz/common.hpp>
+#include <rpcz/event_id_generator.hpp>
 #include <rpcz/manager_ptr.hpp>
 
 namespace zmq {
@@ -71,6 +72,7 @@ class manager : boost::noncopyable {
  public:
   // Get thread specific frontend socket.
   inline zmq::socket_t& get_frontend_socket();
+  inline uint64 get_next_event_id() { return event_id_generator_.get_next(); }
 
  private:
   zmq::socket_t& new_frontend_socket();
@@ -94,6 +96,7 @@ class manager : boost::noncopyable {
   std::string frontend_endpoint_;
   scoped_ptr<sync_event> is_terminating_;
   scoped_ptr<worker> worker_;
+  detail::event_id_generator event_id_generator_;
 };  // class manager
 
 manager_ptr manager::get() {

@@ -59,6 +59,8 @@ void connection::request(
     long timeout_ms) const {
   rpc_header rpc_hdr;
   rpc_request_header* req_hdr = rpc_hdr.mutable_req_hdr();
+  uint64 event_id = manager_->get_next_event_id();
+  req_hdr->set_event_id(event_id);
   req_hdr->set_service(method.service()->name());
   req_hdr->set_method(method.name());
 
@@ -81,6 +83,7 @@ void connection::request(
   // rpc_controller deleted in worker_thread_fun().
   // XXX delete on timeout.
   rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
+  // XXX manager_-> insert_event( event_id, ctrl)....
   request(msg_vector, ctrl);
 }
 

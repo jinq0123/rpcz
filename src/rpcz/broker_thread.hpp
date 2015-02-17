@@ -22,7 +22,6 @@
 #include <map>
 #include <vector>
 
-#include <rpcz/event_id_generator.hpp>
 #include <rpcz/reactor.hpp>
 #include <rpcz/request_handler_manager.hpp>
 #include <rpcz/service_factory_map.hpp>
@@ -87,7 +86,6 @@ class broker_thread {
   typedef std::map<uint64/*event_id*/, rpc_controller*>
       remote_response_map;
   remote_response_map remote_response_map_;
-  detail::event_id_generator event_id_generator_;
   reactor reactor_;
   std::vector<zmq::socket_t*> dealer_sockets_;  // of client.
   std::vector<zmq::socket_t*> router_sockets_;  // of server.
