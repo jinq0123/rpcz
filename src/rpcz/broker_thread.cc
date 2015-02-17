@@ -213,6 +213,8 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
     send_empty_message(frontend_socket_, 0);
 }
 
+// XXX Merge handle_router_socket() and handle_dealer_socket()
+
 void broker_thread::handle_router_socket(uint64 router_index,
     const service_factory_map* factories) {
   assert(NULL != factories);
