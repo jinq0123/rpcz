@@ -36,6 +36,7 @@ class socket_t;
 namespace rpcz {
 class closure;
 class sync_event;
+class worker;
 
 // A manager is a multi-threaded asynchronous system for communication over ZeroMQ sockets.
 // manager is thread-safe.
@@ -92,6 +93,7 @@ class manager : boost::noncopyable {
   boost::thread_specific_ptr<zmq::socket_t> socket_;
   std::string frontend_endpoint_;
   scoped_ptr<sync_event> is_terminating_;
+  scoped_ptr<worker> worker_;
 };  // class manager
 
 manager_ptr manager::get() {

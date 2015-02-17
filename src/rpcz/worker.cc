@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +16,7 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#include <rpcz/worker_thread_fun.hpp>
+#include <rpcz/worker.hpp>
 
 #include <zmq.hpp>
 
@@ -28,10 +29,18 @@
 
 namespace rpcz {
 
-void worker_thread_fun(zmq::context_t& context,
-                       const std::string& endpoint) {
-  zmq::socket_t socket(context, ZMQ_DEALER);
-  socket.connect(endpoint.c_str());
+worker::worker(const std::string& frontend_endpoint,
+               zmq::context_t& context)
+    : frontend_endpoint_(frontend_endpoint),
+      context_(context) {
+}
+
+worker::~worker() {
+}
+
+void worker::operator()() {
+  zmq::socket_t socket(context_, ZMQ_DEALER);
+  socket.connect(frontend_endpoint_.c_str());
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kWorkerReady);
   bool should_continue = true;
@@ -54,7 +63,7 @@ void worker_thread_fun(zmq::context_t& context,
         //assert(handler);
         //handler->handle_request(iter);
         }
-        handleRouterData(iter);
+        handle_router_data(iter);
         break;
       case kHandleDealerData: {
           // XXX
@@ -64,10 +73,10 @@ void worker_thread_fun(zmq::context_t& context,
         //ctrl->handle_response(iter);
         //delete ctrl;
         }
-        handleDealerData(iter);
+        handle_dealer_data(iter);
         break;
       case kHandleTimeout:
-        handleTimeout(iter);
+        handle_timeout(iter);
         break;
       default:
         CHECK(false);
@@ -76,6 +85,18 @@ void worker_thread_fun(zmq::context_t& context,
   } while (should_continue);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kWorkerDone);
+}
+
+void worker::handle_router_data(message_iterator& iter) {
+    // XXX
+}
+
+void worker::handle_dealer_data(message_iterator& iter) {
+    // XXX
+}
+
+void worker::handle_timeout(message_iterator& iter) {
+    // XXX
 }
 
 }  // namespace rpcz

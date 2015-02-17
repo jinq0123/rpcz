@@ -31,7 +31,7 @@
 #include <rpcz/internal_commands.hpp>  // for kConnect
 #include <rpcz/logging.hpp>
 #include <rpcz/sync_event.hpp>
-#include <rpcz/worker_thread_fun.hpp>  // for worker_thread_fun
+#include <rpcz/worker.hpp>  // for worker
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message
 
 namespace rpcz {
@@ -41,7 +41,7 @@ boost::mutex manager::this_weak_ptr_mutex_;
 
 manager::manager()
   : context_(NULL),
-    is_terminating_(new sync_event) { // scoped_ptr
+    is_terminating_(new sync_event) {  // scoped_ptr
   DLOG(INFO) << "manager() ";
   frontend_endpoint_ = "inproc://" + boost::lexical_cast<std::string>(this)
       + ".rpcz.manager.frontend";
@@ -61,10 +61,10 @@ manager::manager()
   frontend_socket->bind(frontend_endpoint_.c_str());
   int nthreads = options.get_worker_threads();
   assert(nthreads > 0);
-  // XXX delete workers and rename broker_thread to worker_thread...master
+  worker_.reset(new worker(frontend_endpoint_, *context_));
   for (int i = 0; i < nthreads; ++i) {
-    worker_threads_.add_thread(new boost::thread(worker_thread_fun,
-        boost::ref(*context_), frontend_endpoint_));
+    worker_threads_.add_thread(new boost::thread(
+        boost::ref(*worker_)));
   }
   sync_event event;
   broker_thread_ = boost::thread(&broker_thread::run,
