@@ -1,7 +1,7 @@
 package rpcz;
 
 message rpc_request_header {
-  // optional int64 OBSOLETE_event_id = 1;
+  optional uint64 event_id = 1;  // One-way request has no event id.
   // optional int32 OBSOLETE_deadline = 2;
   optional string service = 3;
   optional string method = 4;
@@ -19,9 +19,9 @@ message rpc_response_header {
   // optional status_code OBSOLETE_status = 1 [default = OK];
   optional int32 error_code = 2;  // application_error_code and other code
   optional string error_str = 3;
+  optional uint64 event_id = 4;
 }
 
-// event_id is before rpc_header.
 // req or resp is after rpc_header.
 message rpc_header {
   optional rpc_request_header req_hdr = 5;

@@ -29,7 +29,9 @@
 namespace rpcz {
 
 broker_thread::broker_thread(
-    zmq::context_t& context, int nthreads, sync_event* ready_event,
+    zmq::context_t& context,
+    int nthreads,
+    sync_event* ready_event,
     zmq::socket_t* frontend_socket)
     : context_(context),
       frontend_socket_(frontend_socket),
@@ -147,16 +149,12 @@ void broker_thread::handle_connect_command(
 void broker_thread::handle_bind_command(
     const std::string& sender, message_iterator& iter) {
   std::string endpoint(message_to_string(iter.next()));
-  const service_factory_map* factories
-      = interpret_message<const service_factory_map*>(iter.next());
-  assert(factories);
-  handle_bind_command(sender, endpoint, *factories);
+  handle_bind_command(sender, endpoint);
 }
 
 void broker_thread::handle_bind_command(
     const std::string& sender,
-    const std::string& endpoint,
-    const service_factory_map& factories) {
+    const std::string& endpoint) {
   zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
@@ -167,8 +165,7 @@ void broker_thread::handle_bind_command(
   bind_map_[endpoint] = socket;  // for unbind
   // reactor will own socket and callback.
   reactor_.add_socket(socket, new_permanent_callback(
-      this, &broker_thread::handle_router_socket,
-      router_index, &factories));
+      this, &broker_thread::handle_router_socket, router_index));
 
   send_string(frontend_socket_, sender, ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
@@ -213,21 +210,19 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
     send_empty_message(frontend_socket_, 0);
 }
 
-// XXX Merge handle_router_socket() and handle_dealer_socket()
-
-void broker_thread::handle_router_socket(uint64 router_index,
-    const service_factory_map* factories) {
-  assert(NULL != factories);
+void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
-  std::string sender(message_to_string(iter.next()));
-  if (iter.next().size() != 0) return;
-  // XXX request_handler_manager_ is binded to router. Rename it to router_handler_manager?
-  request_handler* handler = request_handler_manager_
-      .get_handler(sender, *factories, router_index);
-  assert(NULL != handler);
-  begin_worker_command(b2w::kHandleRequest);
-  send_pointer(frontend_socket_, handler, ZMQ_SNDMORE);
+
+  // XXX
+  //std::string sender(message_to_string(iter.next()));
+  //if (iter.next().size() != 0) return;
+  //// XXX request_handler_manager_ is binded to router. Rename it to router_handler_manager?
+  //request_handler* handler = request_handler_manager_
+  //    .get_handler(sender, *factories, router_index);
+  //assert(NULL != handler);
+  begin_worker_command(b2w::kHandleRouterData);
+  send_uint64(frontend_socket_, router_index, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
 }
 
@@ -239,30 +234,33 @@ void broker_thread::handle_dealer_socket(zmq::socket_t* socket) {
   if (!iter.has_more()) {
     return;
   }
-  event_id event_id(interpret_message<event_id>(iter.next()));
-  remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
-  if (response_iter == remote_response_map_.end()) {
-    return;
-  }
-  const rpc_controller* ctrl = response_iter->second;
-  BOOST_ASSERT(ctrl);
-  begin_worker_command(b2w::kHandleResponse);
-  send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
+  // XXX no event id ...
+  //event_id event_id(interpret_message<event_id>(iter.next()));
+  //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
+  //if (response_iter == remote_response_map_.end()) {
+  //  return;
+  //}
+  //const rpc_controller* ctrl = response_iter->second;
+  //BOOST_ASSERT(ctrl);
+  begin_worker_command(b2w::kHandleDealerData);
+  //send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
-  remote_response_map_.erase(response_iter);
+  //remote_response_map_.erase(response_iter);
+  // XXX move remote_response_map_ to manager and make it thread-safe
 }
 
-void broker_thread::handle_timeout(event_id event_id) {
-  remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
-  if (response_iter == remote_response_map_.end()) {
-    return;
-  }
-  rpc_controller* ctrl = response_iter->second;
-  BOOST_ASSERT(ctrl);
-  ctrl->set_timeout_expired();
-  begin_worker_command(b2w::kHandleResponse);
-  send_pointer(frontend_socket_, ctrl, 0);
-  remote_response_map_.erase(response_iter);
+void broker_thread::handle_timeout(uint64 event_id) {
+  // XXX
+  //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
+  //if (response_iter == remote_response_map_.end()) {
+  //  return;
+  //}
+  //rpc_controller* ctrl = response_iter->second;
+  //BOOST_ASSERT(ctrl);
+  //ctrl->set_timeout_expired();
+  begin_worker_command(b2w::kHandleTimeout);
+  send_uint64(frontend_socket_, event_id, 0);
+  //remote_response_map_.erase(response_iter);
 }
 
 inline void broker_thread::send_request(message_iterator& iter) {
@@ -270,7 +268,7 @@ inline void broker_thread::send_request(message_iterator& iter) {
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
-  event_id event_id = event_id_generator_.get_next();
+  uint64 event_id = event_id_generator_.get_next();
   remote_response_map_[event_id] = ctrl;
   int64 timeout_ms = ctrl->get_timeout_ms();
   if (-1 != timeout_ms) {

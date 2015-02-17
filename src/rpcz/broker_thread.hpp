@@ -60,8 +60,7 @@ class broker_thread {
       message_iterator& iter);
   void handle_bind_command(
       const std::string& sender,
-      const std::string& endpoint,
-      const service_factory_map& factories);
+      const std::string& endpoint);
   void handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint);
@@ -71,10 +70,9 @@ class broker_thread {
  private:
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
-  void handle_router_socket(uint64 router_index,
-      const service_factory_map* factories);  // TODO: use reference instead of pointer
+  void handle_router_socket(uint64 router_index);
   void handle_dealer_socket(zmq::socket_t* socket);
-  void handle_timeout(event_id event_id);
+  void handle_timeout(uint64 event_id);
 
  private:
   inline void add_closure(closure* closure);
@@ -86,7 +84,7 @@ class broker_thread {
   bool is_router_index_legal(uint64 router_index) const;
 
  private:
-  typedef std::map<event_id, rpc_controller*>
+  typedef std::map<uint64/*event_id*/, rpc_controller*>
       remote_response_map;
   remote_response_map remote_response_map_;
   detail::event_id_generator event_id_generator_;

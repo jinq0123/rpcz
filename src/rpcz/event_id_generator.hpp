@@ -23,8 +23,6 @@
 
 namespace rpcz {
 
-typedef uint64 event_id;
-
 namespace detail {
 
 const uint64 kLargePrime = (1ULL << 63) - 165;
@@ -34,7 +32,7 @@ class event_id_generator : boost::noncopyable {
  public:
   event_id_generator();
 
-  inline event_id get_next() {
+  inline uint64 get_next() {
     state_ = (state_ * kGenerator) % kLargePrime;
     return state_;
   }

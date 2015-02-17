@@ -197,8 +197,7 @@ TEST_F(manager_test, TestUnbind) {
   ASSERT_TRUE(manager::is_destroyed());
   manager_ptr mgr = manager::get();
   const char kEndpoint[] = "inproc://server.point";
-  service_factory_map m;
-  mgr->bind(kEndpoint, m);
+  mgr->bind(kEndpoint);
   mgr->unbind(kEndpoint);
 }
 

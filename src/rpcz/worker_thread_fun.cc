@@ -47,20 +47,25 @@ void worker_thread_fun(zmq::context_t& context,
       case kRunClosure:
         interpret_message<closure*>(iter.next())->run();
         break;
-      case kHandleRequest: {
-        request_handler* handler =
-            interpret_message<request_handler*>(iter.next());
-        assert(handler);
-        handler->handle_request(iter);
+      case kHandleRouterData: {
+          // XXX
+        //request_handler* handler =
+        //    interpret_message<request_handler*>(iter.next());
+        //assert(handler);
+        //handler->handle_request(iter);
         }
         break;
-      case kHandleResponse: {
-        rpc_controller* ctrl =
-            interpret_message<rpc_controller*>(iter.next());
-        BOOST_ASSERT(ctrl);
-        ctrl->handle_response(iter);
-        delete ctrl;
+      case kHandleDealerData: {
+          // XXX
+        //rpc_controller* ctrl =
+        //    interpret_message<rpc_controller*>(iter.next());
+        //BOOST_ASSERT(ctrl);
+        //ctrl->handle_response(iter);
+        //delete ctrl;
         }
+        break;
+      case kHandleTimeout:
+        // XXX
         break;
       default:
         CHECK(false);
