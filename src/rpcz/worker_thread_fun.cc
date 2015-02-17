@@ -54,6 +54,7 @@ void worker_thread_fun(zmq::context_t& context,
         //assert(handler);
         //handler->handle_request(iter);
         }
+        handleRouterData(iter);
         break;
       case kHandleDealerData: {
           // XXX
@@ -63,9 +64,10 @@ void worker_thread_fun(zmq::context_t& context,
         //ctrl->handle_response(iter);
         //delete ctrl;
         }
+        handleDealerData(iter);
         break;
       case kHandleTimeout:
-        // XXX
+        handleTimeout(iter);
         break;
       default:
         CHECK(false);
