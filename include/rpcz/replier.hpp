@@ -20,6 +20,7 @@
 #define RPCZ_REPLIER_HPP
 
 #include <string>
+#include <rpcz/common.hpp>  // for uint64
 #include <rpcz/connection.hpp>  // for reply()
 #include <rpcz/connection_ptr.hpp>
 #include <rpcz/rpcz_api.hpp>
@@ -39,7 +40,7 @@ namespace rpcz {
 // XXX More comments...
 class RPCZ_API replier {
  public:
-  replier(const connection_ptr& conn, const std::string& event_id)
+  replier(const connection_ptr& conn, uint64 event_id)
       : conn_(conn), event_id_(event_id) {
     BOOST_ASSERT(conn);
   }
@@ -63,7 +64,7 @@ class RPCZ_API replier {
 
 private:
   const connection_ptr conn_;
-  const std::string event_id_;
+  const uint64 event_id_;
 };  // class replier
 
 }  // namespace rpcz

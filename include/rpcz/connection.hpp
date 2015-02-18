@@ -8,8 +8,8 @@
 #include <boost/shared_ptr.hpp>
 
 #include <rpcz/common.hpp>
-#include <rpcz/rpcz_api.hpp>
 #include <rpcz/response_message_handler.hpp>
+#include <rpcz/rpcz_api.hpp>
 
 namespace google {
 namespace protobuf {
@@ -47,12 +47,9 @@ class RPCZ_API connection {
       long timeout_ms) const;
 
  public:
-     // XXXX use uint64 event_id
-  void reply(const std::string& event_id,
+  void reply(uint64 event_id,
       const google::protobuf::Message& resp) const;
-  void reply_error(
-      const std::string& event_id,
-      int error_code,
+  void reply_error(uint64 event_id, int error_code,
       const std::string& error_message="") const;
 
  private:

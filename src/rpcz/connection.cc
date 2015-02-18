@@ -86,9 +86,7 @@ void connection::request(
   request(msg_vector, ctrl);
 }
 
-// XXX change event_id to int64
-
-void connection::reply(const std::string& event_id,
+void connection::reply(uint64 event_id,
     const google::protobuf::Message& resp) const {
   int msg_size = resp.ByteSize();
   scoped_ptr<zmq::message_t> payload(new zmq::message_t(msg_size));
@@ -98,7 +96,7 @@ void connection::reply(const std::string& event_id,
   rpc_header rpc_hdr;
   rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(resp_hdr);
-  resp_hdr->set_event_id(0);  // XXXX event_id);
+  resp_hdr->set_event_id(event_id);
   BOOST_ASSERT(rpc_hdr.has_resp_hdr());
   BOOST_ASSERT(!rpc_hdr.has_req_hdr());
   reply(rpc_hdr, payload.release());
@@ -113,14 +111,13 @@ void connection::reply(const std::string& event_id,
 //}
 
 void connection::reply_error(
-    const std::string& event_id,
-    int error_code,
+    uint64 event_id, int error_code,
     const std::string& error_message/* = "" */) const {
   rpc_header rpc_hdr;
   rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(resp_hdr);
   zmq::message_t* payload = new zmq::message_t();
-  resp_hdr->set_event_id(0);  // XXXX event_id);
+  resp_hdr->set_event_id(event_id);
   resp_hdr->set_error_code(error_code);
   if (!error_message.empty()) {
     resp_hdr->set_error_str(error_message);

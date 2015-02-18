@@ -36,7 +36,7 @@ request_handler::~request_handler() {
 
 void request_handler::handle_request(message_iterator& iter) {
   if (!iter.has_more()) return;
-  std::string event_id(message_to_string(iter.next()));  // TODO: uint64 event_id?
+  uint64 event_id(interpret_message<uint64>(iter.next()));
   if (!iter.has_more()) return;
   rpc_header rpc_hdr;
   connection_ptr conn(new connection(conn_info_));  // shared_ptr
