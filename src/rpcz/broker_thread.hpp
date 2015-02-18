@@ -75,8 +75,8 @@ class broker_thread {
 
  private:
   inline void add_closure(closure* closure);
-  inline void send_request(message_iterator& iter);
-  inline void send_reply(message_iterator& iter);
+  inline void send_request(zmq::socket_t* frontend_socket);
+  inline void send_reply(zmq::socket_t* frontend_socket);
 
  private:
   bool is_dealer_index_legal(uint64 dealer_index) const;

@@ -7,6 +7,7 @@
 
 #include <zmq.hpp>
 #include <rpcz/connection_info.hpp>
+#include <rpcz/zmq_utils.hpp>  // for send_uint64()
 
 namespace rpcz {
 

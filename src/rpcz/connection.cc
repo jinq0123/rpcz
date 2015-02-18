@@ -7,6 +7,7 @@
 #include <zmq.hpp>
 
 #include <rpcz/connection_info.hpp>
+#include <rpcz/connection_info_zmq.hpp>  // for write_connection_info()
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/invalid_message_error.hpp>
 #include <rpcz/logging.hpp>  // for CHECK()
@@ -124,7 +125,6 @@ void connection::reply_error(
   reply(event_id, rpc_hdr, payload);
 }
 
-// XXX request on router conn.
 void connection::request(
     message_vector& data,
     rpc_controller* ctrl) const {
@@ -132,8 +132,7 @@ void connection::request(
   zmq::socket_t* socket = &manager_->get_frontend_socket();
   send_empty_message(socket, ZMQ_SNDMORE);
   send_char(socket, c2b::kRequest, ZMQ_SNDMORE);
-  send_uint64(socket, info_->index, ZMQ_SNDMORE);
-  // XXX need sender for router... store in controller?
+  write_connection_info(socket, *info_, ZMQ_SNDMORE);
   send_pointer(socket, ctrl, ZMQ_SNDMORE);
   write_vector_to_socket(socket, data);
 }
@@ -159,11 +158,7 @@ void connection::reply(const std::string& event_id,
   zmq::socket_t* socket = &manager_->get_frontend_socket();
   send_empty_message(socket, ZMQ_SNDMORE);
   send_char(socket, c2b::kReply, ZMQ_SNDMORE);
-  const connection_info& info = *info_;
-  send_uint64(socket, info.index, ZMQ_SNDMORE);
-  // XXX reply to dealer...
-  send_string(socket, info.sender, ZMQ_SNDMORE);
-  send_empty_message(socket, ZMQ_SNDMORE);
+  write_connection_info(socket, *info_, ZMQ_SNDMORE);
   send_string(socket, event_id, ZMQ_SNDMORE);
   write_vector_to_socket(socket, data);
 }

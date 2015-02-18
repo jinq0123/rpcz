@@ -20,6 +20,7 @@
 
 #include <rpcz/callback.hpp>
 #include <rpcz/clock.hpp>  // for zclock_ms()
+#include <rpcz/connection_info_zmq.hpp>  // for read_connection_info()
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/logging.hpp>
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
@@ -93,10 +94,10 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     // XXX Request from dealer (dealer index)
     // XXX Request from router (router index, sender)
     case kRequest:
-      send_request(iter);
+      send_request(frontend_socket);
       break;
     case kReply:
-      send_reply(iter);
+      send_reply(frontend_socket);
       break;
 
     case kRunClosure:
@@ -266,33 +267,43 @@ void broker_thread::handle_timeout(uint64 event_id) {
 // XXX dealer index -> worker thread index (worker name)
 // XXX (router index, sender) -> worker thread index (worker name)
 
-inline void broker_thread::send_request(message_iterator& iter) {
-  uint64 dealer_index = interpret_message<uint64>(iter.next());
-  BOOST_ASSERT(is_dealer_index_legal(dealer_index));
-  rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
-  BOOST_ASSERT(ctrl);
-  uint64 event_id = ctrl->get_event_id();
-  remote_response_map_[event_id] = ctrl;
+inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
+  BOOST_ASSERT(frontend_socket);
+  connection_info info;
+  read_connection_info(frontend_socket, &info);
 
-  int64 timeout_ms = ctrl->get_timeout_ms();
-  if (-1 != timeout_ms) {
-    // XXX when to delete timeout handler?
-    reactor_.run_closure_at(zclock_ms() + timeout_ms,
-        new_callback(this, &broker_thread::handle_timeout, event_id));
-  }
+  // XXX send request...
+  //uint64 dealer_index = interpret_message<uint64>(iter.next());
+  //BOOST_ASSERT(is_dealer_index_legal(dealer_index));
+  //rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
+  //BOOST_ASSERT(ctrl);
+  //uint64 event_id = ctrl->get_event_id();
+  //remote_response_map_[event_id] = ctrl;
 
-  zmq::socket_t* socket = dealer_sockets_[dealer_index];
-  BOOST_ASSERT(socket);
-  send_string(socket, "", ZMQ_SNDMORE);
-  forward_messages(iter, *socket);
+  //int64 timeout_ms = ctrl->get_timeout_ms();
+  //if (-1 != timeout_ms) {
+  //  // XXX when to delete timeout handler?
+  //  reactor_.run_closure_at(zclock_ms() + timeout_ms,
+  //      new_callback(this, &broker_thread::handle_timeout, event_id));
+  //}
+
+  //zmq::socket_t* socket = dealer_sockets_[dealer_index];
+  //BOOST_ASSERT(socket);
+  //send_string(socket, "", ZMQ_SNDMORE);
+  //forward_messages(iter, *socket);
 }
 
-inline void broker_thread::send_reply(message_iterator& iter) {
-  uint64 router_index = interpret_message<uint64>(iter.next());
-  BOOST_ASSERT(is_router_index_legal(router_index));
-  zmq::socket_t* socket = router_sockets_[router_index];
-  BOOST_ASSERT(socket);
-  forward_messages(iter, *socket);
+inline void broker_thread::send_reply(zmq::socket_t* frontend_socket) {
+  BOOST_ASSERT(frontend_socket);
+  connection_info info;
+  read_connection_info(frontend_socket, &info);
+
+  // XXX send reply...
+  //uint64 router_index = interpret_message<uint64>(iter.next());
+  //BOOST_ASSERT(is_router_index_legal(router_index));
+  //zmq::socket_t* socket = router_sockets_[router_index];
+  //BOOST_ASSERT(socket);
+  //forward_messages(iter, *socket);
 }
 
 bool broker_thread::is_dealer_index_legal(uint64 dealer_index) const {
