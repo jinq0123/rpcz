@@ -70,7 +70,7 @@ class broker_thread {
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
   void handle_router_socket(uint64 router_index);
-  void handle_dealer_socket(zmq::socket_t* socket);
+  void handle_dealer_socket(uint64 dealer_index);
   void handle_timeout(uint64 event_id);
 
  private:
@@ -83,9 +83,6 @@ class broker_thread {
   bool is_router_index_legal(uint64 router_index) const;
 
  private:
-  typedef std::map<uint64/*event_id*/, rpc_controller*>
-      remote_response_map;
-  remote_response_map remote_response_map_;
   reactor reactor_;
   std::vector<zmq::socket_t*> dealer_sockets_;  // of client.
   std::vector<zmq::socket_t*> router_sockets_;  // of server.
@@ -96,6 +93,11 @@ class broker_thread {
   std::vector<std::string> workers_;
   int current_worker_;
   request_handler_manager request_handler_manager_;
+
+  // XXX move map into worker thread, or make it thread-safe...
+  typedef std::map<uint64/*event_id*/, rpc_controller*>
+      remote_response_map;
+  remote_response_map remote_response_map_;
 };
 
 }  // namespace rpcz

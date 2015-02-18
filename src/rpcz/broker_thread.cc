@@ -134,16 +134,16 @@ void broker_thread::handle_connect_command(
   BOOST_ASSERT(!dealer_sockets_.empty());  // idx 0 is reserved
   zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
   dealer_sockets_.push_back(socket);
+  uint64 dealer_index = dealer_sockets_.size() - 1;
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->connect(endpoint.c_str());
   reactor_.add_socket(socket, new_permanent_callback(
-          this, &broker_thread::handle_dealer_socket,
-          socket));
+          this, &broker_thread::handle_dealer_socket, dealer_index));
 
   send_string(frontend_socket_, sender, ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-  send_uint64(frontend_socket_, dealer_sockets_.size() - 1, 0);
+  send_uint64(frontend_socket_, dealer_index, 0);
 }
 
 void broker_thread::handle_bind_command(
@@ -210,6 +210,8 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
     send_empty_message(frontend_socket_, 0);
 }
 
+// XXX merge handle_router_socket() and handle_dealer_socket()
+
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
@@ -226,8 +228,9 @@ void broker_thread::handle_router_socket(uint64 router_index) {
   forward_messages(iter, *frontend_socket_);
 }
 
-void broker_thread::handle_dealer_socket(zmq::socket_t* socket) {
-  message_iterator iter(*socket);
+void broker_thread::handle_dealer_socket(uint64 dealer_index) {
+  BOOST_ASSERT(is_dealer_index_legal(dealer_index));
+  message_iterator iter(*dealer_sockets_[dealer_index]);
   if (iter.next().size() != 0) {
     return;
   }
