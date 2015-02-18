@@ -129,13 +129,13 @@ void connection::request(
     message_vector& data,
     rpc_controller* ctrl) const {
   BOOST_ASSERT(ctrl);
-  zmq::socket_t& socket = manager_->get_frontend_socket();
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, c2b::kRequest, ZMQ_SNDMORE);
-  send_uint64(&socket, info_->index, ZMQ_SNDMORE);
+  zmq::socket_t* socket = &manager_->get_frontend_socket();
+  send_empty_message(socket, ZMQ_SNDMORE);
+  send_char(socket, c2b::kRequest, ZMQ_SNDMORE);
+  send_uint64(socket, info_->index, ZMQ_SNDMORE);
   // XXX need sender for router... store in controller?
-  send_pointer(&socket, ctrl, ZMQ_SNDMORE);
-  write_vector_to_socket(&socket, data);
+  send_pointer(socket, ctrl, ZMQ_SNDMORE);
+  write_vector_to_socket(socket, data);
 }
 
 // Sends rpc header and payload.
@@ -156,16 +156,16 @@ void connection::reply(
 
 void connection::reply(const std::string& event_id,
                        message_vector& data) const {
-  zmq::socket_t& socket = manager_->get_frontend_socket();
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, c2b::kReply, ZMQ_SNDMORE);
+  zmq::socket_t* socket = &manager_->get_frontend_socket();
+  send_empty_message(socket, ZMQ_SNDMORE);
+  send_char(socket, c2b::kReply, ZMQ_SNDMORE);
   const connection_info& info = *info_;
-  send_uint64(&socket, info.index, ZMQ_SNDMORE);
+  send_uint64(socket, info.index, ZMQ_SNDMORE);
   // XXX reply to dealer...
-  send_string(&socket, info.sender, ZMQ_SNDMORE);
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_string(&socket, event_id, ZMQ_SNDMORE);
-  write_vector_to_socket(&socket, data);
+  send_string(socket, info.sender, ZMQ_SNDMORE);
+  send_empty_message(socket, ZMQ_SNDMORE);
+  send_string(socket, event_id, ZMQ_SNDMORE);
+  write_vector_to_socket(socket, data);
 }
 
 void connection::init(bool is_router,

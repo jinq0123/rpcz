@@ -89,12 +89,16 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     case kUnbind:
       handle_unbind_command(sender, message_to_string(iter.next()));
       break;
+
+    // XXX Request from dealer (dealer index)
+    // XXX Request from router (router index, sender)
     case kRequest:
       send_request(iter);
       break;
     case kReply:
       send_reply(iter);
       break;
+
     case kRunClosure:
       add_closure(interpret_message<closure*>(iter.next()));
       break;
@@ -113,6 +117,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   }  // switch
 }
 
+// XXX Use worker name to specify worker thread...
 // command must be broker to worker (b2w) command.
 void broker_thread::begin_worker_command(char command) {
   send_string(frontend_socket_, workers_[current_worker_], ZMQ_SNDMORE);
@@ -256,6 +261,10 @@ void broker_thread::handle_timeout(uint64 event_id) {
   begin_worker_command(b2w::kHandleTimeout);
   send_uint64(frontend_socket_, event_id, 0);
 }
+
+// XXX Map connection to worker thread.
+// XXX dealer index -> worker thread index (worker name)
+// XXX (router index, sender) -> worker thread index (worker name)
 
 inline void broker_thread::send_request(message_iterator& iter) {
   uint64 dealer_index = interpret_message<uint64>(iter.next());
