@@ -257,23 +257,21 @@ void broker_thread::handle_timeout(uint64 event_id) {
 inline void broker_thread::send_request(message_iterator& iter) {
   uint64 dealer_index = interpret_message<uint64>(iter.next());
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
-  //rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
-  //BOOST_ASSERT(ctrl);
-  // DEL remote_response_map_[event_id] = ctrl;
+  rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
+  BOOST_ASSERT(ctrl);
+  uint64 event_id = ctrl->get_event_id();
+  remote_response_map_[event_id] = ctrl;
 
-  // XXX timeout request...
-  //int64 timeout_ms = interpret_message<int64>(iter.next());
-  //if (-1 != timeout_ms) {
-  //  // XXX when to delete timeout handler?
-  //  reactor_.run_closure_at(zclock_ms() + timeout_ms,
-  //      new_callback(this, &broker_thread::handle_timeout, event_id));
-  //}
+  int64 timeout_ms = ctrl->get_timeout_ms();
+  if (-1 != timeout_ms) {
+    // XXX when to delete timeout handler?
+    reactor_.run_closure_at(zclock_ms() + timeout_ms,
+        new_callback(this, &broker_thread::handle_timeout, event_id));
+  }
 
   zmq::socket_t* socket = dealer_sockets_[dealer_index];
   BOOST_ASSERT(socket);
   send_string(socket, "", ZMQ_SNDMORE);
-  // send_uint64(socket, event_id, ZMQ_SNDMORE);
-  // XXX no event_id
   forward_messages(iter, *socket);
 }
 

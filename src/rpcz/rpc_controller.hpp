@@ -31,8 +31,9 @@ class rpc_controller : boost::noncopyable {
   inline ~rpc_controller() {}
 
  public:
+  inline uint64 get_event_id() const { return event_id_; }
   inline long get_timeout_ms() const { return timeout_ms_; }
-  inline void set_timeout_expired() { timeout_expired_ = true; }
+  inline void set_timeout_expired() { timeout_expired_ = true; }  // DEL?
 
  public:
   // Not inlined to inline all other private handlers in .cc file.
