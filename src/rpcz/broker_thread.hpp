@@ -31,6 +31,7 @@ namespace rpcz {
 class message_iterator;
 class rpc_controller;
 class sync_event;
+struct connection_info;
 
 // Client and server use the same broker_thread.
 class broker_thread {
@@ -81,6 +82,12 @@ class broker_thread {
  private:
   bool is_dealer_index_legal(uint64 dealer_index) const;
   bool is_router_index_legal(uint64 router_index) const;
+  bool is_connection_info_legal(const connection_info& info) const;
+
+ private:
+  inline void forward_to(
+      const connection_info& conn_info,
+      message_iterator& iter);
 
  private:
   reactor reactor_;
@@ -94,7 +101,6 @@ class broker_thread {
   int current_worker_;
   request_handler_manager request_handler_manager_;
 
-  // XXX move map into worker thread, or make it thread-safe...
   typedef std::map<uint64/*event_id*/, rpc_controller*>
       remote_response_map;
   remote_response_map remote_response_map_;

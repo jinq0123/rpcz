@@ -90,16 +90,12 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     case kUnbind:
       handle_unbind_command(sender, message_to_string(iter.next()));
       break;
-
-    // XXX Request from dealer (dealer index)
-    // XXX Request from router (router index, sender)
     case kRequest:
       send_request(frontend_socket);
       break;
     case kReply:
       send_reply(frontend_socket);
       break;
-
     case kRunClosure:
       add_closure(interpret_message<closure*>(iter.next()));
       break;
@@ -271,39 +267,33 @@ inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
   BOOST_ASSERT(frontend_socket);
   connection_info info;
   read_connection_info(frontend_socket, &info);
+  BOOST_ASSERT(is_connection_info_legal(info));
+  message_iterator iter(*frontend_socket);
 
   // XXX send request...
-  //uint64 dealer_index = interpret_message<uint64>(iter.next());
-  //BOOST_ASSERT(is_dealer_index_legal(dealer_index));
-  //rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
-  //BOOST_ASSERT(ctrl);
-  //uint64 event_id = ctrl->get_event_id();
-  //remote_response_map_[event_id] = ctrl;
 
-  //int64 timeout_ms = ctrl->get_timeout_ms();
-  //if (-1 != timeout_ms) {
-  //  // XXX when to delete timeout handler?
-  //  reactor_.run_closure_at(zclock_ms() + timeout_ms,
-  //      new_callback(this, &broker_thread::handle_timeout, event_id));
-  //}
+  BOOST_ASSERT(iter.has_more());
+  rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
+  BOOST_ASSERT(ctrl);
+  uint64 event_id = ctrl->get_event_id();
+  remote_response_map_[event_id] = ctrl;
 
-  //zmq::socket_t* socket = dealer_sockets_[dealer_index];
-  //BOOST_ASSERT(socket);
-  //send_string(socket, "", ZMQ_SNDMORE);
-  //forward_messages(iter, *socket);
+  int64 timeout_ms = ctrl->get_timeout_ms();
+  if (-1 != timeout_ms) {
+    // XXX when to delete timeout handler?
+    reactor_.run_closure_at(zclock_ms() + timeout_ms,
+        new_callback(this, &broker_thread::handle_timeout, event_id));
+    // XXX add connection_info?
+  }
+  forward_to(info, iter);
 }
 
 inline void broker_thread::send_reply(zmq::socket_t* frontend_socket) {
   BOOST_ASSERT(frontend_socket);
   connection_info info;
   read_connection_info(frontend_socket, &info);
-
-  // XXX send reply...
-  //uint64 router_index = interpret_message<uint64>(iter.next());
-  //BOOST_ASSERT(is_router_index_legal(router_index));
-  //zmq::socket_t* socket = router_sockets_[router_index];
-  //BOOST_ASSERT(socket);
-  //forward_messages(iter, *socket);
+  BOOST_ASSERT(is_connection_info_legal(info));
+  forward_to(info, message_iterator(*frontend_socket));
 }
 
 bool broker_thread::is_dealer_index_legal(uint64 dealer_index) const {
@@ -314,6 +304,30 @@ bool broker_thread::is_dealer_index_legal(uint64 dealer_index) const {
 bool broker_thread::is_router_index_legal(uint64 router_index) const {
   // Index 0 is reserved.
   return router_index > 0 && router_index < router_sockets_.size();
+}
+
+bool broker_thread::is_connection_info_legal(const connection_info& info) const {
+  if (info.is_router)
+      return is_router_index_legal(info.index);
+  return is_dealer_index_legal(info.index);
+}
+
+inline void broker_thread::forward_to(
+    const connection_info& conn_info,
+    message_iterator& iter) {
+  BOOST_ASSERT(is_connection_info_legal(conn_info));
+  if (conn_info.is_router) {
+    zmq::socket_t* socket = router_sockets_[conn_info.index];
+    BOOST_ASSERT(socket);
+    send_string(socket, conn_info.sender, ZMQ_SNDMORE);
+    send_empty_message(socket, ZMQ_SNDMORE);
+    forward_messages(iter, *socket);
+    return;
+  }
+  zmq::socket_t* socket = dealer_sockets_[conn_info.index];
+  BOOST_ASSERT(socket);
+  send_empty_message(socket, ZMQ_SNDMORE);
+  forward_messages(iter, *socket);
 }
 
 }  // namespace rpcz
