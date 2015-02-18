@@ -47,6 +47,7 @@ class RPCZ_API connection {
       long timeout_ms) const;
 
  public:
+     // XXXX use uint64 event_id
   void reply(const std::string& event_id,
       const google::protobuf::Message& resp) const;
   void reply_error(
@@ -67,7 +68,7 @@ class RPCZ_API connection {
  private:
   // Sends rpc header and payload.
   // Takes ownership of the provided payload message.
-  inline void reply(const std::string& event_id,
+  inline void reply(
       const rpc_header& rpc_hdr,
       zmq::message_t* payload) const;
   inline void reply(message_vector& data) const;

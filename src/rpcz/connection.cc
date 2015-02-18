@@ -96,10 +96,12 @@ void connection::reply(const std::string& event_id,
     throw invalid_message_error("Invalid response message");
   }
   rpc_header rpc_hdr;
-  (void)rpc_hdr.mutable_resp_hdr();
+  rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
+  BOOST_ASSERT(resp_hdr);
+  resp_hdr->set_event_id(0);  // XXXX event_id);
   BOOST_ASSERT(rpc_hdr.has_resp_hdr());
   BOOST_ASSERT(!rpc_hdr.has_req_hdr());
-  reply(event_id, rpc_hdr, payload.release());
+  reply(rpc_hdr, payload.release());
 }
 
 // XXX for language binding
@@ -118,11 +120,12 @@ void connection::reply_error(
   rpc_response_header* resp_hdr = rpc_hdr.mutable_resp_hdr();
   BOOST_ASSERT(resp_hdr);
   zmq::message_t* payload = new zmq::message_t();
+  resp_hdr->set_event_id(0);  // XXXX event_id);
   resp_hdr->set_error_code(error_code);
   if (!error_message.empty()) {
     resp_hdr->set_error_str(error_message);
   }
-  reply(event_id, rpc_hdr, payload);
+  reply(rpc_hdr, payload);
 }
 
 void connection::request(
@@ -140,7 +143,6 @@ void connection::request(
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
 inline void connection::reply(
-    const std::string& event_id,
     const rpc_header& rpc_hdr,
     zmq::message_t* payload) const {
   size_t msg_size = rpc_hdr.ByteSize();
