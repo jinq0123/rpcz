@@ -126,7 +126,8 @@ TEST_F(manager_test, TestTimeoutAsync) {
     }
   } hdl;
 
-  request_connection(*conn, *request, new rpc_controller(boost::ref(hdl), 0));
+  request_connection(*conn, *request,
+      new rpc_controller(0, boost::ref(hdl), 0));
   hdl.event.wait();
 }
 
@@ -161,7 +162,8 @@ void SendManyMessages(const connection_ptr& conn, int thread_id) {
     message_vector* request = create_simple_request(
         thread_id * request_count * 17 + i);
     requests.push_back(request);
-    request_connection(*conn, *request, new rpc_controller(boost::ref(barrier), -1));
+    request_connection(*conn, *request,
+        new rpc_controller(0, boost::ref(barrier), -1));
   }
   barrier.wait(request_count);
 }
@@ -188,7 +190,8 @@ TEST_F(manager_test, ManyClientsTest) {
       event.signal();
     }
   } hdl;
-  request_connection(*conn, *request, new rpc_controller(boost::ref(hdl), -1));
+  request_connection(*conn, *request,
+      new rpc_controller(0, boost::ref(hdl), -1));
   hdl.event.wait();
   thread.join();
 }

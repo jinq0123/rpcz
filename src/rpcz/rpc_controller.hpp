@@ -1,6 +1,6 @@
 // Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
-// Rpc context used to call the response handler.
+// Rpc controller to call the response handler.
 
 #ifndef RPCZ_RPC_CONTEXT_HPP
 #define RPCZ_RPC_CONTEXT_HPP
@@ -9,6 +9,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <rpcz/response_message_handler.hpp>
+#include <rpcz/common.hpp>  // for uint64
 
 namespace zmq {
 class message_t;
@@ -20,10 +21,11 @@ class message_iterator;
 
 class rpc_controller : boost::noncopyable {
  public:
-  inline rpc_controller(
+  inline rpc_controller(uint64 event_id,
       const response_message_handler& handler,
       long timeout_ms)
-      : handler_(handler),
+      : event_id_(event_id),
+        handler_(handler),
         timeout_ms_(timeout_ms),
         timeout_expired_(false) {}
   inline ~rpc_controller() {}
@@ -48,6 +50,7 @@ class rpc_controller : boost::noncopyable {
       const std::string& error_str);
 
  private:
+  uint64 event_id_;
   response_message_handler handler_;
   long timeout_ms_;
   bool timeout_expired_;

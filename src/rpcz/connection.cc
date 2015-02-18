@@ -82,8 +82,7 @@ void connection::request(
   // rpc_controller will be deleted on response or timeout.
   // rpc_controller deleted in worker thread.
   // XXX delete on timeout.
-  rpc_controller* ctrl = new rpc_controller(handler, timeout_ms);
-  // XXX manager_-> insert_event( event_id, ctrl)....
+  rpc_controller* ctrl = new rpc_controller(event_id, handler, timeout_ms);
   request(msg_vector, ctrl);
 }
 
