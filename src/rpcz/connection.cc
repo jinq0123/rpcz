@@ -139,7 +139,7 @@ void connection::request(
 
 // Sends rpc header and payload.
 // Takes ownership of the provided payload message.
-void connection::reply(
+inline void connection::reply(
     const std::string& event_id,
     const rpc_header& rpc_hdr,
     zmq::message_t* payload) const {
@@ -150,17 +150,14 @@ void connection::reply(
   message_vector v;
   v.push_back(zmq_hdr_msg);
   v.push_back(payload);
-  reply(event_id, v);  // XXXX no event id
+  reply(v);
 }
 
-// XXXX no event id...
-void connection::reply(const std::string& event_id,
-                       message_vector& data) const {
+inline void connection::reply(message_vector& data) const {
   zmq::socket_t* socket = &manager_->get_frontend_socket();
   send_empty_message(socket, ZMQ_SNDMORE);
   send_char(socket, c2b::kReply, ZMQ_SNDMORE);
   write_connection_info(socket, *info_, ZMQ_SNDMORE);
-  // XXXX no event_id send_string(socket, event_id, ZMQ_SNDMORE);
   write_vector_to_socket(socket, data);
 }
 
@@ -172,7 +169,6 @@ void connection::init(bool is_router,
   info_->index = index;
   info_->sender = sender;
 }
-
 
 void connection::init_dealer(const std::string& endpoint) {
   uint64 dealer_index = connect(endpoint);

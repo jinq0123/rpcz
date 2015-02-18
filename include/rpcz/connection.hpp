@@ -67,10 +67,10 @@ class RPCZ_API connection {
  private:
   // Sends rpc header and payload.
   // Takes ownership of the provided payload message.
-  void reply(const std::string& event_id,
+  inline void reply(const std::string& event_id,
       const rpc_header& rpc_hdr,
       zmq::message_t* payload) const;
-  void reply(const std::string& event_id, message_vector& data) const;
+  inline void reply(message_vector& data) const;
 
  private:
   void init(bool is_router, uint64 index, const std::string& sender="");

@@ -270,8 +270,6 @@ inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
   BOOST_ASSERT(is_connection_info_legal(info));
   message_iterator iter(*frontend_socket);
 
-  // XXX send request...
-
   BOOST_ASSERT(iter.has_more());
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
@@ -308,7 +306,7 @@ bool broker_thread::is_router_index_legal(uint64 router_index) const {
 
 bool broker_thread::is_connection_info_legal(const connection_info& info) const {
   if (info.is_router)
-      return is_router_index_legal(info.index);
+    return is_router_index_legal(info.index);
   return is_dealer_index_legal(info.index);
 }
 
