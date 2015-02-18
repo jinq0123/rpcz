@@ -13,13 +13,6 @@ Introduction
 * The Python module is a Cython wrapper around the C++ API. 
 * RPCZ has been tested on Windows, Ubuntu 11.10 and Mac OS X Lion.
     
-CMake
------
-
-VC build need to check on rpcz_build_static, 
-because rpcz.dll will not produce lib file,
-which zsendrpc need.
-
 Example
 --------
 ### Sync Client
