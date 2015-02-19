@@ -21,6 +21,7 @@
 #include <zmq.hpp>
 
 #include <rpcz/callback.hpp>  // for closure
+#include <rpcz/connection_info_zmq.hpp>  // for read_connection_info()
 #include <rpcz/internal_commands.hpp>  // for kReady
 #include <rpcz/logging.hpp>  // for CHECK_EQ()
 #include <rpcz/request_handler.hpp>
@@ -56,24 +57,8 @@ void worker::operator()() {
       case kRunClosure:
         interpret_message<closure*>(iter.next())->run();
         break;
-      case kHandleRouterData: {
-          // XXX
-        //request_handler* handler =
-        //    interpret_message<request_handler*>(iter.next());
-        //assert(handler);
-        //handler->handle_request(iter);
-        }
-        handle_router_data(iter);
-        break;
-      case kHandleDealerData: {
-          // XXX
-        //rpc_controller* ctrl =
-        //    interpret_message<rpc_controller*>(iter.next());
-        //BOOST_ASSERT(ctrl);
-        //ctrl->handle_response(iter);
-        //delete ctrl;
-        }
-        handle_dealer_data(iter);
+      case kHandleData:
+        handle_data(socket);
         break;
       case kHandleTimeout:
         handle_timeout(iter);
@@ -87,17 +72,27 @@ void worker::operator()() {
   send_char(&socket, c2b::kWorkerDone);
 }
 
-void worker::handle_router_data(message_iterator& iter) {
-    // XXX
-}
+void worker::handle_data(zmq::socket_t& socket) {
+  connection_info info;
+  read_connection_info(&socket, &info);
+  // XXXX
+          // XXX
+        //request_handler* handler =
+        //    interpret_message<request_handler*>(iter.next());
+        //assert(handler);
+        //handler->handle_request(iter);
 
-void worker::handle_dealer_data(message_iterator& iter) {
-    // XXX
+          // XXX
+        //rpc_controller* ctrl =
+        //    interpret_message<rpc_controller*>(iter.next());
+        //BOOST_ASSERT(ctrl);
+        //ctrl->handle_response(iter);
+        //delete ctrl;
 }
 
 void worker::handle_timeout(message_iterator& iter) {
   uint64 event_id = interpret_message<uint64>(iter.next());
-  // XXX
+  // XXXX
   //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
   //if (response_iter == remote_response_map_.end()) {
   //  return;

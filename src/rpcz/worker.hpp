@@ -9,6 +9,7 @@
 
 namespace zmq {
 class context_t; 
+class socket_t;
 }  // namespace zmq
 
 namespace rpcz {
@@ -25,8 +26,7 @@ class worker {
   void operator()();
 
  private:
-  void handle_router_data(message_iterator& iter);
-  void handle_dealer_data(message_iterator& iter);
+  void handle_data(zmq::socket_t& socket);
   void handle_timeout(message_iterator& iter);
 
  private:

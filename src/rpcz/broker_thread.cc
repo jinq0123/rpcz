@@ -217,28 +217,29 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
+  if (!iter.has_more()) return;
+  std::string sender(message_to_string(iter.next()));
+  if (!iter.has_more()) return;
+  if (iter.next().size() != 0) return;
+  if (!iter.has_more()) return;
 
-  // XXX
-  //std::string sender(message_to_string(iter.next()));
-  //if (iter.next().size() != 0) return;
-  //// XXX request_handler_manager_ is binded to router. Rename it to router_handler_manager?
-  //request_handler* handler = request_handler_manager_
+  // XXX request_handler_manager_ is binded to router. Rename it to router_handler_manager?
+  // XXXX request_handler* handler = request_handler_manager_
   //    .get_handler(sender, *factories, router_index);
-  //assert(NULL != handler);
-  begin_worker_command(b2w::kHandleRouterData);
-  send_uint64(frontend_socket_, router_index, ZMQ_SNDMORE);
+  // assert(NULL != handler);
+  begin_worker_command(b2w::kHandleData);
+  connection_info info = { true, router_index, sender };
+  write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
 }
 
 void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
   message_iterator iter(*dealer_sockets_[dealer_index]);
-  if (iter.next().size() != 0) {
-    return;
-  }
-  if (!iter.has_more()) {
-    return;
-  }
+  if (!iter.has_more()) return;
+  if (iter.next().size() != 0) return;
+  if (!iter.has_more()) return;
+
   // XXX no event id ...
   //event_id event_id(interpret_message<event_id>(iter.next()));
   //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
@@ -247,7 +248,9 @@ void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   //}
   //const rpc_controller* ctrl = response_iter->second;
   //BOOST_ASSERT(ctrl);
-  begin_worker_command(b2w::kHandleDealerData);
+  begin_worker_command(b2w::kHandleData);
+  connection_info info = { false, dealer_index, "" };
+  write_connection_info(frontend_socket_, info);
   //send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
   //remote_response_map_.erase(response_iter);

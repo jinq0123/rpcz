@@ -35,9 +35,9 @@ namespace rpcz {
 
 // replier is copyable.
 // Each request has its own replier, and should reply once.
-// replier can be used in callback by copy.  // XXX Need example.
+// replier can be used in callback by copy.  // TODO: Need example.
 // replier's copy operator is quick.
-// XXX More comments...
+// TODO: More comments...
 class RPCZ_API replier {
  public:
   replier(const connection_ptr& conn, uint64 event_id)
