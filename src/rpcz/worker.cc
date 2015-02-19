@@ -31,9 +31,11 @@
 
 namespace rpcz {
 
-worker::worker(const std::string& frontend_endpoint,
+worker::worker(size_t worker_index,
+               const std::string& frontend_endpoint,
                zmq::context_t& context)
-    : frontend_endpoint_(frontend_endpoint),
+    : worker_index_(worker_index),
+      frontend_endpoint_(frontend_endpoint),
       context_(context) {
 }
 
@@ -44,7 +46,8 @@ void worker::operator()() {
   zmq::socket_t socket(context_, ZMQ_DEALER);
   socket.connect(frontend_endpoint_.c_str());
   send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, c2b::kWorkerReady);
+  send_char(&socket, c2b::kWorkerReady, ZMQ_SNDMORE);
+  send_uint64(&socket, worker_index_);
   bool should_continue = true;
   do {
     message_iterator iter(socket);

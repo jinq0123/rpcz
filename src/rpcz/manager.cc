@@ -63,7 +63,7 @@ manager::manager()
   assert(nthreads > 0);
   workers_.reset(new scoped_worker[nthreads]);
   for (int i = 0; i < nthreads; ++i) {
-    workers_[i].reset(new worker(frontend_endpoint_, *context_));
+    workers_[i].reset(new worker(i, frontend_endpoint_, *context_));
     worker_threads_.add_thread(new boost::thread(
         boost::ref(*workers_[i])));
   }

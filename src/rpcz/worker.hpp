@@ -18,7 +18,8 @@ class message_iterator;
 
 class worker {
  public:
-  worker(const std::string& frontend_endpoint,
+  worker(size_t worker_index,
+      const std::string& frontend_endpoint,
       zmq::context_t& context);
   ~worker();
 
@@ -30,6 +31,7 @@ class worker {
   void handle_timeout(message_iterator& iter);
 
  private:
+  const size_t worker_index_;
   const std::string frontend_endpoint_;
   zmq::context_t& context_;
 };

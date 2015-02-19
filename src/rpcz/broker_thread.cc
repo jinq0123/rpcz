@@ -53,15 +53,21 @@ broker_thread::broker_thread(
 
 void broker_thread::wait_for_workers_ready_reply(int nthreads) {
   BOOST_ASSERT(nthreads > 0);
+  workers_.resize(nthreads);
   for (int i = 0; i < nthreads; ++i) {
     message_iterator iter(*frontend_socket_);
     std::string sender = message_to_string(iter.next());
-    assert(!sender.empty());  // zmq id
+    BOOST_ASSERT(!sender.empty());  // zmq id
     CHECK_EQ(0, iter.next().size());
     char command(interpret_message<char>(iter.next()));
     CHECK_EQ(c2b::kWorkerReady, command)
         << "Got unexpected command " << (int)command;
-    workers_.push_back(sender);
+    BOOST_ASSERT(iter.has_more());
+    uint64 worker_index(interpret_message<uint64>(iter.next()));
+    BOOST_ASSERT(!iter.has_more());
+    BOOST_ASSERT(worker_index < workers_.size());
+    BOOST_ASSERT(workers_[worker_index].empty());
+    workers_[worker_index] = sender;
   }
 }
 
