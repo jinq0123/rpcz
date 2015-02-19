@@ -53,6 +53,7 @@ broker_thread::broker_thread(
 
 void broker_thread::wait_for_workers_ready_reply(int nthreads) {
   BOOST_ASSERT(nthreads > 0);
+  BOOST_ASSERT(workers_.empty());
   workers_.resize(nthreads);
   for (int i = 0; i < nthreads; ++i) {
     message_iterator iter(*frontend_socket_);
@@ -222,7 +223,7 @@ void broker_thread::handle_worker_done_command(
 void broker_thread::handle_socket_deleted(const std::string sender) {
   send_string(frontend_socket_, sender, ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-  send_empty_message(frontend_socket_, 0);  // XXX ?
+  send_empty_message(frontend_socket_, 0);  // Only to end zmq message?
 }
 
 // XXX merge handle_router_socket() and handle_dealer_socket()
@@ -292,7 +293,6 @@ inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
   uint64 event_id = ctrl->get_event_id();
-  remote_response_map_[event_id] = ctrl;
 
   int64 timeout_ms = ctrl->get_timeout_ms();
   if (-1 != timeout_ms) {
@@ -300,9 +300,17 @@ inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
     reactor_.run_closure_at(zclock_ms() + timeout_ms,
         new_callback(this, &broker_thread::handle_timeout,
             event_id, get_worker_index(info)));
-    // XXX add connection_info?
   }
-  forward_to(info, iter);
+  forward_to(info, iter);  // Request remote server.
+
+  start_rpc(info, ctrl);  // Let worker thread start this rpc
+}
+
+inline void broker_thread::start_rpc(
+    const connection_info& info,
+    const rpc_controller* ctrl) {
+  begin_worker_command(info, b2w::kStartRpc);
+  send_pointer(frontend_socket_, ctrl);
 }
 
 inline void broker_thread::send_reply(zmq::socket_t* frontend_socket) {

@@ -80,6 +80,8 @@ class broker_thread {
  private:
   inline void add_closure(closure* closure);
   inline void send_request(zmq::socket_t* frontend_socket);
+  inline void start_rpc(const connection_info& info,
+                        const rpc_controller* ctrl);
   inline void send_reply(zmq::socket_t* frontend_socket);
 
  private:
@@ -105,10 +107,6 @@ class broker_thread {
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;
   request_handler_manager request_handler_manager_;
-
-  typedef std::map<uint64/*event_id*/, rpc_controller*>
-      remote_response_map;
-  remote_response_map remote_response_map_;
 };
 
 }  // namespace rpcz

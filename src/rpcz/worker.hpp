@@ -6,6 +6,9 @@
 #define RPCZ_WORKER_HPP
 
 #include <string>
+#include <boost/unordered_map.hpp>
+
+#include <rpcz/common.hpp>  // for uint64
 
 namespace zmq {
 class context_t; 
@@ -15,6 +18,7 @@ class socket_t;
 namespace rpcz {
 
 class message_iterator;
+class rpc_controller;
 
 class worker {
  public:
@@ -27,6 +31,7 @@ class worker {
   void operator()();
 
  private:
+  void start_rpc(message_iterator& iter);
   void handle_data(zmq::socket_t& socket);
   void handle_timeout(message_iterator& iter);
 
@@ -34,6 +39,11 @@ class worker {
   const size_t worker_index_;
   const std::string frontend_endpoint_;
   zmq::context_t& context_;
+
+ private:
+  typedef boost::unordered_map<uint64/*event_id*/, rpc_controller*>
+      remote_response_map;
+  remote_response_map remote_response_map_;
 };
 
 }  // namespace rpcz

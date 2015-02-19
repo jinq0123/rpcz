@@ -61,6 +61,9 @@ void worker::operator()() {
       case kRunClosure:
         interpret_message<closure*>(iter.next())->run();
         break;
+      case kStartRpc:
+        start_rpc(iter);
+        break;
       case kHandleData:
         handle_data(socket);
         break;
@@ -74,6 +77,15 @@ void worker::operator()() {
   } while (should_continue);
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kWorkerDone);
+}
+
+void worker::start_rpc(message_iterator& iter) {
+  BOOST_ASSERT(iter.has_more());
+  rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
+  BOOST_ASSERT(!iter.has_more());
+  BOOST_ASSERT(ctrl);
+  uint64 event_id = ctrl->get_event_id();
+  remote_response_map_[event_id] = ctrl;
 }
 
 void worker::handle_data(zmq::socket_t& socket) {
