@@ -75,6 +75,18 @@ void worker::operator()() {
 void worker::handle_data(zmq::socket_t& socket) {
   connection_info info;
   read_connection_info(&socket, &info);
+  message_iterator iter(socket);
+  if (!iter.has_more()) return;
+  const zmq::message_t& msg = iter.next();
+  rpc_header rpc_hdr;
+  if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
+    // Handle bad rpc.
+    DLOG(INFO) << "Received bad header.";
+    // XXXX rep.reply_error(error_code::INVALID_HEADER, "Invalid rpc_header.");
+    return;
+  }
+  if (!iter.has_more()) return;
+
   // XXXX
           // XXX
         //request_handler* handler =
