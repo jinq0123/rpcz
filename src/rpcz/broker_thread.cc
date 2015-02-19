@@ -214,9 +214,9 @@ void broker_thread::handle_worker_done_command(
 }
 
 void broker_thread::handle_socket_deleted(const std::string sender) {
-    send_string(frontend_socket_, sender, ZMQ_SNDMORE);
-    send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-    send_empty_message(frontend_socket_, 0);
+  send_string(frontend_socket_, sender, ZMQ_SNDMORE);
+  send_empty_message(frontend_socket_, ZMQ_SNDMORE);
+  send_empty_message(frontend_socket_, 0);  // XXX ?
 }
 
 // XXX merge handle_router_socket() and handle_dealer_socket()

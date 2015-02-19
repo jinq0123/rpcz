@@ -61,10 +61,11 @@ manager::manager()
   frontend_socket->bind(frontend_endpoint_.c_str());
   int nthreads = options.get_worker_threads();
   assert(nthreads > 0);
-  worker_.reset(new worker(frontend_endpoint_, *context_));
+  workers_.reset(new scoped_worker[nthreads]);
   for (int i = 0; i < nthreads; ++i) {
+    workers_[i].reset(new worker(frontend_endpoint_, *context_));
     worker_threads_.add_thread(new boost::thread(
-        boost::ref(*worker_)));
+        boost::ref(*workers_[i])));
   }
   sync_event event;
   broker_thread_ = boost::thread(&broker_thread::run,

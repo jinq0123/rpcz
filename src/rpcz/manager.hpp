@@ -21,6 +21,7 @@
 #include <string>
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
+#include <boost/scoped_array.hpp>
 #include <boost/thread.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -95,7 +96,8 @@ class manager : boost::noncopyable {
   boost::thread_specific_ptr<zmq::socket_t> socket_;
   std::string frontend_endpoint_;
   scoped_ptr<sync_event> is_terminating_;
-  scoped_ptr<worker> worker_;
+  typedef scoped_ptr<worker> scoped_worker;
+  boost::scoped_array<scoped_worker> workers_;
   detail::event_id_generator event_id_generator_;
 };  // class manager
 
