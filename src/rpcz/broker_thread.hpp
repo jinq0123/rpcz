@@ -51,7 +51,10 @@ class broker_thread {
  private:
   void wait_for_workers_ready_reply(int nthreads);
   void handle_frontend_socket(zmq::socket_t* frontend_socket);
-  void begin_worker_command(char command);
+  inline void begin_worker_command(
+      const connection_info& conn_info, char command);
+  inline void begin_worker_command(
+      size_t worker_index, char command);
   void handle_connect_command(
       const std::string& sender,
       const std::string& endpoint);
@@ -72,7 +75,7 @@ class broker_thread {
   void handle_socket_deleted(const std::string sender);
   void handle_router_socket(uint64 router_index);
   void handle_dealer_socket(uint64 dealer_index);
-  void handle_timeout(uint64 event_id);
+  void handle_timeout(uint64 event_id, size_t worker_index);
 
  private:
   inline void add_closure(closure* closure);
@@ -83,6 +86,9 @@ class broker_thread {
   bool is_dealer_index_legal(uint64 dealer_index) const;
   bool is_router_index_legal(uint64 router_index) const;
   bool is_connection_info_legal(const connection_info& info) const;
+
+ private:
+  inline size_t get_worker_index(const connection_info& info) const;
 
  private:
   inline void forward_to(
@@ -98,7 +104,6 @@ class broker_thread {
   zmq::context_t& context_;
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;
-  int current_worker_;
   request_handler_manager request_handler_manager_;
 
   typedef std::map<uint64/*event_id*/, rpc_controller*>

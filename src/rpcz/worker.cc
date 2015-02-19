@@ -26,6 +26,7 @@
 #include <rpcz/logging.hpp>  // for CHECK_EQ()
 #include <rpcz/request_handler.hpp>
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
+#include <rpcz/rpcz.pb.h>
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message()
 
 namespace rpcz {

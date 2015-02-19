@@ -20,6 +20,7 @@
 
 #include <rpcz/callback.hpp>
 #include <rpcz/clock.hpp>  // for zclock_ms()
+#include <rpcz/connection_info_hash.hpp>  // for hash_value()
 #include <rpcz/connection_info_zmq.hpp>  // for read_connection_info()
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/logging.hpp>
@@ -35,8 +36,8 @@ broker_thread::broker_thread(
     sync_event* ready_event,
     zmq::socket_t* frontend_socket)
     : context_(context),
-      frontend_socket_(frontend_socket),
-      current_worker_(0) {
+    frontend_socket_(frontend_socket) {
+  BOOST_ASSERT(nthreads > 0);
   // Index 0 is reserved for debug check.
   dealer_sockets_.push_back(NULL);
   BOOST_ASSERT(1 == dealer_sockets_.size());
@@ -51,6 +52,7 @@ broker_thread::broker_thread(
 }
 
 void broker_thread::wait_for_workers_ready_reply(int nthreads) {
+  BOOST_ASSERT(nthreads > 0);
   for (int i = 0; i < nthreads; ++i) {
     message_iterator iter(*frontend_socket_);
     std::string sender = message_to_string(iter.next());
@@ -114,20 +116,26 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   }  // switch
 }
 
-// XXX Use worker name to specify worker thread...
 // command must be broker to worker (b2w) command.
-void broker_thread::begin_worker_command(char command) {
-  send_string(frontend_socket_, workers_[current_worker_], ZMQ_SNDMORE);
-  send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-  send_char(frontend_socket_, command, ZMQ_SNDMORE);
-  ++current_worker_;
-  if (current_worker_ == workers_.size()) {
-    current_worker_ = 0;
-  }
+inline void broker_thread::begin_worker_command(
+    const connection_info& conn_info, char command) {
+  begin_worker_command(get_worker_index(conn_info), command);
 }
 
+// command must be broker to worker (b2w) command.
+inline void broker_thread::begin_worker_command(
+    size_t worker_index, char command) {
+  BOOST_ASSERT(worker_index < workers_.size());
+  send_string(frontend_socket_, workers_[worker_index], ZMQ_SNDMORE);
+  send_empty_message(frontend_socket_, ZMQ_SNDMORE);
+  send_char(frontend_socket_, command, ZMQ_SNDMORE);
+}
+
+// Add closure to random worker thread.
 inline void broker_thread::add_closure(closure* closure) {
-  begin_worker_command(b2w::kRunClosure);
+  BOOST_ASSERT(!workers_.empty());
+  size_t worker_index = rand() % workers_.size();
+  begin_worker_command(worker_index, b2w::kRunClosure);
   send_pointer(frontend_socket_, closure, 0);
 }
 
@@ -199,7 +207,6 @@ void broker_thread::handle_quit_command(message_iterator& iter) {
 void broker_thread::handle_worker_done_command(
     const std::string& sender) {
   workers_.erase(std::remove(workers_.begin(), workers_.end(), sender));
-  current_worker_ = 0;  // XXX ?
   if (!workers_.empty())
     return;
   // All workers are gone, time to quit.
@@ -227,8 +234,8 @@ void broker_thread::handle_router_socket(uint64 router_index) {
   // XXXX request_handler* handler = request_handler_manager_
   //    .get_handler(sender, *factories, router_index);
   // assert(NULL != handler);
-  begin_worker_command(b2w::kHandleData);
   connection_info info = { true, router_index, sender };
+  begin_worker_command(info, b2w::kHandleData);
   write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
 }
@@ -248,8 +255,8 @@ void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   //}
   //const rpc_controller* ctrl = response_iter->second;
   //BOOST_ASSERT(ctrl);
-  begin_worker_command(b2w::kHandleData);
   connection_info info = { false, dealer_index, "" };
+  begin_worker_command(info, b2w::kHandleData);
   write_connection_info(frontend_socket_, info);
   //send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
@@ -257,8 +264,10 @@ void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   // XXX move remote_response_map_ to manager and make it thread-safe
 }
 
-void broker_thread::handle_timeout(uint64 event_id) {
-  begin_worker_command(b2w::kHandleTimeout);
+void broker_thread::handle_timeout(uint64 event_id, size_t worker_index) {
+  BOOST_ASSERT(!workers_.empty());
+  worker_index %= workers_.size();
+  begin_worker_command(worker_index, b2w::kHandleTimeout);
   send_uint64(frontend_socket_, event_id, 0);
 }
 
@@ -283,7 +292,8 @@ inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
   if (-1 != timeout_ms) {
     // XXX when to delete timeout handler?
     reactor_.run_closure_at(zclock_ms() + timeout_ms,
-        new_callback(this, &broker_thread::handle_timeout, event_id));
+        new_callback(this, &broker_thread::handle_timeout,
+            event_id, get_worker_index(info)));
     // XXX add connection_info?
   }
   forward_to(info, iter);
@@ -329,6 +339,13 @@ inline void broker_thread::forward_to(
   BOOST_ASSERT(socket);
   send_empty_message(socket, ZMQ_SNDMORE);
   forward_messages(iter, *socket);
+}
+
+// Map connection to worker thread.
+inline size_t broker_thread::get_worker_index(
+    const connection_info& info) const {
+  BOOST_ASSERT(!workers_.empty());
+  return hash_value(info) % workers_.size();
 }
 
 }  // namespace rpcz
