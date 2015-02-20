@@ -50,13 +50,13 @@ void request_handler::handle_request(
     rep.reply_error(error_code::NO_SUCH_SERVICE, error_str);
     return;
   }
-  rpcz::iservice* svc = iter->second;
+  iservice* svc = iter->second;
   assert(svc);
   svc->dispatch_request(req_hdr.method(), data, len, rep);
 }  // handle_request()
 
 void request_handler::register_service(
-    const std::string& name, rpcz::iservice* svc) {
+    const std::string& name, iservice* svc) {
   BOOST_ASSERT(svc);
   unregister_service(name);
   service_map_[name] = svc;

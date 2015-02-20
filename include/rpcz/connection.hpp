@@ -24,6 +24,7 @@ class message_t;
 
 namespace rpcz {
 
+class iservice;
 class manager;
 class message_vector;
 class rpc_controller;
@@ -51,6 +52,10 @@ class RPCZ_API connection {
       const google::protobuf::Message& resp) const;
   void reply_error(uint64 event_id, int error_code,
       const std::string& error_message="") const;
+
+ public:
+  // register_service() will take the ownership of input service.
+  void register_service(const std::string& name, iservice* svc);
 
  private:
   // Request over the connection.

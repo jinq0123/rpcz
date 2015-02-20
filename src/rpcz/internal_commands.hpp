@@ -26,10 +26,11 @@ namespace c2b {  // command to broker
 // Message sent from outside to the broker thread:
 const char kRequest         = 0x01;  // send request to a connected socket.
 const char kConnect         = 0x02;  // connect to a given endpoint.
-const char kBind            = 0x03;  // bind to an endpoint.
+const char kBind            = 0x03;  // bind to an endpoint and register services
 const char kUnbind          = 0x04;  // unbind an endpoint.
 const char kReply           = 0x05;  // reply to a request
 const char kRunClosure      = 0x06;  // run a closure
+const char kRegisterSvc     = 0x07;  // register service
 const char kQuit            = 0x0f;  // Starts the quit second.
 // Messages sent from a worker thread to the broker:
 const char kWorkerReady     = 0x21;  // Always the first message sent.
@@ -42,6 +43,7 @@ const char kRunClosure       = 0x11;  // Run a closure.
 const char kStartRpc         = 0x12;  // Start an rpc. Map event_id to rpc_controller.
 const char kHandleData       = 0x13;  // Handle router/dealer socket data.
 const char kHandleTimeout    = 0x14;  // Handle request timeout.
+const char kRegisterSvc      = 0x15;  // Register service.
 const char kWorkerQuit       = 0x1f;  // Asks the worker to quit.
 }  // namespace b2w
 

@@ -83,6 +83,9 @@ class broker_thread {
   inline void send_reply(zmq::socket_t* frontend_socket);
 
  private:
+  void register_service(zmq::socket_t* frontend_socket);
+
+ private:
   bool is_dealer_index_legal(uint64 dealer_index) const;
   bool is_router_index_legal(uint64 router_index) const;
   bool is_connection_info_legal(const connection_info& info) const;

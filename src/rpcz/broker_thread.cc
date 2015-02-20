@@ -108,6 +108,9 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
     case kRunClosure:
       add_closure(interpret_message<closure*>(iter.next()));
       break;
+    case kRegisterSvc:
+      register_service(frontend_socket);
+      break;
 
     // worker to broker commands
     case kWorkerReady:
@@ -227,6 +230,7 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
 }
 
 // XXX Must read all data...
+
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
@@ -236,10 +240,6 @@ void broker_thread::handle_router_socket(uint64 router_index) {
   if (iter.next().size() != 0) return;
   if (!iter.has_more()) return;
 
-  // XXX request_handler_manager_ is binded to router. Rename it to router_handler_manager?
-  // XXXX request_handler* handler = request_handler_manager_
-  //    .get_handler(sender, *factories, router_index);
-  // assert(NULL != handler);
   connection_info info = { true, router_index, sender };
   begin_worker_command(info, b2w::kHandleData);
   write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
@@ -307,6 +307,19 @@ inline void broker_thread::send_reply(zmq::socket_t* frontend_socket) {
   read_connection_info(frontend_socket, &info);
   BOOST_ASSERT(is_connection_info_legal(info));
   forward_to(info, message_iterator(*frontend_socket));
+}
+
+void broker_thread::register_service(zmq::socket_t* frontend_socket) {
+  BOOST_ASSERT(frontend_socket);
+  connection_info info;
+  read_connection_info(frontend_socket, &info);
+  BOOST_ASSERT(is_connection_info_legal(info));
+
+  // forward to worker thread
+  begin_worker_command(info, b2w::kRegisterSvc);
+  write_connection_info(frontend_socket_, info);
+  message_iterator iter(*frontend_socket);
+  forward_messages(iter, *frontend_socket_);
 }
 
 bool broker_thread::is_dealer_index_legal(uint64 dealer_index) const {

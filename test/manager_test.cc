@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include <boost/lexical_cast.hpp>
+#include <boost/make_shared.hpp>
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <boost/thread/condition_variable.hpp>
 #include <boost/thread/mutex.hpp>
@@ -37,6 +38,7 @@
 #include "rpcz/rpc_error.hpp"
 #include "rpcz/sync_event.hpp"
 #include "rpcz/zmq_utils.hpp"
+#include "rpcz/service_factory_map.hpp"
 
 namespace rpcz {
 
@@ -200,7 +202,7 @@ TEST_F(manager_test, TestUnbind) {
   ASSERT_TRUE(manager::is_destroyed());
   manager_ptr mgr = manager::get();
   const char kEndpoint[] = "inproc://server.point";
-  mgr->bind(kEndpoint);
+  mgr->bind(kEndpoint, boost::make_shared<service_factory_map>());
   mgr->unbind(kEndpoint);
 }
 

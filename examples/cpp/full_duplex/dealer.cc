@@ -25,13 +25,15 @@ class SearchServiceImpl : public SearchService {
 }  // namespace examples
 
 int main() {
-  cout << "Dealer starting...";
-  examples::SearchService_Stub stub("tcp://localhost:5555");
+  cout << "Dealer starting..." << endl;
+  using namespace examples;
+  SearchService_Stub stub("tcp://localhost:5555");
 
   rpcz::connection_ptr conn = stub.get_connection_ptr();
-  // XXX conn.bind_service(examples::SearchServiceImpl);
+  conn->register_service(SearchServiceImpl::descriptor()->name(),
+      new SearchServiceImpl);
 
-  examples::SearchRequest request;  // only to trigger reversed request
+  SearchRequest request;  // only to trigger reversed request
   stub.async_Search(request);
   
   // Serve for router.

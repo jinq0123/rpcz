@@ -30,9 +30,11 @@ class request_handler {
   void handle_request(const ::rpcz::rpc_request_header& req_hdr,
                       const void* data, size_t len);
 
- private:
+ public:
   // register_service() will take the ownership of input service.
-  void register_service(const std::string& name, rpcz::iservice* svc);
+  void register_service(const std::string& name, iservice* svc);
+
+ private:
   void create_and_register_service(const std::string& name,
       const service_factory_ptr& factory);
 
@@ -43,7 +45,7 @@ class request_handler {
   void create_services();
 
  private:
-  typedef std::map<std::string, rpcz::iservice*> service_map;
+  typedef std::map<std::string, iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
   connection_info_ptr conn_info_;

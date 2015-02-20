@@ -104,6 +104,7 @@ zmq::socket_t& manager::new_frontend_socket() {
 
 void manager::bind(const std::string& endpoint,
     const service_factory_map_ptr& factories) {
+  BOOST_ASSERT(factories);
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kBind, ZMQ_SNDMORE);
@@ -113,7 +114,6 @@ void manager::bind(const std::string& endpoint,
   BOOST_ASSERT(iter.has_more());
   uint64 router_index(interpret_message<uint64>(iter.next()));
   BOOST_ASSERT(!iter.has_more());
-  BOOST_ASSERT(factories);
   factories_->insert(router_index, factories);  // thread-safe
 }
 

@@ -72,6 +72,9 @@ void worker::operator()() {
       case kHandleTimeout:
         handle_timeout(iter);
         break;
+      case kRegisterSvc:
+        register_service(socket);
+        break;
       default:
         CHECK(false);
         break;
@@ -125,6 +128,20 @@ void worker::handle_timeout(message_iterator& iter) {
   ctrl->handle_timeout();
   delete ctrl;
   remote_response_map_.erase(response_iter);
+}
+
+void worker::register_service(zmq::socket_t& socket) {
+  connection_info info;
+  read_connection_info(&socket, &info);
+  message_iterator iter(socket);
+  BOOST_ASSERT(iter.has_more());
+  std::string name = message_to_string(iter.next());
+  BOOST_ASSERT(iter.has_more());
+  iservice* svc = interpret_message<iservice*>(iter.next());
+  BOOST_ASSERT(!iter.has_more());
+  BOOST_ASSERT(svc);
+  request_handler& handler = request_handler_manager_.get_handler(info);
+  handler.register_service(name, svc);
 }
 
 void worker::handle_request(

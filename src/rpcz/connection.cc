@@ -16,6 +16,8 @@
 #include <rpcz/rpcz.pb.h>  // for rpc_header
 #include <rpcz/zmq_utils.hpp>
 
+// XXX Is connection thread-safe?
+
 namespace rpcz {
 
 // XXX block? exception?
@@ -123,6 +125,18 @@ void connection::reply_error(
     resp_hdr->set_error_str(error_message);
   }
   reply(rpc_hdr, payload);
+}
+
+// register_service() will take the ownership of input service.
+void connection::register_service(
+    const std::string& name, iservice* svc) {
+  BOOST_ASSERT(svc);
+  zmq::socket_t* socket = &manager_->get_frontend_socket();
+  send_empty_message(socket, ZMQ_SNDMORE);
+  send_char(socket, c2b::kRegisterSvc, ZMQ_SNDMORE);
+  write_connection_info(socket, *info_, ZMQ_SNDMORE);
+  send_string(socket, name, ZMQ_SNDMORE);
+  send_pointer(socket, svc);
 }
 
 void connection::request(
