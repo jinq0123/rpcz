@@ -33,21 +33,21 @@ server::~server() {
 }
 
 void server::register_singleton_service(cpp_service& svc) {
-  register_singleton_service(svc, svc.GetDescriptor()->name());
+  register_singleton_service(svc.GetDescriptor()->name(), svc);
 }
 
-void server::register_singleton_service(iservice& svc, const std::string& name) {
+void server::register_singleton_service(const std::string& name, iservice& svc) {
   service_factory_ptr factory(new singleton_service_factory(svc));  // shared_ptr
-  impl_->register_service_factory(factory, name);
+  impl_->register_service_factory(name, factory);
 }
 
 void server::bind(const std::string& endpoint) {
   impl_->bind(endpoint);
 }
 
-void server::register_service_factory(service_factory_ptr factory,
-                                      const std::string& name) {
-  impl_->register_service_factory(factory, name);
+void server::register_service_factory(
+    const std::string& name, service_factory_ptr factory) {
+  impl_->register_service_factory(name, factory);
 }
 
 }  // namespace rpcz

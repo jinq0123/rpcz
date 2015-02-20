@@ -6,16 +6,19 @@
 #define RPCZ_REQUEST_HANDLER_H
 
 #include <map>
-#include <rpcz/common.hpp>  // for uint64
-// XXX #include <rpcz/connection_ptr.hpp>
+#include <string>
+
+#include <rpcz/service_factory_ptr.hpp>
 #include <rpcz/connection.hpp>
 
 namespace rpcz {
 
 class iservice;
+struct connection_info;
 
-// Each connection has its request_hander.
+// Each connection will create a request_hander on first request.
 // Run in worker thread.
+// Worker has a map from connection_info to request_handler.
 // Non-thread-safe.
 class request_handler {
  public:
@@ -27,7 +30,9 @@ class request_handler {
 
  private:
   // register_service() will take the ownership of input service.
-  void register_service(rpcz::iservice* svc, const std::string& name);
+  void register_service(const std::string& name, rpcz::iservice* svc);
+  void create_and_register_service(const std::string& name,
+      const service_factory_ptr& factory);
 
  private:
   void unregister_service(const std::string& name);
@@ -39,7 +44,7 @@ class request_handler {
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
-  connection_info conn_info_;
+  connection_info_ptr conn_info_;
 };
 
 }  // namespace rpcz

@@ -16,6 +16,7 @@ namespace rpcz {
 class router_service_factories {
  public:
   void insert(uint64 router_index, const service_factory_map_ptr& factories);
+  service_factory_map_ptr get(uint64 router_index);
 
  private:
   typedef std::map<uint64, service_factory_map_ptr> index_to_factories;

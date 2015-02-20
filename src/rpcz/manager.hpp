@@ -79,6 +79,7 @@ class manager : boost::noncopyable {
   // Get thread specific frontend socket.
   inline zmq::socket_t& get_frontend_socket();
   inline uint64 get_next_event_id() { return event_id_generator_.get_next(); }
+  router_service_factories& get_factories() { return *factories_; }
 
  private:
   zmq::socket_t& new_frontend_socket();
@@ -106,7 +107,7 @@ class manager : boost::noncopyable {
   detail::event_id_generator event_id_generator_;
 
   // Map router index to factories.
-  scoped_ptr<router_service_factories> factories_;  // thread-safe
+  const scoped_ptr<router_service_factories> factories_;  // thread-safe
 };  // class manager
 
 manager_ptr manager::get() {

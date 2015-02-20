@@ -27,4 +27,3 @@ void service_factory_map::for_each(callback& cb) {
 }
 
 }  // namespace rpcz
-#endif  // RPCZ_SERVICE_FACTORY_MAP_HPP

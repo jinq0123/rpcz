@@ -34,7 +34,7 @@ private:
   handler_map handler_map_;
 };
 
-request_handler* request_handler_manager::get_handler(
+request_handler& request_handler_manager::get_handler(
     const connection_info& info) {
   handler_map::const_iterator iter = handler_map_.find(info);
   if (iter != handler_map_.end()) {

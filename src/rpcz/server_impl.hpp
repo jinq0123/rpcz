@@ -24,6 +24,7 @@
 
 #include <rpcz/manager_ptr.hpp>
 #include <rpcz/service_factory_map_ptr.hpp>
+#include <rpcz/service_factory_ptr.hpp>
 
 namespace rpcz {
 

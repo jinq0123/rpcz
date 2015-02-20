@@ -1,22 +1,26 @@
+// Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
+// Request handler.
+// Created on first request.
 
 #include <rpcz/request_handler.hpp>
 
 #include <boost/foreach.hpp>
 
 #include <rpcz/application_error_code.hpp>  // for error_code
+#include <rpcz/connection.hpp>
+#include <rpcz/connection_info.hpp>
 #include <rpcz/iservice.hpp>  // for dispatch_request()
 #include <rpcz/logging.hpp>
+#include <rpcz/manager.hpp>
 #include <rpcz/replier.hpp>
 #include <rpcz/rpcz.pb.h>  // for rpc_request_header
 #include <rpcz/zmq_utils.hpp>  // for message_iterator
-#include <rpcz/connection.hpp>
-#include <rpcz/connection_info.hpp>
 
 namespace rpcz {
 
 request_handler::request_handler(const connection_info& conn_info)
-    : conn_info_(conn_info) {
+    : conn_info_(new connection_info(conn_info)) {  // shared_ptr
   create_services();
 }
 
@@ -47,10 +51,20 @@ void request_handler::handle_request() {
                         rep);
 }  // handle_request()
 
-void request_handler::register_service(rpcz::iservice* svc,
-                                       const std::string& name) {
+void request_handler::register_service(
+    const std::string& name, rpcz::iservice* svc) {
+  BOOST_ASSERT(svc);
   unregister_service(name);
   service_map_[name] = svc;
+}
+
+void request_handler::create_and_register_service(
+    const std::string& name,
+    const service_factory_ptr& factory) {
+  BOOST_ASSERT(factory);
+  iservice* svc = factory->create();
+  BOOST_ASSERT(svc);
+  register_service(name, svc);
 }
 
 void request_handler::unregister_service(const std::string& name) {
@@ -61,17 +75,19 @@ void request_handler::unregister_service(const std::string& name) {
   service_map_.erase(iter);
 }
 
-// TODO: register services on connection...
-
-// Register service factories on server.
-
 // Create services for this handler.
 void request_handler::create_services() {
-  // XXXX
-  //BOOST_FOREACH(const service_factory_map::value_type& v, factories) {
-  //  iservice* svc = v.second->create();
-  //  assert(svc);
-  //  register_service(svc, v.first);
+  if (conn_info_.is_router) {
+    manager_ptr mgr = manager::get();
+    BOOST_ASSERT(mgr);
+    router_service_factories& factories = mgr->get_factories();
+    service_factory_map_ptr router_factories
+        = factories.get(conn_info_.index);
+    if (!router_factories) return;
+    router_factories->for_each(boost::bind(
+        &request_handler::create_and_register_service, this, _1, _2))
+  }
+  // XXXX register service for dealer socket.
 }
 
 }  // namespace rpcz

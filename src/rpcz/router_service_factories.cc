@@ -14,5 +14,15 @@ void router_service_factories::insert(uint64 router_index,
   map_[router_index] = factories;
 }
 
+service_factory_map_ptr router_service_factories::get(
+    uint64 router_index) {
+  lock lk(mu_);
+  index_to_factories::const_iterator iter = map_.find(router_index);
+  if (iter == map_.end())
+    return service_factory_map_ptr();
+  BOOST_ASSERT((*iter).second);
+  return (*iter).second;
+}
+
 }  // namespace rpcz
 #endif  // RPCZ_SERVICE_FACTORY_MAP_HPP

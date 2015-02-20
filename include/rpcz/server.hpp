@@ -40,7 +40,6 @@ class RPCZ_API server : boost::noncopyable {
 
  public:
   // Registers cpp service with this server. Only for cpp.
-  // All registrations must occur before bind() is called. TODO: allow after bind()
   // The name parameter identifies the service for external clients.
   // If you use the first form, the service name from the
   //   protocol buffer definition will be used.
@@ -50,7 +49,7 @@ class RPCZ_API server : boost::noncopyable {
   // It does not take ownership of the provided service,
   //   which must be valid during server's lifetime.
   void register_singleton_service(cpp_service& svc);
-  void register_singleton_service(iservice& svc, const std::string& name);
+  void register_singleton_service(const std::string& name, iservice& svc);
 
   // Register service. XXX Only for cpp service.
   // Each connection will create it's own service instance.
@@ -64,14 +63,11 @@ class RPCZ_API server : boost::noncopyable {
 
   // TODO: unregister_service()
 
-  // Must register service before bind.
-  // Registration after bind will be ignored.
-
-  // TODO: register after bind. Move register into broker thread.
-
  public:
   // service_factory creates service for each connection.
-  void register_service_factory(service_factory_ptr factory, const std::string& name);
+  void register_service_factory(
+      const std::string& name,
+      service_factory_ptr factory);
 
  private:
   scoped_ptr<server_impl> impl_;
@@ -85,7 +81,7 @@ void server::register_service() {
 template <typename Service>
 void server::register_service(const std::string& name) {
   service_factory_ptr factory(new default_service_factory<Service>);  // shared_ptr
-  register_service_factory(factory, name);
+  register_service_factory(name, factory);
 }
 
 }  // namespace rpcz
