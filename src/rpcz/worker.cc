@@ -96,9 +96,7 @@ void worker::handle_data(zmq::socket_t& socket) {
   const zmq::message_t& msg = iter.next();
   rpc_header rpc_hdr;
   if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
-    // Handle bad rpc.
     DLOG(INFO) << "Received bad header.";
-    // XXXX rep.reply_error(error_code::INVALID_HEADER, "Invalid rpc_header.");
     return;
   }
   if (rpc_hdr.has_req_hdr()) {
@@ -109,15 +107,7 @@ void worker::handle_data(zmq::socket_t& socket) {
     handle_response(rpc_hdr.resp_hdr(), iter);
     return;
   }
-  // TODO: disconnect
 }
-
-  // XXXX
-          // XXX
-        //request_handler* handler =
-        //    interpret_message<request_handler*>(iter.next());
-        //assert(handler);
-        //handler->handle_request(iter);
 
 void worker::handle_timeout(message_iterator& iter) {
   uint64 event_id = interpret_message<uint64>(iter.next());
@@ -141,24 +131,26 @@ void worker::handle_request(
   if (!iter.has_more()) return;
         // XXXX
 }
+  // XXXX
+          // XXX
+        //request_handler* handler =
+        //    interpret_message<request_handler*>(iter.next());
+        //assert(handler);
+        //handler->handle_request(iter);
 
 void worker::handle_response(
     const ::rpcz::rpc_response_header& resp_hdr,
     message_iterator& iter) {
-  // Must read until end.
-  bool has_error = resp_hdr.has_error_code();
-  if (has_error) {
+  if (resp_hdr.has_error_code()) {
     handle_error_resp(resp_hdr);
     return;
   }
 
-  if (!iter.has_more()) {
-    // XXX handle_error(error_code::INVALID_MESSAGE, "");
-    return;  // Illegal response.
-  }
   // normal response
-  const zmq::message_t& payload = iter.next();
-  handle_done_resp(resp_hdr.event_id(), payload);
+  if (iter.has_more()) {
+    const zmq::message_t& payload = iter.next();
+    handle_done_resp(resp_hdr.event_id(), payload);
+  }
 }
 
 void worker::handle_done_resp(uint64 event_id,
