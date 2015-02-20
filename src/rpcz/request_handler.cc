@@ -5,6 +5,7 @@
 
 #include <rpcz/request_handler.hpp>
 
+#include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
 #include <rpcz/application_error_code.hpp>  // for error_code
@@ -15,6 +16,9 @@
 #include <rpcz/manager.hpp>
 #include <rpcz/replier.hpp>
 #include <rpcz/router_service_factories.hpp>
+#include <rpcz/rpcz.pb.h>  // for rpc_request_header
+#include <rpcz/service_factory.hpp>  // for create()
+#include <rpcz/service_factory_map.hpp>  // for for_each()
 
 namespace rpcz {
 
@@ -77,15 +81,15 @@ void request_handler::unregister_service(const std::string& name) {
 
 // Create services for this handler.
 void request_handler::create_services() {
-  if (conn_info_.is_router) {
+  if (conn_info_->is_router) {
     manager_ptr mgr = manager::get();
     BOOST_ASSERT(mgr);
     router_service_factories& factories = mgr->get_factories();
     service_factory_map_ptr router_factories
-        = factories.get(conn_info_.index);
+        = factories.get(conn_info_->index);
     if (!router_factories) return;
     router_factories->for_each(boost::bind(
-        &request_handler::create_and_register_service, this, _1, _2))
+        &request_handler::create_and_register_service, this, _1, _2));
   }
   // XXXX register service for dealer socket.
 }

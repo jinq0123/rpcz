@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +29,9 @@
 
 #include <rpcz/application_options.hpp>
 #include <rpcz/broker_thread.hpp>
-#include <rpcz/internal_commands.hpp>  // for kConnect
+#include <rpcz/internal_commands.hpp>  // for kBind
 #include <rpcz/logging.hpp>
+#include <rpcz/router_service_factories.hpp>
 #include <rpcz/sync_event.hpp>
 #include <rpcz/worker.hpp>  // for worker
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message

@@ -19,7 +19,7 @@ class service_factory_map {
   void erase(const std::string& name);
   typedef boost::function<void (const std::string& name,
       const service_factory_ptr& factory)> callback;
-  void for_each(callback& cb);
+  void for_each(callback cb);
 
  private:
   typedef std::map<std::string, service_factory_ptr> name_to_factory;

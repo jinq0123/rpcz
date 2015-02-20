@@ -25,4 +25,3 @@ service_factory_map_ptr router_service_factories::get(
 }
 
 }  // namespace rpcz
-#endif  // RPCZ_SERVICE_FACTORY_MAP_HPP

@@ -6,13 +6,14 @@
 #define RPCZ_REQUEST_HANDLER_MANAGER
 
 #include <boost/unordered_map.hpp>
+
 #include <rpcz/common.hpp>  // for uint64
+#include <rpcz/connection_info.hpp>
+#include <rpcz/connection_info_hash.hpp>
 #include <rpcz/request_handler_ptr.hpp>
 #include <rpcz/service_factory_map.hpp>
 
 namespace rpcz {
-
-struct connection_info;
 
 // Managers this thread's request_handlers.
 // Used in worker thread.

@@ -15,8 +15,8 @@ struct connection_info {
   std::string sender;  // Zmq sender id. Empty for dealer type.
 };
 
-bool operator==(const connection_info& lhs,
-                const connection_info& rhs)
+inline bool operator==(const connection_info& lhs,
+                       const connection_info& rhs)
 {
   return lhs.is_router == rhs.is_router
       && lhs.index == rhs.index

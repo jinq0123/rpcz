@@ -20,7 +20,7 @@ void service_factory_map::erase(const std::string& name) {
   map_.erase(name);
 }
 
-void service_factory_map::for_each(callback& cb) {
+void service_factory_map::for_each(callback cb) {
   lock lk(mu_);
   BOOST_FOREACH(const name_to_factory::value_type& v, map_)
     cb(v.first, v.second);
