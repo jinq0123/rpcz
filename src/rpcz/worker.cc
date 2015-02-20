@@ -102,6 +102,16 @@ void worker::handle_data(zmq::socket_t& socket) {
     return;
   }
   if (!iter.has_more()) return;
+  if (rpc_hdr.has_req_hdr()) {
+    handle_request(rpc_hdr.req_hdr(), iter);
+    return;
+  }
+  if (rpc_hdr.has_resp_hdr()) {
+    handle_response(rpc_hdr.resp_hdr(), iter);
+    return;
+  }
+  // TODO: disconnect
+}
 
   // XXXX
           // XXX
@@ -109,14 +119,6 @@ void worker::handle_data(zmq::socket_t& socket) {
         //    interpret_message<request_handler*>(iter.next());
         //assert(handler);
         //handler->handle_request(iter);
-
-          // XXX
-        //rpc_controller* ctrl =
-        //    interpret_message<rpc_controller*>(iter.next());
-        //BOOST_ASSERT(ctrl);
-        //ctrl->handle_response(iter);
-        //delete ctrl;
-}
 
 void worker::handle_timeout(message_iterator& iter) {
   uint64 event_id = interpret_message<uint64>(iter.next());
@@ -129,6 +131,27 @@ void worker::handle_timeout(message_iterator& iter) {
   //BOOST_ASSERT(ctrl);
   //ctrl->set_timeout_expired();  XXX ->timeout()
   //remote_response_map_.erase(response_iter);
+}
+
+void worker::handle_request(
+    const ::rpcz::rpc_request_header& req_hdr,
+    message_iterator& iter) {
+        // XXXX
+}
+
+void worker::handle_response(
+    const ::rpcz::rpc_response_header& resp_hdr,
+    message_iterator& iter) {
+  remote_response_map::iterator response_iter
+      = remote_response_map_.find(resp_hdr.event_id());
+  if (response_iter == remote_response_map_.end())
+    return;  // maybe already timedout
+
+  rpc_controller* ctrl = response_iter->second;
+  BOOST_ASSERT(ctrl);
+  // XXXX ctrl->handle_response(iter);
+  delete ctrl;
+  remote_response_map_.erase(response_iter);
 }
 
 }  // namespace rpcz

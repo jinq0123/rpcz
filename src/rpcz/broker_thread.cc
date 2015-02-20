@@ -226,8 +226,6 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
   send_empty_message(frontend_socket_, 0);  // Only to end zmq message?
 }
 
-// XXX merge handle_router_socket() and handle_dealer_socket()
-
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
@@ -254,21 +252,10 @@ void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   if (iter.next().size() != 0) return;
   if (!iter.has_more()) return;
 
-  // XXX no event id ...
-  //event_id event_id(interpret_message<event_id>(iter.next()));
-  //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
-  //if (response_iter == remote_response_map_.end()) {
-  //  return;
-  //}
-  //const rpc_controller* ctrl = response_iter->second;
-  //BOOST_ASSERT(ctrl);
   connection_info info = { false, dealer_index, "" };
   begin_worker_command(info, b2w::kHandleData);
   write_connection_info(frontend_socket_, info);
-  //send_pointer(frontend_socket_, ctrl, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
-  //remote_response_map_.erase(response_iter);
-  // XXX move remote_response_map_ to manager and make it thread-safe
 }
 
 void broker_thread::handle_timeout(uint64 event_id, size_t worker_index) {

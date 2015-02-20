@@ -19,6 +19,8 @@ namespace rpcz {
 
 class message_iterator;
 class rpc_controller;
+class rpc_request_header;
+class rpc_response_header;
 
 class worker {
  public:
@@ -34,6 +36,12 @@ class worker {
   void start_rpc(message_iterator& iter);
   void handle_data(zmq::socket_t& socket);
   void handle_timeout(message_iterator& iter);
+
+ private:
+  void handle_request(const ::rpcz::rpc_request_header& req_hdr,
+                      message_iterator& iter);
+  void handle_response(const ::rpcz::rpc_response_header& resp_hdr,
+                       message_iterator& iter);
 
  private:
   const size_t worker_index_;
