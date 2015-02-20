@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -25,9 +26,11 @@ namespace rpcz {
 
 server_impl::server_impl()
   : manager_(manager::get()),
-    binding_(false) {
-  assert(manager_);
+    service_factory_map_(new service_factory_map) {  // shared_ptr
+  BOOST_ASSERT(manager_);
 }
+
+// TODO: unbine service factory...
 
 server_impl::~server_impl() {
   // unbind first
@@ -36,15 +39,14 @@ server_impl::~server_impl() {
   endpoints_.clear();
 }
 
-void server_impl::register_service_factory(service_factory_ptr factory,
-                                           const std::string& name) {
-  assert(factory);
-  if (binding_) return;  // Must register before bind().
-  service_factory_map_[name] = factory;
+void server_impl::register_service_factory(
+    const std::string& name,
+    const service_factory_ptr& factory) {
+  BOOST_ASSERT(factory);
+  service_factory_map_->insert(name, factory);
 }
 
 void server_impl::bind(const std::string& endpoint) {
-  binding_ = true;  // Stop registeration after bind.
   // Record endpoints for unbind later. (Server can multi bind.)
   if (!endpoints_.insert(endpoint).second)
     return;  // already bound

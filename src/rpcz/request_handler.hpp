@@ -25,12 +25,15 @@ class request_handler {
  public:
   void handle_request();
 
- public:
+ private:
   // register_service() will take the ownership of input service.
   void register_service(rpcz::iservice* svc, const std::string& name);
 
  private:
   void unregister_service(const std::string& name);
+
+ private:
+  void create_services();
 
  private:
   typedef std::map<std::string, rpcz::iservice*> service_map;

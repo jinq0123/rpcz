@@ -186,7 +186,7 @@ void broker_thread::handle_bind_command(
 
   send_string(frontend_socket_, sender, ZMQ_SNDMORE);
   send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-  send_empty_message(frontend_socket_, 0);
+  send_uint64(frontend_socket_, router_index);
 }
 
 void broker_thread::handle_unbind_command(

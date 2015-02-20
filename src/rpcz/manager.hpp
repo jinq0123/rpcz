@@ -28,6 +28,7 @@
 #include <rpcz/common.hpp>
 #include <rpcz/event_id_generator.hpp>
 #include <rpcz/manager_ptr.hpp>
+#include <rpcz/service_factory_map_ptr.hpp>
 
 namespace zmq {
 class context_t;
@@ -36,7 +37,9 @@ class socket_t;
 }  // namespace zmq
 
 namespace rpcz {
+
 class closure;
+class router_service_factories;
 class sync_event;
 class worker;
 
@@ -59,7 +62,7 @@ class manager : boost::noncopyable {
   // Binds a socket to the given endpoint.
   // And binds service factories to this socket.
   void bind(const std::string& endpoint,
-      const service_factory_map& factories);
+      const service_factory_map_ptr& factories);
   // Unbind socket of the given endpoint.
   void unbind(const std::string& endpoint);
 
@@ -101,6 +104,9 @@ class manager : boost::noncopyable {
   typedef scoped_ptr<worker> scoped_worker;
   boost::scoped_array<scoped_worker> workers_;
   detail::event_id_generator event_id_generator_;
+
+  // Map router index to factories.
+  scoped_ptr<router_service_factories> factories_;  // thread-safe
 };  // class manager
 
 manager_ptr manager::get() {

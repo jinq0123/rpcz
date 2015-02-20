@@ -22,14 +22,7 @@ request_handler* request_handler_manager::insert_new_handler(
   BOOST_ASSERT(handler_map_.find(info) == handler_map_.end());
   // New request_handler. TODO: delete request_handler on disconnection
   request_handler_ptr handler_ptr(new request_handler(info));  // shared_ptr
-  // Create services for this handler...
-  BOOST_FOREACH(const service_factory_map::value_type& v, factories) {
-    iservice* svc = v.second->create();
-    assert(svc);
-    handler_ptr->register_service(svc, v.first);
-  }
   handler_map_[info] = handler_ptr;
-  // TODO: request_handler.set_client_connection(sender)
   return *handler_ptr;
 }
 

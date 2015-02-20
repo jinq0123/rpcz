@@ -24,10 +24,12 @@ set(RPCZ_SOURCES
     reactor.cc
     request_handler.cc
     request_handler_manager.cc
+    router_service_factories.cc
     rpc_controller.cc
     rpc_error.cc
     server.cc
     server_impl.cc
+    service_factory_map.cc
     service_stub.cc
     singleton_service_factory.cc
     sync_call_handler.cc

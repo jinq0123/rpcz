@@ -15,8 +15,9 @@
 
 namespace rpcz {
 
-request_handler::request_handler(const connection_info& conn_info) {
-  conn_info_(conn_info);
+request_handler::request_handler(const connection_info& conn_info)
+    : conn_info_(conn_info) {
+  create_services();
 }
 
 request_handler::~request_handler() {
@@ -58,6 +59,19 @@ void request_handler::unregister_service(const std::string& name) {
   assert((*iter).second);
   delete (*iter).second;
   service_map_.erase(iter);
+}
+
+// TODO: register services on connection...
+
+// Register service factories on server.
+
+// Create services for this handler.
+void request_handler::create_services() {
+  // XXXX
+  //BOOST_FOREACH(const service_factory_map::value_type& v, factories) {
+  //  iservice* svc = v.second->create();
+  //  assert(svc);
+  //  register_service(svc, v.first);
 }
 
 }  // namespace rpcz

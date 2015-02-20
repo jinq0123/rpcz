@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,8 +23,7 @@
 #include <boost/noncopyable.hpp>
 
 #include <rpcz/manager_ptr.hpp>
-#include <rpcz/service_factory_map.hpp>
-#include <rpcz/service_factory_ptr.hpp>
+#include <rpcz/service_factory_map_ptr.hpp>
 
 namespace rpcz {
 
@@ -36,22 +36,17 @@ class server_impl : boost::noncopyable {
   ~server_impl();
 
   // Registers an rpc service factory with this server_impl.
-  // All registrations must occur before bind() is called. TODO: allow after
   // The name parameter identifies the service for external clients. 
-
-  void register_service_factory(service_factory_ptr factory, const std::string& name);
+  void register_service_factory(const std::string& name,
+      const service_factory_ptr& factory);
 
   void bind(const std::string& endpoint);
-
-  // Must register service before bind. Registeration after bind will be ignored.
 
  private:
   manager_ptr manager_;
   typedef std::set<std::string> bind_endpoint_set;
   bind_endpoint_set endpoints_;
-  bool binding_;  // To ignore registeration after bind.
-  service_factory_map service_factory_map_;
-  // TODO: use thread-safe service_factories to allow register after bind.
+  service_factory_map_ptr service_factory_map_;  // thread-safe
 };
 
 }  // namespace rpcz

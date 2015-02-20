@@ -23,7 +23,6 @@
 #include <vector>
 
 #include <rpcz/reactor.hpp>
-#include <rpcz/service_factory_map.hpp>
 
 namespace rpcz {
 
