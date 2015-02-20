@@ -226,6 +226,7 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
   send_empty_message(frontend_socket_, 0);  // Only to end zmq message?
 }
 
+// XXX Must read all data...
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);

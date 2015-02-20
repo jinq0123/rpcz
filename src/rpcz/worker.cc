@@ -101,7 +101,6 @@ void worker::handle_data(zmq::socket_t& socket) {
     // XXXX rep.reply_error(error_code::INVALID_HEADER, "Invalid rpc_header.");
     return;
   }
-  if (!iter.has_more()) return;
   if (rpc_hdr.has_req_hdr()) {
     handle_request(rpc_hdr.req_hdr(), iter);
     return;
@@ -136,12 +135,46 @@ void worker::handle_timeout(message_iterator& iter) {
 void worker::handle_request(
     const ::rpcz::rpc_request_header& req_hdr,
     message_iterator& iter) {
+  if (!iter.has_more()) return;
         // XXXX
 }
 
 void worker::handle_response(
     const ::rpcz::rpc_response_header& resp_hdr,
     message_iterator& iter) {
+  // Must read until end.
+  bool has_error = resp_hdr.has_error_code();
+  if (has_error) {
+    handle_error_resp(resp_hdr);
+    return;
+  }
+
+  if (!iter.has_more()) {
+    // XXX handle_error(error_code::INVALID_MESSAGE, "");
+    return;  // Illegal response.
+  }
+  // normal response
+  const zmq::message_t& payload = iter.next();
+  handle_done_response(resp_hdr.event_id(), payload);
+}
+
+void worker::handle_done_response(uint64 event_id,
+    const zmq::message_t& response) {
+  remote_response_map::iterator response_iter
+      = remote_response_map_.find(event_id);
+  if (response_iter == remote_response_map_.end())
+    return;  // maybe already timedout
+
+  rpc_controller* ctrl = response_iter->second;
+  BOOST_ASSERT(ctrl);
+  BOOST_ASSERT(ctrl->get_event_id() == event_id);
+  ctrl->handle_response(response.data(), response.size());
+  delete ctrl;
+  remote_response_map_.erase(response_iter);
+}
+
+void worker::handle_error_resp(const ::rpcz::rpc_response_header& resp_hdr) {
+  BOOST_ASSERT(resp_hdr.has_error_code());
   remote_response_map::iterator response_iter
       = remote_response_map_.find(resp_hdr.event_id());
   if (response_iter == remote_response_map_.end())
@@ -149,7 +182,8 @@ void worker::handle_response(
 
   rpc_controller* ctrl = response_iter->second;
   BOOST_ASSERT(ctrl);
-  // XXXX ctrl->handle_response(iter);
+  BOOST_ASSERT(ctrl->get_event_id() == resp_hdr.event_id());
+  ctrl->handle_error(resp_hdr.error_code(), resp_hdr.error_str());
   delete ctrl;
   remote_response_map_.erase(response_iter);
 }

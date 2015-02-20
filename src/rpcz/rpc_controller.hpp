@@ -36,17 +36,14 @@ class rpc_controller : boost::noncopyable {
   inline void set_timeout_expired() { timeout_expired_ = true; }  // DEL?
 
  public:
-  // Not inlined to inline all other private handlers in .cc file.
-  // And hide rpcz.pb.h.
-  void handle_response(message_iterator& iter);
+  inline void handle_response(const void* data, size_t size);
 
- private:
-  inline void handle_response_message(const void* data, size_t size);
-  inline void handle_done_response(message_iterator& iter);
-
- private:
   // Error handlers are not inlined.
+
+ private:
   void handle_timeout_expired();
+
+ public:
   void handle_error(int error_code,
       const std::string& error_str);
 
@@ -56,6 +53,15 @@ class rpc_controller : boost::noncopyable {
   long timeout_ms_;
   bool timeout_expired_;
 };  // class rpc_controller
+
+// Run in worker thread.
+inline void rpc_controller::handle_response(
+    const void* data, size_t size) {
+  BOOST_ASSERT(data);
+  if (handler_) {
+    handler_(NULL, data, size);
+  }
+}  // handle_response_message
 
 }  // namespace rpcz
 #endif  // RPCZ_RPC_CONTEXT_HPP

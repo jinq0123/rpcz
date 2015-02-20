@@ -11,7 +11,8 @@
 #include <rpcz/common.hpp>  // for uint64
 
 namespace zmq {
-class context_t; 
+class context_t;
+class message_t;
 class socket_t;
 }  // namespace zmq
 
@@ -42,6 +43,8 @@ class worker {
                       message_iterator& iter);
   void handle_response(const ::rpcz::rpc_response_header& resp_hdr,
                        message_iterator& iter);
+  void handle_done_response(uint64 event_id, const zmq::message_t& response);
+  void handle_error_resp(const ::rpcz::rpc_response_header& resp_hdr);
 
  private:
   const size_t worker_index_;
