@@ -14,8 +14,7 @@
 #include <rpcz/logging.hpp>
 #include <rpcz/manager.hpp>
 #include <rpcz/replier.hpp>
-#include <rpcz/rpcz.pb.h>  // for rpc_request_header
-#include <rpcz/zmq_utils.hpp>  // for message_iterator
+#include <rpcz/router_service_factories.hpp>
 
 namespace rpcz {
 
@@ -32,23 +31,24 @@ request_handler::~request_handler() {
   assert(service_map_.empty());
 }
 
-void request_handler::handle_request() {
+void request_handler::handle_request(
+    const ::rpcz::rpc_request_header& req_hdr,
+    const void* data, size_t len) {
+  BOOST_ASSERT(data);
   connection_ptr conn(new connection(conn_info_));  // shared_ptr
-  replier rep(conn, event_id);
-  service_map::const_iterator service_it
-      = service_map_.find(req_hdr.service());
-  if (service_it == service_map_.end()) {
+  // TODO: One-way request: if req_hdr.has_event_id()
+  replier rep(conn, req_hdr.event_id());
+  service_map::const_iterator iter = service_map_.find(req_hdr.service());
+  if (iter == service_map_.end()) {
     // Handle invalid service.
     std::string error_str = "Invalid service: " + req_hdr.service();
     DLOG(INFO) << error_str;
     rep.reply_error(error_code::NO_SUCH_SERVICE, error_str);
     return;
   }
-  rpcz::iservice* svc = service_it->second;
+  rpcz::iservice* svc = iter->second;
   assert(svc);
-  svc->dispatch_request(req_hdr.method(),
-                        payload.data(), payload.size(),
-                        rep);
+  svc->dispatch_request(req_hdr.method(), data, len, rep);
 }  // handle_request()
 
 void request_handler::register_service(

@@ -23,7 +23,7 @@ public:
   virtual ~request_handler_manager(void);
 
 public:
-  inline request_handler&& get_handler(const connection_info& info);
+  inline request_handler& get_handler(const connection_info& info);
 
 private:
   request_handler& insert_new_handler(const connection_info& info);

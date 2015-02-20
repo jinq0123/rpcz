@@ -14,6 +14,7 @@
 namespace rpcz {
 
 class iservice;
+class rpc_request_header;
 struct connection_info;
 
 // Each connection will create a request_hander on first request.
@@ -26,7 +27,8 @@ class request_handler {
   ~request_handler();
 
  public:
-  void handle_request();
+  void handle_request(const ::rpcz::rpc_request_header& req_hdr,
+                      const void* data, size_t len);
 
  private:
   // register_service() will take the ownership of input service.

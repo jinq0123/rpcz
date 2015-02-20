@@ -134,7 +134,7 @@ void worker::handle_request(
   if (!iter.has_more()) return;
   zmq::message_t& payload = iter.next();
   request_handler& handler = request_handler_manager_.get_handler(conn_info);
-  handler.handle_request(payload.data(), payload.size());
+  handler.handle_request(req_hdr, payload.data(), payload.size());
 }
 
 void worker::handle_response(

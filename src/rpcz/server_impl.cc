@@ -21,6 +21,7 @@
 #include <boost/foreach.hpp>
 
 #include <rpcz/manager.hpp>
+#include <rpcz/service_factory_map.hpp>
 
 namespace rpcz {
 
