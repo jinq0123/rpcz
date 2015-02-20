@@ -15,16 +15,9 @@
 
 namespace rpcz {
 
-// XXX should ctr from conn ptr
-// XXX use dealer conn
-request_handler::request_handler(uint64 router_index,
-                                 const std::string& sender) {
-  conn_info_.reset(new connection_info);
-  conn_info_->is_router = true;
-  conn_info_->index = router_index;
-  conn_info_->sender = sender;
+request_handler::request_handler(const connection_info& conn_info) {
+  conn_info_(conn_info);
 }
-// XXX : conn_(new connection(router_index, sender)) {  // shared_ptr
 
 request_handler::~request_handler() {
   // Delete proto_rpc_service pointers.
@@ -34,24 +27,9 @@ request_handler::~request_handler() {
   assert(service_map_.empty());
 }
 
-void request_handler::handle_request(message_iterator& iter) {
-  if (!iter.has_more()) return;
-  uint64 event_id(interpret_message<uint64>(iter.next()));
-  if (!iter.has_more()) return;
-  rpc_header rpc_hdr;
+void request_handler::handle_request() {
   connection_ptr conn(new connection(conn_info_));  // shared_ptr
   replier rep(conn, event_id);
-  zmq::message_t& msg = iter.next();
-  if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
-    // Handle bad rpc.
-    DLOG(INFO) << "Received bad header.";
-    rep.reply_error(error_code::INVALID_HEADER, "Invalid rpc_header.");
-    return;
-  }
-  if (!iter.has_more()) return;
-  zmq::message_t& payload = iter.next();
-  if (iter.has_more()) return;
-  const rpc_request_header& req_hdr = rpc_hdr.req_hdr();
   service_map::const_iterator service_it
       = service_map_.find(req_hdr.service());
   if (service_it == service_map_.end()) {

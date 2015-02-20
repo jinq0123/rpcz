@@ -23,7 +23,6 @@
 #include <vector>
 
 #include <rpcz/reactor.hpp>
-#include <rpcz/request_handler_manager.hpp>
 #include <rpcz/service_factory_map.hpp>
 
 namespace rpcz {
@@ -106,7 +105,6 @@ class broker_thread {
   zmq::context_t& context_;
   zmq::socket_t* frontend_socket_;
   std::vector<std::string> workers_;
-  request_handler_manager request_handler_manager_;
 };
 
 }  // namespace rpcz

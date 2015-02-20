@@ -99,7 +99,8 @@ zmq::socket_t& manager::new_frontend_socket() {
   return *socket;
 }
 
-void manager::bind(const std::string& endpoint) {
+void manager::bind(const std::string& endpoint,
+    const service_factory_map& factories) {
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kBind, ZMQ_SNDMORE);

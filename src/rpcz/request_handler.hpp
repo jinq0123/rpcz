@@ -1,4 +1,6 @@
+// Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
+// Request handler.
 
 #ifndef RPCZ_REQUEST_HANDLER_H
 #define RPCZ_REQUEST_HANDLER_H
@@ -10,20 +12,18 @@
 
 namespace rpcz {
 
-class message_iterator;
 class iservice;
 
-// Each client has its request_hander.
-// Used in broker thread.
-// Run in random worker thread.
+// Each connection has its request_hander.
+// Run in worker thread.
 // Non-thread-safe.
 class request_handler {
  public:
-  request_handler(uint64 router_index, const std::string& sender);
+  explicit request_handler(const connection_info& conn_info);
   ~request_handler();
 
  public:
-  void handle_request(message_iterator& iter);
+  void handle_request();
 
  public:
   // register_service() will take the ownership of input service.
@@ -36,10 +36,7 @@ class request_handler {
   typedef std::map<std::string, rpcz::iservice*> service_map;
   service_map service_map_;  // Owns service. Delete in destructor.
 
-  // XXX Use connection_ptr instead of connection_info_ptr
-  //     after deletion on disconnection is implemented.
-  // XXX connection_ptr conn_;
-  connection_info_ptr conn_info_;
+  connection_info conn_info_;
 };
 
 }  // namespace rpcz

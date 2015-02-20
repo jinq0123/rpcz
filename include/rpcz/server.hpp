@@ -68,7 +68,6 @@ class RPCZ_API server : boost::noncopyable {
   // Registration after bind will be ignored.
 
   // TODO: register after bind. Move register into broker thread.
-  //       service_factory_map_ owned by broker thread.
 
  public:
   // service_factory creates service for each connection.

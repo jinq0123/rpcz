@@ -48,7 +48,7 @@ void server_impl::bind(const std::string& endpoint) {
   // Record endpoints for unbind later. (Server can multi bind.)
   if (!endpoints_.insert(endpoint).second)
     return;  // already bound
-  manager_->bind(endpoint);  // XXX , service_factory_map_);
+  manager_->bind(endpoint, service_factory_map_);
 }
 
 }  // namespace rpcz

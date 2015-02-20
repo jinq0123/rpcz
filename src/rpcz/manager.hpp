@@ -56,8 +56,10 @@ class manager : boost::noncopyable {
   // Blocks the current thread until all connections have completed.
   ~manager();
 
-  // binds a socket to the given endpoint. 
-  void bind(const std::string& endpoint);
+  // Binds a socket to the given endpoint.
+  // And binds service factories to this socket.
+  void bind(const std::string& endpoint,
+      const service_factory_map& factories);
   // Unbind socket of the given endpoint.
   void unbind(const std::string& endpoint);
 

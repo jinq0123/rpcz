@@ -14,5 +14,14 @@ struct connection_info {
   uint64 index;  // router or dealer index
   std::string sender;  // Zmq sender id. Empty for dealer type.
 };
+
+bool operator==(const connection_info& lhs,
+                const connection_info& rhs)
+{
+  return lhs.is_router == rhs.is_router
+      && lhs.index == rhs.index
+      && lhs.sender == rhs.sender;
+}
+
 }  // namesapce rpcz
 #endif  // RPCZ_CONNECTION_INFO_HPP

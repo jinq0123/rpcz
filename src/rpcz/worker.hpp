@@ -1,4 +1,4 @@
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0.
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Worker function. Runs in worker thread.
 
@@ -9,6 +9,7 @@
 #include <boost/unordered_map.hpp>
 
 #include <rpcz/common.hpp>  // for uint64
+#include <rpcz/request_handler_manager.hpp>
 
 namespace zmq {
 class context_t;
@@ -22,6 +23,7 @@ class message_iterator;
 class rpc_controller;
 class rpc_request_header;
 class rpc_response_header;
+struct connection_info;
 
 class worker {
  public:
@@ -39,7 +41,8 @@ class worker {
   void handle_timeout(message_iterator& iter);
 
  private:
-  void handle_request(const ::rpcz::rpc_request_header& req_hdr,
+  void handle_request(const connection_info& conn_info,
+                      const ::rpcz::rpc_request_header& req_hdr,
                       message_iterator& iter);
   void handle_response(const ::rpcz::rpc_response_header& resp_hdr,
                        message_iterator& iter);
@@ -55,6 +58,8 @@ class worker {
   typedef boost::unordered_map<uint64/*event_id*/, rpc_controller*>
       remote_response_map;
   remote_response_map remote_response_map_;
+
+  request_handler_manager request_handler_manager_;
 };
 
 }  // namespace rpcz

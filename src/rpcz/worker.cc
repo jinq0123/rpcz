@@ -16,6 +16,8 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
+// Worker thread function.
+
 #include <rpcz/worker.hpp>
 
 #include <zmq.hpp>
@@ -100,7 +102,7 @@ void worker::handle_data(zmq::socket_t& socket) {
     return;
   }
   if (rpc_hdr.has_req_hdr()) {
-    handle_request(rpc_hdr.req_hdr(), iter);
+    handle_request(info, rpc_hdr.req_hdr(), iter);
     return;
   }
   if (rpc_hdr.has_resp_hdr()) {
@@ -126,17 +128,14 @@ void worker::handle_timeout(message_iterator& iter) {
 }
 
 void worker::handle_request(
+    const connection_info& conn_info,
     const ::rpcz::rpc_request_header& req_hdr,
     message_iterator& iter) {
   if (!iter.has_more()) return;
-        // XXXX
+  zmq::message_t& payload = iter.next();
+  request_handler& handler = request_handler_manager_.get_handler(conn_info);
+  handler.handle_request(payload.data(), payload.size());
 }
-  // XXXX
-          // XXX
-        //request_handler* handler =
-        //    interpret_message<request_handler*>(iter.next());
-        //assert(handler);
-        //handler->handle_request(iter);
 
 void worker::handle_response(
     const ::rpcz::rpc_response_header& resp_hdr,
