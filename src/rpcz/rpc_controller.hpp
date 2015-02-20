@@ -11,10 +11,6 @@
 #include <rpcz/response_message_handler.hpp>
 #include <rpcz/common.hpp>  // for uint64
 
-namespace zmq {
-class message_t;
-}  // namespace zmq
-
 namespace rpcz {
 
 class message_iterator;
@@ -26,24 +22,18 @@ class rpc_controller : boost::noncopyable {
       long timeout_ms)
       : event_id_(event_id),
         handler_(handler),
-        timeout_ms_(timeout_ms),
-        timeout_expired_(false) {}
+        timeout_ms_(timeout_ms) {}
   inline ~rpc_controller() {}
 
  public:
   inline uint64 get_event_id() const { return event_id_; }
   inline long get_timeout_ms() const { return timeout_ms_; }
-  inline void set_timeout_expired() { timeout_expired_ = true; }  // DEL?
 
  public:
   inline void handle_response(const void* data, size_t size);
 
   // Error handlers are not inlined.
-
- private:
-  void handle_timeout_expired();
-
- public:
+  void handle_timeout();
   void handle_error(int error_code,
       const std::string& error_str);
 
@@ -51,7 +41,6 @@ class rpc_controller : boost::noncopyable {
   uint64 event_id_;
   response_message_handler handler_;
   long timeout_ms_;
-  bool timeout_expired_;
 };  // class rpc_controller
 
 // Run in worker thread.

@@ -43,7 +43,7 @@ class worker {
                       message_iterator& iter);
   void handle_response(const ::rpcz::rpc_response_header& resp_hdr,
                        message_iterator& iter);
-  void handle_done_response(uint64 event_id, const zmq::message_t& response);
+  void handle_done_resp(uint64 event_id, const zmq::message_t& response);
   void handle_error_resp(const ::rpcz::rpc_response_header& resp_hdr);
 
  private:

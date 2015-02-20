@@ -121,15 +121,18 @@ void worker::handle_data(zmq::socket_t& socket) {
 
 void worker::handle_timeout(message_iterator& iter) {
   uint64 event_id = interpret_message<uint64>(iter.next());
-  // XXXX
-  //remote_response_map::iterator response_iter = remote_response_map_.find(event_id);
-  //if (response_iter == remote_response_map_.end()) {
-  //  return;
-  //}
-  //rpc_controller* ctrl = response_iter->second;
-  //BOOST_ASSERT(ctrl);
-  //ctrl->set_timeout_expired();  XXX ->timeout()
-  //remote_response_map_.erase(response_iter);
+  BOOST_ASSERT(!iter.has_more());
+  remote_response_map::iterator response_iter
+      = remote_response_map_.find(event_id);
+  if (response_iter == remote_response_map_.end())
+    return;  // already be responded?
+
+  rpc_controller* ctrl = response_iter->second;
+  BOOST_ASSERT(ctrl);
+  BOOST_ASSERT(ctrl->get_event_id() == event_id);
+  ctrl->handle_timeout();
+  delete ctrl;
+  remote_response_map_.erase(response_iter);
 }
 
 void worker::handle_request(
@@ -155,15 +158,15 @@ void worker::handle_response(
   }
   // normal response
   const zmq::message_t& payload = iter.next();
-  handle_done_response(resp_hdr.event_id(), payload);
+  handle_done_resp(resp_hdr.event_id(), payload);
 }
 
-void worker::handle_done_response(uint64 event_id,
+void worker::handle_done_resp(uint64 event_id,
     const zmq::message_t& response) {
   remote_response_map::iterator response_iter
       = remote_response_map_.find(event_id);
   if (response_iter == remote_response_map_.end())
-    return;  // maybe already timedout
+    return;  // maybe already timeout
 
   rpc_controller* ctrl = response_iter->second;
   BOOST_ASSERT(ctrl);
