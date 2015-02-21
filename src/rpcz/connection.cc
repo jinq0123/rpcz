@@ -83,7 +83,6 @@ void connection::request(
   msg_vector.push_back(payload_out.release());
 
   // rpc_controller will be deleted on response or timeout in worker thread.
-  // XXX delete on timeout.
   rpc_controller* ctrl = new rpc_controller(event_id, handler, timeout_ms);
   request(msg_vector, ctrl);
 }

@@ -229,8 +229,6 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
   send_empty_message(frontend_socket_, 0);  // Only to end zmq message?
 }
 
-// XXX Must read all data...
-
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
@@ -265,10 +263,6 @@ void broker_thread::handle_timeout(uint64 event_id, size_t worker_index) {
   begin_worker_command(worker_index, b2w::kHandleTimeout);
   send_uint64(frontend_socket_, event_id, 0);
 }
-
-// XXX Map connection to worker thread.
-// XXX dealer index -> worker thread index (worker name)
-// XXX (router index, sender) -> worker thread index (worker name)
 
 inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
   BOOST_ASSERT(frontend_socket);

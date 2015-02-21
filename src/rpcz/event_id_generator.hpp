@@ -29,7 +29,7 @@ namespace detail {
 const uint64 kLargePrime = (1ULL << 63) - 165;
 const uint64 kGenerator = 2;
 
-// thread-safe.  XXX change it to atomic_uint64...
+// thread-safe.  XXXX change it to atomic_uint64...
 class event_id_generator : boost::noncopyable {
  public:
   event_id_generator();
