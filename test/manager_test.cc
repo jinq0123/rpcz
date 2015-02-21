@@ -70,7 +70,7 @@ void sink_server() {
   zmq::context_t context(1);
   zmq::socket_t socket(context, ZMQ_DEALER);
   // Use tcp because inproc must under the same zmq context.
-  socket.bind("tcp://*:5555");
+  socket.bind("tcp://*:5556");
 
   bool should_quit = false;
   while (!should_quit) {
@@ -109,8 +109,8 @@ TEST_F(manager_test, TestTimeoutAsync) {
   manager_ptr mgr = manager::get();
   zmq::context_t context(1);
   zmq::socket_t server(context, ZMQ_DEALER);
-  server.bind("tcp://*:5555");
-  connection_ptr conn(new connection("tcp://localhost:5555"));
+  server.bind("tcp://*:5557");
+  connection_ptr conn(new connection("tcp://localhost:5557"));
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -168,7 +168,7 @@ TEST_F(manager_test, ManyClientsTest) {
 
   boost::thread thrd(sink_server);
 
-  connection_ptr conn(new connection("tcp://localhost:5555"));
+  connection_ptr conn(new connection("tcp://localhost:5556"));
   SendManyMessages(conn);
   scoped_ptr<message_vector> request(create_quit_request());
   struct handler {
