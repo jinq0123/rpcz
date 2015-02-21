@@ -81,17 +81,18 @@ void request_handler::unregister_service(const std::string& name) {
 
 // Create services for this handler.
 void request_handler::create_services() {
-  if (conn_info_->is_router) {
-    manager_ptr mgr = manager::get();
-    BOOST_ASSERT(mgr);
-    router_service_factories& factories = mgr->get_factories();
-    service_factory_map_ptr router_factories
-        = factories.get(conn_info_->index);
-    if (!router_factories) return;
-    router_factories->for_each(boost::bind(
-        &request_handler::create_and_register_service, this, _1, _2));
-  }
-  // XXXX register service for dealer socket.
+  // Only router socket can create services from factories.
+  // Dealer socket register_service() directly.
+  if (!conn_info_->is_router)
+      return;
+  manager_ptr mgr = manager::get();
+  BOOST_ASSERT(mgr);
+  router_service_factories& factories = mgr->get_factories();
+  service_factory_map_ptr router_factories
+      = factories.get(conn_info_->index);
+  if (!router_factories) return;
+  router_factories->for_each(boost::bind(
+      &request_handler::create_and_register_service, this, _1, _2));
 }
 
 }  // namespace rpcz
