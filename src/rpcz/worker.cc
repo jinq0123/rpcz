@@ -140,7 +140,7 @@ void worker::register_service(zmq::socket_t& socket) {
   iservice* svc = interpret_message<iservice*>(iter.next());
   BOOST_ASSERT(!iter.has_more());
   BOOST_ASSERT(svc);
-  request_handler& handler = request_handler_manager_.get_handler(info);
+  request_handler& handler = request_handler_map_.get_handler(info);
   handler.register_service(name, svc);
 }
 
@@ -150,7 +150,7 @@ void worker::handle_request(
     message_iterator& iter) {
   if (!iter.has_more()) return;
   zmq::message_t& payload = iter.next();
-  request_handler& handler = request_handler_manager_.get_handler(conn_info);
+  request_handler& handler = request_handler_map_.get_handler(conn_info);
   handler.handle_request(req_hdr, payload.data(), payload.size());
 }
 

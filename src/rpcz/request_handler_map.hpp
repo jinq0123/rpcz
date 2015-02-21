@@ -2,8 +2,8 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Manager of request handlers.
 
-#ifndef RPCZ_REQUEST_HANDLER_MANAGER
-#define RPCZ_REQUEST_HANDLER_MANAGER
+#ifndef RPCZ_REQUEST_HANDLER_MAP_HPP
+#define RPCZ_REQUEST_HANDLER_MAP_HPP
 
 #include <boost/unordered_map.hpp>
 
@@ -18,10 +18,10 @@ namespace rpcz {
 // Managers this thread's request_handlers.
 // Used in worker thread.
 // Non-thread-safe.
-class request_handler_manager {
+class request_handler_map {
 public:
-  request_handler_manager(void);
-  virtual ~request_handler_manager(void);
+  request_handler_map(void);
+  virtual ~request_handler_map(void);
 
 public:
   inline request_handler& get_handler(const connection_info& info);
@@ -35,7 +35,7 @@ private:
   handler_map handler_map_;
 };
 
-request_handler& request_handler_manager::get_handler(
+request_handler& request_handler_map::get_handler(
     const connection_info& info) {
   handler_map::const_iterator iter = handler_map_.find(info);
   if (iter != handler_map_.end()) {
@@ -46,4 +46,4 @@ request_handler& request_handler_manager::get_handler(
 }
 
 }  // namespace rpcz
-#endif  // RPCZ_REQUEST_HANDLER_MANAGER
+#endif  // RPCZ_REQUEST_HANDLER_MAP_HPP

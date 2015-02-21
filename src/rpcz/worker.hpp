@@ -60,7 +60,7 @@ class worker {
       remote_response_map;
   remote_response_map remote_response_map_;
 
-  request_handler_manager request_handler_manager_;
+  request_handler_map request_handler_map_;
 };
 
 }  // namespace rpcz
