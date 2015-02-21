@@ -35,14 +35,18 @@ static uint64 connect(const std::string& endpoint) {
 }
 
 connection::connection(uint64 router_index,
-                       const std::string& sender) {
+                       const std::string& sender)
+    : manager_(manager::get()) {
+  BOOST_ASSERT(manager_);
   init_router(router_index, sender);
-  BOOST_ASSERT(manager_ && info_);
+  BOOST_ASSERT(info_);
 };
 
-connection::connection(const std::string& endpoint) {
+connection::connection(const std::string& endpoint)
+    : manager_(manager::get()) {
+  BOOST_ASSERT(manager_);
   init_dealer(endpoint);
-  BOOST_ASSERT(manager_ && info_);
+  BOOST_ASSERT(info_);
 }
 
 connection::connection(const connection_info_ptr& info)
@@ -175,7 +179,6 @@ inline void connection::reply(message_vector& data) const {
 
 void connection::init(bool is_router,
     uint64 index, const std::string& sender/*=""*/) {
-  manager_ = manager::get();
   info_.reset(new connection_info);
   info_->is_router = is_router;
   info_->index = index;
