@@ -34,6 +34,7 @@ int main() {
       new SearchServiceImpl);
 
   SearchRequest request;  // only to trigger reversed request
+  request.set_query("");  // required field
   stub.async_Search(request);
   
   // Serve for router.
