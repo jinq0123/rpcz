@@ -24,17 +24,12 @@
 #include <boost/scoped_array.hpp>
 #include <boost/thread.hpp>
 #include <boost/weak_ptr.hpp>
+#include <zmq.hpp>
 
 #include <rpcz/common.hpp>
 #include <rpcz/event_id_generator.hpp>
 #include <rpcz/manager_ptr.hpp>
 #include <rpcz/service_factory_map_ptr.hpp>
-
-namespace zmq {
-class context_t;
-class message_t;
-class socket_t;
-}  // namespace zmq
 
 namespace rpcz {
 
@@ -94,8 +89,7 @@ class manager : boost::noncopyable {
   static boost::mutex this_weak_ptr_mutex_;
 
  private:
-  scoped_ptr<zmq::context_t> own_context_;
-  zmq::context_t* context_;  // Use own_context_ or external context
+  zmq::context_t context_;
 
   boost::thread broker_thread_;
   boost::thread_group worker_threads_;

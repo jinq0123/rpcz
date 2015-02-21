@@ -31,20 +31,15 @@ void run() {
   manager::get()->run();
 }
 
+// TODO: run() in main thread, and callback in main thread.
+// TODO: run_in_background() run callback in background worker thread.
+
 void terminate() {
   manager::get()->terminate();
 }
 
-void set_zmq_context(zmq::context_t* context) {
-  application_options::set_zmq_context(context);
-}
-
-void set_zmq_io_threads(int n) {
-  application_options::set_zmq_io_threads(n);
-}
-
-void set_manager_threads(int n) {
-  application_options::set_manager_threads(n);
+void set_worker_threads(int n) {
+  application_options::set_worker_threads(n);
 }
 
 }  // namespace application

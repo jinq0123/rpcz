@@ -63,12 +63,10 @@ class SearchServiceImpl : public SearchService {
 
 class server_test : public ::testing::Test {
  public:
-  server_test() :
-      context_(new zmq::context_t(1)) /* scoped_ptr */ {
+  server_test() {
     LOG(INFO) << "server_test()";
     EXPECT_TRUE(manager::is_destroyed());
-    application::set_zmq_context(context_.get());
-    application::set_manager_threads(10);
+    application::set_worker_threads(10);
     server_.reset(new server);
     start_server();
   }
@@ -83,7 +81,6 @@ class server_test : public ::testing::Test {
 
     while (!manager::is_destroyed())
         ;
-    context_.reset();
   }
 
   void start_server() {
@@ -97,7 +94,6 @@ class server_test : public ::testing::Test {
 
 protected:
   // destruct in reversed order
-  scoped_ptr<zmq::context_t> context_;  // destruct last
   connection_ptr connection_;
   scoped_ptr<SearchServiceImpl> service_;
   // Server must destruct before service. (Or unregister services before destruct.)

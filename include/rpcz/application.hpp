@@ -44,15 +44,7 @@ namespace application {
   // * Number of worker threads. Those threads are used for
   //   running user code: handling server requests or running callbacks.
   //   Default 1.
-  // * ZeroMQ context to use for our application. If NULL, then application will
-  //   construct its own ZeroMQ context and own it. If you provide your own
-  //   ZeroMQ context, application will not take ownership of it. The ZeroMQ
-  //   context must outlive the rpcz application. Default NULL.
-  // * Number of ZeroMQ I/O threads, to be passed to zmq_init(). This value is
-  //   ignored when you provide your own ZeroMQ context. Default 1.
-  RPCZ_API void set_manager_threads(int n);  // default 1
-  RPCZ_API void set_zmq_context(zmq::context_t* context);  // default NULL
-  RPCZ_API void set_zmq_io_threads(int n);  // default 1
+  RPCZ_API void set_worker_threads(int n);  // default 1
 }  // namespace application
 
 }  // namespace rpcz

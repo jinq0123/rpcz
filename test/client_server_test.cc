@@ -112,11 +112,9 @@ class BackendSearchServiceImpl : public SearchService {
 
 class server_test : public ::testing::Test {
  public:
-  server_test() :
-      context_(new zmq::context_t(1)) /* scoped_ptr */ {
+  server_test() {
     EXPECT_TRUE(manager::is_destroyed());
-    application::set_zmq_context(context_.get());
-    application::set_manager_threads(10);
+    application::set_worker_threads(10);
     frontend_server_.reset(new server);
     backend_server_.reset(new server);
     start_server();
@@ -134,7 +132,6 @@ class server_test : public ::testing::Test {
 
     while (!manager::is_destroyed())
         ;
-    context_.reset();
   }
 
   void start_server() {
@@ -153,7 +150,6 @@ class server_test : public ::testing::Test {
 
 protected:
   // destruct in reversed order
-  scoped_ptr<zmq::context_t> context_;  // destruct last
   connection_ptr frontend_connection_;
   connection_ptr backend_connection_;
   scoped_ptr<SearchServiceImpl> frontend_service_;

@@ -44,15 +44,12 @@ namespace rpcz {
 
 class manager_test : public ::testing::Test {
  public:
-  manager_test() : context(1) {
-    application::set_zmq_context(&context);
+  manager_test() {
   }
   ~manager_test() {
-    application::set_zmq_context(NULL);
   }
 
  protected:
-  zmq::context_t context;
 };
 
 // friend function of connection.
@@ -64,12 +61,13 @@ void request_connection(connection& conn,
 
 TEST_F(manager_test, TestStartsAndFinishes) {
   ASSERT_TRUE(manager::is_destroyed());
-  application::set_manager_threads(4);
+  application::set_worker_threads(4);
   manager_ptr mgr = manager::get();
 }
 
 // Sink server will not reply.
-void sink_server(zmq::context_t& context) {
+void sink_server() {
+  zmq::context_t context(1);
   scoped_ptr<zmq::socket_t> socket(new zmq::socket_t(context, ZMQ_DEALER));
   socket->bind("inproc://server.test");
 
@@ -90,10 +88,6 @@ void sink_server(zmq::context_t& context) {
   }
 }
 
-boost::thread start_server(zmq::context_t& context) {
-  return boost::thread(boost::bind(sink_server, boost::ref(context)));
-}
-
 message_vector* create_simple_request(int number=0) {
   message_vector* request = new message_vector;
   request->push_back(string_to_message("hello"));
@@ -112,8 +106,9 @@ message_vector* create_quit_request() {
 
 TEST_F(manager_test, TestTimeoutAsync) {
   ASSERT_TRUE(manager::is_destroyed());
-  application::set_manager_threads(4);
+  application::set_worker_threads(4);
   manager_ptr mgr = manager::get();
+  zmq::context_t context(1);
   zmq::socket_t server(context, ZMQ_DEALER);
   server.bind("inproc://server.test");
   connection_ptr conn(new connection("inproc://server.test"));
@@ -169,10 +164,10 @@ void SendManyMessages(const connection_ptr& conn) {
 
 TEST_F(manager_test, ManyClientsTest) {
   ASSERT_TRUE(manager::is_destroyed());
-  application::set_manager_threads(4);
+  application::set_worker_threads(4);
   manager_ptr mgr = manager::get();
 
-  boost::thread thrd(start_server(context));
+  boost::thread thrd(sink_server);
 
   connection_ptr conn(new connection("inproc://server.test"));
   SendManyMessages(conn);
@@ -212,8 +207,9 @@ void DoThis(zmq::context_t* context) {
 
 TEST_F(manager_test, ProcessesSingleCallback) {
   ASSERT_TRUE(manager::is_destroyed());
-  application::set_manager_threads(4);
+  application::set_worker_threads(4);
   manager_ptr mgr = manager::get();
+  zmq::context_t context(1);
   zmq::socket_t socket(context, ZMQ_PULL);
   socket.bind(kEndpoint);
   mgr->add(new_callback(&DoThis, &context));
@@ -250,7 +246,7 @@ void add_many_closures() {
 TEST_F(manager_test, ProcessesManyCallbacksFromManyThreads) {
   ASSERT_TRUE(manager::is_destroyed());
   const int thread_count = 10;
-  application::set_manager_threads(thread_count);
+  application::set_worker_threads(thread_count);
   manager_ptr mgr = manager::get();
   boost::thread_group thread_group;
   for (int i = 0; i < thread_count; ++i) {

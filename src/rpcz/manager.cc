@@ -42,37 +42,28 @@ manager::weak_ptr manager::this_weak_ptr_;
 boost::mutex manager::this_weak_ptr_mutex_;
 
 manager::manager()
-  : context_(NULL),
+  : context_(1),
     is_terminating_(new sync_event),  // scoped_ptr
     factories_(new router_service_factories) {  // scoped_ptr
   DLOG(INFO) << "manager() ";
   frontend_endpoint_ = "inproc://" + boost::lexical_cast<std::string>(this)
       + ".rpcz.manager.frontend";
 
-  application_options options;
-  context_ = options.get_zmq_context();
-  if (NULL == context_) {
-    int zmq_io_threads = options.get_zmq_io_threads();
-    assert(zmq_io_threads > 0);
-    own_context_.reset(new zmq::context_t(zmq_io_threads));
-    context_ = own_context_.get();
-  }
-  assert(context_);
-  zmq::socket_t* frontend_socket = new zmq::socket_t(*context_, ZMQ_ROUTER);
+  zmq::socket_t* frontend_socket = new zmq::socket_t(context_, ZMQ_ROUTER);
   int linger_ms = 0;
   frontend_socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   frontend_socket->bind(frontend_endpoint_.c_str());
-  int nthreads = options.get_worker_threads();
+  int nthreads = application_options::get_worker_threads();
   assert(nthreads > 0);
   workers_.reset(new scoped_worker[nthreads]);
   for (int i = 0; i < nthreads; ++i) {
-    workers_[i].reset(new worker(i, frontend_endpoint_, *context_));
+    workers_[i].reset(new worker(i, frontend_endpoint_, context_));
     worker_threads_.add_thread(new boost::thread(
         boost::ref(*workers_[i])));
   }
   sync_event event;
   broker_thread_ = boost::thread(&broker_thread::run,
-                                 boost::ref(*context_), nthreads, &event,
+                                 boost::ref(context_), nthreads, &event,
                                  frontend_socket);
   event.wait();
 }
@@ -93,7 +84,7 @@ bool manager::is_destroyed() {
 // used by get_frontend_socket()
 zmq::socket_t& manager::new_frontend_socket() {
   assert(NULL == socket_.get());
-  zmq::socket_t* socket = new zmq::socket_t(*context_, ZMQ_DEALER);
+  zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->connect(frontend_endpoint_.c_str());
