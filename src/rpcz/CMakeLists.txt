@@ -23,7 +23,7 @@ set(RPCZ_SOURCES
     manager.cc
     reactor.cc
     request_handler.cc
-    request_handler_manager.cc
+    request_handler_map.cc
     router_service_factories.cc
     rpc_controller.cc
     rpc_error.cc

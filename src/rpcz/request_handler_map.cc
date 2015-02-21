@@ -4,7 +4,7 @@
 // XXXX rename it to request_handler_map
 // Map connection info to request handler.
 
-#include <rpcz/request_handler_manager.hpp>
+#include <rpcz/request_handler_map.hpp>
 
 #include <boost/foreach.hpp>
 

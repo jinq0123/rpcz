@@ -9,7 +9,7 @@
 #include <boost/unordered_map.hpp>
 
 #include <rpcz/common.hpp>  // for uint64
-#include <rpcz/request_handler_manager.hpp>
+#include <rpcz/request_handler_map.hpp>
 
 namespace zmq {
 class context_t;
