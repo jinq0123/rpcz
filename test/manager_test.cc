@@ -68,22 +68,21 @@ TEST_F(manager_test, TestStartsAndFinishes) {
 // Sink server will not reply.
 void sink_server() {
   zmq::context_t context(1);
-  scoped_ptr<zmq::socket_t> socket(new zmq::socket_t(context, ZMQ_DEALER));
-  socket->bind("inproc://server.test");
+  zmq::socket_t socket(context, ZMQ_DEALER);
+  // Use tcp because inproc must under the same zmq context.
+  socket.bind("tcp://*:5555");
 
   bool should_quit = false;
-  int messages = 0;
   while (!should_quit) {
     message_vector v;
-    GOOGLE_CHECK(read_message_to_vector(socket.get(), &v));
-    ++messages;
+    GOOGLE_CHECK(read_message_to_vector(&socket, &v));
     ASSERT_EQ(3, v.size());
     if (message_to_string(v[1]) == "hello") {
       ASSERT_EQ("there", message_to_string(v[2]).substr(0, 5));
     } else if (message_to_string(v[1]) == "QUIT") {
       should_quit = true;
     } else {
-      GOOGLE_CHECK(false) << "Unknown command: " << message_to_string(v[2]);
+      GOOGLE_CHECK(false) << "Unknown command: " << message_to_string(v[1]);
     }
   }
 }
@@ -110,8 +109,8 @@ TEST_F(manager_test, TestTimeoutAsync) {
   manager_ptr mgr = manager::get();
   zmq::context_t context(1);
   zmq::socket_t server(context, ZMQ_DEALER);
-  server.bind("inproc://server.test");
-  connection_ptr conn(new connection("inproc://server.test"));
+  server.bind("tcp://*:5555");
+  connection_ptr conn(new connection("tcp://localhost:5555"));
   scoped_ptr<message_vector> request(create_simple_request());
 
   struct handler {
@@ -152,12 +151,12 @@ class barrier_handler {
 };
 
 void SendManyMessages(const connection_ptr& conn) {
-  const int request_count = 1000;
+  const int request_count = 1500;
   barrier_handler barrier;
   for (int i = 0; i < request_count; ++i) {
     message_vector* request = create_simple_request(i);
     request_connection(*conn, *request,
-        new rpc_controller(0, boost::ref(barrier), 0/*ms*/));
+        new rpc_controller(i, boost::ref(barrier), 0/*ms*/));
   }
   barrier.wait(request_count);
 }
@@ -169,7 +168,7 @@ TEST_F(manager_test, ManyClientsTest) {
 
   boost::thread thrd(sink_server);
 
-  connection_ptr conn(new connection("inproc://server.test"));
+  connection_ptr conn(new connection("tcp://localhost:5555"));
   SendManyMessages(conn);
   scoped_ptr<message_vector> request(create_quit_request());
   struct handler {
@@ -179,7 +178,7 @@ TEST_F(manager_test, ManyClientsTest) {
     }
   } hdl;
   request_connection(*conn, *request,
-      new rpc_controller(0, boost::ref(hdl), 0/*ms*/));
+      new rpc_controller(12345678, boost::ref(hdl), 0/*ms*/));
   hdl.event.wait();
   thrd.join();
 }

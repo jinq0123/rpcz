@@ -261,7 +261,7 @@ void broker_thread::handle_timeout(uint64 event_id, size_t worker_index) {
   BOOST_ASSERT(!workers_.empty());
   worker_index %= workers_.size();
   begin_worker_command(worker_index, b2w::kHandleTimeout);
-  send_uint64(frontend_socket_, event_id, 0);
+  send_uint64(frontend_socket_, event_id);
 }
 
 inline void broker_thread::send_request(message_iterator& iter) {
