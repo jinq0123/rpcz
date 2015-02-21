@@ -53,7 +53,9 @@ void worker::operator()() {
   bool should_continue = true;
   do {
     message_iterator iter(socket);
+    BOOST_ASSERT(iter.has_more());
     CHECK_EQ(0, iter.next().size());
+    BOOST_ASSERT(iter.has_more());
     char command(interpret_message<char>(iter.next()));
     using namespace b2w;  // broker to worker command
     switch (command) {
