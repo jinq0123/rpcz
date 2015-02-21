@@ -9,6 +9,7 @@ Introduction
 * RPCZ is a library for writing fast and robust RPC clients and servers that speak Protocol Buffers. 
 * RPCZ currently supports writing clients and servers in C++ and Python. More languages may be added in the future. 
 * The API offers both asynchronous (callbacks) and synchronous (blocking) style functionality. Both styles allow specifying deadlines in millisecond resolution. 
+* RPCZ supports full duplex RPC over the same connection.
 * RPCZ is built on top of ZeroMQ for handling the low-level I/O details in a lock-free manner. 
 * The Python module is a Cython wrapper around the C++ API. 
 * RPCZ has been tested on Windows, Ubuntu 11.10 and Mac OS X Lion.
@@ -77,3 +78,20 @@ See async_client_adv.cc
     handler hdl;
     search_stub.async_Search(request,
         boost::bind(&handler::fun, &hdl, _1, _2));
+
+### Full Duplex RPC
+See full_duplex/dealer.cc, router.cc
+
+Register service on stub's connection:
+    SearchService_Stub stub("tcp://localhost:5555");
+    rpcz::connection_ptr conn = stub.get_connection_ptr();
+    conn->register_service(SearchServiceImpl::descriptor()->name(),
+        new SearchServiceImpl);
+
+Get connection from the replier and create stub:
+    virtual void Search(
+        const SearchRequest& /*request*/,
+        const rpcz::replier& rep) {
+      SearchService_Stub search_stub(rep.get_connection_ptr());
+      ...
+    }
