@@ -78,10 +78,10 @@ void echo_server(zmq::context_t& context) {
     message_vector v;
     GOOGLE_CHECK(read_message_to_vector(socket.get(), &v));
     ++messages;
-    ASSERT_EQ(4, v.size());
-    if (message_to_string(v[2]) == "hello") {
-      ASSERT_EQ("there", message_to_string(v[3]).substr(0, 5));
-    } else if (message_to_string(v[2]) == "QUIT") {
+    ASSERT_EQ(3, v.size());
+    if (message_to_string(v[1]) == "hello") {
+      ASSERT_EQ("there", message_to_string(v[2]).substr(0, 5));
+    } else if (message_to_string(v[1]) == "QUIT") {
       should_quit = true;
     } else {
       GOOGLE_CHECK(false) << "Unknown command: " << message_to_string(v[2]);
