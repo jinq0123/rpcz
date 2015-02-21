@@ -37,9 +37,9 @@ class worker {
 
  private:
   void start_rpc(message_iterator& iter);
-  void handle_data(zmq::socket_t& socket);
+  void handle_data(message_iterator& iter);
   void handle_timeout(message_iterator& iter);
-  void register_service(zmq::socket_t& socket);
+  void register_service(message_iterator& iter);
 
  private:
   void handle_request(const connection_info& conn_info,

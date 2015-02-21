@@ -12,11 +12,9 @@
 namespace rpcz {
 
 inline void read_connection_info(
-    zmq::socket_t* socket,
+    message_iterator& iter,
     connection_info* info) {
-  BOOST_ASSERT(socket);
   BOOST_ASSERT(info);
-  message_iterator iter(*socket);
   BOOST_ASSERT(iter.has_more());
   char is_router(interpret_message<char>(iter.next()));
   BOOST_ASSERT(iter.has_more());

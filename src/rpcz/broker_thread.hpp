@@ -77,13 +77,13 @@ class broker_thread {
 
  private:
   inline void add_closure(closure* closure);
-  inline void send_request(zmq::socket_t* frontend_socket);
+  inline void send_request(message_iterator& iter);
   inline void start_rpc(const connection_info& info,
                         const rpc_controller* ctrl);
-  inline void send_reply(zmq::socket_t* frontend_socket);
+  inline void send_reply(message_iterator& iter);
 
  private:
-  void register_service(zmq::socket_t* frontend_socket);
+  void register_service(message_iterator& iter);
 
  private:
   bool is_dealer_index_legal(uint64 dealer_index) const;

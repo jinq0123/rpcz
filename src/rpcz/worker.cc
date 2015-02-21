@@ -67,13 +67,13 @@ void worker::operator()() {
         start_rpc(iter);
         break;
       case kHandleData:
-        handle_data(socket);
+        handle_data(iter);
         break;
       case kHandleTimeout:
         handle_timeout(iter);
         break;
       case kRegisterSvc:
-        register_service(socket);
+        register_service(iter);
         break;
       default:
         CHECK(false);
@@ -93,10 +93,10 @@ void worker::start_rpc(message_iterator& iter) {
   remote_response_map_[event_id] = ctrl;
 }
 
-void worker::handle_data(zmq::socket_t& socket) {
+void worker::handle_data(message_iterator& iter) {
+  BOOST_ASSERT(iter.has_more());
   connection_info info;
-  read_connection_info(&socket, &info);
-  message_iterator iter(socket);
+  read_connection_info(iter, &info);
   if (!iter.has_more()) return;
   const zmq::message_t& msg = iter.next();
   rpc_header rpc_hdr;
@@ -130,10 +130,10 @@ void worker::handle_timeout(message_iterator& iter) {
   remote_response_map_.erase(response_iter);
 }
 
-void worker::register_service(zmq::socket_t& socket) {
+void worker::register_service(message_iterator& iter) {
+  BOOST_ASSERT(iter.has_more());
   connection_info info;
-  read_connection_info(&socket, &info);
-  message_iterator iter(socket);
+  read_connection_info(iter, &info);
   BOOST_ASSERT(iter.has_more());
   std::string name = message_to_string(iter.next());
   BOOST_ASSERT(iter.has_more());

@@ -100,16 +100,16 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
       handle_unbind_command(sender, message_to_string(iter.next()));
       break;
     case kRequest:
-      send_request(frontend_socket);
+      send_request(iter);
       break;
     case kReply:
-      send_reply(frontend_socket);
+      send_reply(iter);
       break;
     case kRunClosure:
       add_closure(interpret_message<closure*>(iter.next()));
       break;
     case kRegisterSvc:
-      register_service(frontend_socket);
+      register_service(iter);
       break;
 
     // worker to broker commands
@@ -264,13 +264,11 @@ void broker_thread::handle_timeout(uint64 event_id, size_t worker_index) {
   send_uint64(frontend_socket_, event_id, 0);
 }
 
-inline void broker_thread::send_request(zmq::socket_t* frontend_socket) {
-  BOOST_ASSERT(frontend_socket);
+inline void broker_thread::send_request(message_iterator& iter) {
+  BOOST_ASSERT(iter.has_more());
   connection_info info;
-  read_connection_info(frontend_socket, &info);
+  read_connection_info(iter, &info);
   BOOST_ASSERT(is_connection_info_legal(info));
-  message_iterator iter(*frontend_socket);
-
   BOOST_ASSERT(iter.has_more());
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
   BOOST_ASSERT(ctrl);
@@ -295,24 +293,23 @@ inline void broker_thread::start_rpc(
   send_pointer(frontend_socket_, ctrl);
 }
 
-inline void broker_thread::send_reply(zmq::socket_t* frontend_socket) {
-  BOOST_ASSERT(frontend_socket);
+inline void broker_thread::send_reply(message_iterator& iter) {
+  BOOST_ASSERT(iter.has_more());
   connection_info info;
-  read_connection_info(frontend_socket, &info);
+  read_connection_info(iter, &info);
   BOOST_ASSERT(is_connection_info_legal(info));
-  forward_to(info, message_iterator(*frontend_socket));
+  forward_to(info, iter);
 }
 
-void broker_thread::register_service(zmq::socket_t* frontend_socket) {
-  BOOST_ASSERT(frontend_socket);
+void broker_thread::register_service(message_iterator& iter) {
+  BOOST_ASSERT(iter.has_more());
   connection_info info;
-  read_connection_info(frontend_socket, &info);
+  read_connection_info(iter, &info);
   BOOST_ASSERT(is_connection_info_legal(info));
 
   // forward to worker thread
   begin_worker_command(info, b2w::kRegisterSvc);
   write_connection_info(frontend_socket_, info);
-  message_iterator iter(*frontend_socket);
   forward_messages(iter, *frontend_socket_);
 }
 
