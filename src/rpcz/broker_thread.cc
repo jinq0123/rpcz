@@ -253,7 +253,7 @@ void broker_thread::handle_dealer_socket(uint64 dealer_index) {
 
   connection_info info = { false, dealer_index, "" };
   begin_worker_command(info, b2w::kHandleData);
-  write_connection_info(frontend_socket_, info);
+  write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
 }
 
@@ -309,7 +309,7 @@ void broker_thread::register_service(message_iterator& iter) {
 
   // forward to worker thread
   begin_worker_command(info, b2w::kRegisterSvc);
-  write_connection_info(frontend_socket_, info);
+  write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
   forward_messages(iter, *frontend_socket_);
 }
 
