@@ -83,12 +83,14 @@ See async_client_adv.cc
 See full_duplex/dealer.cc, router.cc
 
 Register service on stub's connection:
+
     SearchService_Stub stub("tcp://localhost:5555");
     rpcz::connection_ptr conn = stub.get_connection_ptr();
     conn->register_service(SearchServiceImpl::descriptor()->name(),
         new SearchServiceImpl);
 
 Get connection from the replier and create stub:
+
     virtual void Search(
         const SearchRequest& /*request*/,
         const rpcz::replier& rep) {
