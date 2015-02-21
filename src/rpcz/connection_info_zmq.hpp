@@ -18,7 +18,7 @@ inline void read_connection_info(
   BOOST_ASSERT(iter.has_more());
   char is_router(interpret_message<char>(iter.next()));
   BOOST_ASSERT(iter.has_more());
-  info->is_router = is_router;
+  info->is_router = (0 != is_router);
   info->index = interpret_message<uint64>(iter.next());
   if (!is_router) return;
   BOOST_ASSERT(iter.has_more());

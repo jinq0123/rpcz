@@ -68,7 +68,8 @@ TEST_F(manager_test, TestStartsAndFinishes) {
   manager_ptr mgr = manager::get();
 }
 
-void echo_server(zmq::context_t& context) {
+// Sink server will not reply.
+void sink_server(zmq::context_t& context) {
   scoped_ptr<zmq::socket_t> socket(new zmq::socket_t(context, ZMQ_DEALER));
   socket->bind("inproc://server.test");
 
@@ -86,12 +87,11 @@ void echo_server(zmq::context_t& context) {
     } else {
       GOOGLE_CHECK(false) << "Unknown command: " << message_to_string(v[2]);
     }
-    write_vector_to_socket(socket.get(), v);
   }
 }
 
 boost::thread start_server(zmq::context_t& context) {
-  return boost::thread(boost::bind(echo_server, boost::ref(context)));
+  return boost::thread(boost::bind(sink_server, boost::ref(context)));
 }
 
 message_vector* create_simple_request(int number=0) {
@@ -157,12 +157,12 @@ class barrier_handler {
 };
 
 void SendManyMessages(const connection_ptr& conn) {
-  const int request_count = 1;
+  const int request_count = 1000;
   barrier_handler barrier;
   for (int i = 0; i < request_count; ++i) {
     message_vector* request = create_simple_request(i);
     request_connection(*conn, *request,
-        new rpc_controller(0, boost::ref(barrier), -1));
+        new rpc_controller(0, boost::ref(barrier), 0/*ms*/));
   }
   barrier.wait(request_count);
 }
@@ -184,7 +184,7 @@ TEST_F(manager_test, ManyClientsTest) {
     }
   } hdl;
   request_connection(*conn, *request,
-      new rpc_controller(0, boost::ref(hdl), -1));
+      new rpc_controller(0, boost::ref(hdl), 0/*ms*/));
   hdl.event.wait();
   thrd.join();
 }
