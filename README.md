@@ -97,3 +97,12 @@ Get connection from the replier and create stub:
       SearchService_Stub search_stub(rep.get_connection_ptr());
       ...
     }
+
+Thread-Safety
+-------------
+Service stub and its connection are thread-safe
+and can be shared and used in any threads.
+server class is not thread-safe.
+The callbacks will be run in multiple internal worker threads.
+Worker threads number can be set by application::set_worker_threads(), default 1.
+One connection's callbacks will always run in the same worker thread.
