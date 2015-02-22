@@ -16,7 +16,7 @@
 #include <rpcz/rpcz.pb.h>  // for rpc_header
 #include <rpcz/zmq_utils.hpp>
 
-// XXX Is connection thread-safe?
+// connection is thread-safe.
 
 namespace rpcz {
 
@@ -79,7 +79,7 @@ void connection::request(
   size_t bytes = req.ByteSize();
   payload_out.reset(new zmq::message_t(bytes));
   if (!req.SerializeToArray(payload_out->data(), bytes)) {
-    throw invalid_message_error("Request serialization failed.");  // XXX
+    throw invalid_message_error("Request serialization failed.");
   }
 
   message_vector msg_vector;

@@ -33,6 +33,7 @@ struct connection_info;
 
 typedef boost::shared_ptr<connection_info> connection_info_ptr;
 
+// thread-safe
 class RPCZ_API connection {
  public:
   connection(uint64 router_index, const std::string& sender);
