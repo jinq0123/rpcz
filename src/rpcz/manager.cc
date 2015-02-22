@@ -44,7 +44,8 @@ boost::mutex manager::this_weak_ptr_mutex_;
 manager::manager()
   : context_(1),
     is_terminating_(new sync_event),  // scoped_ptr
-    factories_(new router_service_factories) {  // scoped_ptr
+    factories_(new router_service_factories),  // scoped_ptr
+    next_event_id_(1) {
   DLOG(INFO) << "manager() ";
   frontend_endpoint_ = "inproc://" + boost::lexical_cast<std::string>(this)
       + ".rpcz.manager.frontend";

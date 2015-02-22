@@ -19,6 +19,7 @@
 #define RPCZ_CONNECTION_MANAGER_H
 
 #include <string>
+#include <boost/atomic/atomic.hpp>  // for atomic_uint64_t
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_array.hpp>
@@ -27,7 +28,6 @@
 #include <zmq.hpp>
 
 #include <rpcz/common.hpp>
-#include <rpcz/event_id_generator.hpp>
 #include <rpcz/manager_ptr.hpp>
 #include <rpcz/service_factory_map_ptr.hpp>
 
@@ -73,7 +73,7 @@ class manager : boost::noncopyable {
  public:
   // Get thread specific frontend socket.
   inline zmq::socket_t& get_frontend_socket();
-  inline uint64 get_next_event_id() { return event_id_generator_.get_next(); }
+  inline uint64 get_next_event_id() { return next_event_id_.fetch_add(1); }
   router_service_factories& get_factories() { return *factories_; }
 
  private:
@@ -98,7 +98,7 @@ class manager : boost::noncopyable {
   scoped_ptr<sync_event> is_terminating_;
   typedef scoped_ptr<worker> scoped_worker;
   boost::scoped_array<scoped_worker> workers_;
-  detail::event_id_generator event_id_generator_;
+  boost::atomic_uint64_t next_event_id_;
 
   // Map router index to factories.
   const scoped_ptr<router_service_factories> factories_;  // thread-safe
