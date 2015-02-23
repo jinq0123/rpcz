@@ -17,8 +17,8 @@
 #include <rpcz/reactor.hpp>
 
 #include <rpcz/callback.hpp>
-#include <rpcz/clock.hpp>
 #include <rpcz/logging.hpp>
+#include <rpcz/utc_ms.hpp>
 
 namespace rpcz {
 namespace {
@@ -140,7 +140,7 @@ int reactor::loop() {
 
 // Return the time in milliseconds before the next closure.
 long reactor::process_closure_run_map() {
-  uint64 now_ms = zclock_ms();
+  uint64 now_ms = utc_ms();
   closure_run_map::iterator ub(closure_run_map_.upper_bound(now_ms));
   for (closure_run_map::const_iterator it = closure_run_map_.begin();
        it != ub;

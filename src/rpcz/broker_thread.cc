@@ -19,13 +19,13 @@
 #include <rpcz/broker_thread.hpp>
 
 #include <rpcz/callback.hpp>
-#include <rpcz/clock.hpp>  // for zclock_ms()
 #include <rpcz/connection_info_hash.hpp>  // for hash_value()
 #include <rpcz/connection_info_zmq.hpp>  // for read_connection_info()
 #include <rpcz/internal_commands.hpp>
 #include <rpcz/logging.hpp>
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/sync_event.hpp>
+#include <rpcz/utc_ms.hpp>
 #include <rpcz/zmq_utils.hpp>
 
 namespace rpcz {
@@ -277,7 +277,7 @@ inline void broker_thread::send_request(message_iterator& iter) {
   int64 timeout_ms = ctrl->get_timeout_ms();
   if (-1 != timeout_ms) {
     // XXX when to delete timeout handler?
-    reactor_.run_closure_at(zclock_ms() + timeout_ms,
+    reactor_.run_closure_at(utc_ms() + timeout_ms,
         new_callback(this, &broker_thread::handle_timeout,
             event_id, get_worker_index(info)));
   }

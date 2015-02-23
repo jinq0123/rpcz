@@ -16,7 +16,6 @@ set(RPCZ_SOURCES
     application_options.cc
     assert_application_error_code.cc
     broker_thread.cc
-    clock.cc
     connection.cc
     cpp_service.cc
     manager.cc
