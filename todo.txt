@@ -1,10 +1,15 @@
 
-* Delete
-  SearchService_Stub(::rpcz::rpc_channel* channel, 
-                   const ::std::string& service_name,
-                   bool owns_channel=false);
-  ::std::string service_name_;
-
 * Replace std::map with boost::unordered_map.
   
-* rpc_channel and connection are the same thing?
+* One-way request. 
+  If async request has no callback, the request becomes an one-way request.
+  No event_id. No response.
+
+* Void request, like:
+    service SearchService {
+      rpc SearchGold(VoidRequest) returns(SearchResponse);
+    }
+
+    SearchResponse resp = searchStub.SearchGold();
+
+* Use TBB concurrent queue instead of ZMQ inproc queue.

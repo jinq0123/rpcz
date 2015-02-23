@@ -10,9 +10,21 @@ Introduction
 * RPCZ currently supports writing clients and servers in C++ and Python. More languages may be added in the future. 
 * The API offers both asynchronous (callbacks) and synchronous (blocking) style functionality. Both styles allow specifying deadlines in millisecond resolution. 
 * RPCZ supports full duplex RPC over the same connection.
+* Each connection has its service instance,
+  or all connections share one service instance. (TODO: example)
 * RPCZ is built on top of ZeroMQ for handling the low-level I/O details in a lock-free manner. 
 * The Python module is a Cython wrapper around the C++ API. 
 * RPCZ has been tested on Windows, Ubuntu 11.10 and Mac OS X Lion.
+
+Dependings
+-----------
+RPCZ depends on:
+* boost
+* protobuf
+* zeromq
+* cppzmq
+* glog
+* gtest
     
 Example
 --------
@@ -100,7 +112,7 @@ Get connection from the replier and create stub:
 
 Thread-Safety
 -------------
-Service stub and its connection are thread-safe
+Service stub and connection are thread-safe
 and can be shared and used in any threads.
 server class is not thread-safe.
 The callbacks will be run in multiple internal worker threads.

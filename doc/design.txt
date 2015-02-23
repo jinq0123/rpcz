@@ -1,6 +1,5 @@
 data format on the wire:
 zeromq parts:
 
-uint64 event_id
 rpc_header
 rpc_request/rpc_response
