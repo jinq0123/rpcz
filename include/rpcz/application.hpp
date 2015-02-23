@@ -16,36 +16,31 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_APPLICATION_H
-#define RPCZ_APPLICATION_H
+#ifndef RPCZ_APPLICATION_HPP
+#define RPCZ_APPLICATION_HPP
 
-#include <string>
 #include <rpcz/rpcz_api.hpp>
 
-namespace zmq {
-class context_t; 
-}  // namespace zmq
-
 namespace rpcz {
-class requester;
 
 // rpcz::application is a simple interface that helps setting up a common
 // RPCZ client or server application.
+// Thread-safe.
 namespace application {
 
   // Blocks the current thread until another thread calls terminate.
   RPCZ_API void run();
 
-  // Releases all the threads that are blocked inside run()
+  // Terminate the rpcz application internal threads.
+  // Releases all the threads that are blocked inside run().
   RPCZ_API void terminate();
 
-  // You can change the default options BEFORE any client or server.
-  // These options are:
-  // * Number of worker threads. Those threads are used for
-  //   running user code: handling server requests or running callbacks.
-  //   Default 1.
-  RPCZ_API void set_worker_threads(int n);  // default 1
+  // Set number of worker threads. Those threads are used for running user code:
+  //   handling server requests or running callbacks.
+  // Default 1.
+  // Should set BEFORE any client or server.
+  RPCZ_API void set_worker_threads(int n);
 }  // namespace application
 
 }  // namespace rpcz
-#endif
+#endif  // RPCZ_APPLICATION_HPP

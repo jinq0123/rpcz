@@ -31,9 +31,6 @@ void run() {
   manager::get()->run();
 }
 
-// TODO: run() in main thread, and callback in main thread.
-// TODO: run_in_background() run callback in background worker thread.
-
 void terminate() {
   manager::get()->terminate();
 }

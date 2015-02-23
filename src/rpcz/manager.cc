@@ -21,7 +21,6 @@
 #include <string>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/thread/thread.hpp>
 #include <boost/thread/tss.hpp>
 
 #include <zmq.hpp>
@@ -43,17 +42,18 @@ boost::mutex manager::this_weak_ptr_mutex_;
 
 manager::manager()
   : context_(1),
-    is_terminating_(new sync_event),  // scoped_ptr
+    terminated_(new sync_event),  // scoped_ptr
     factories_(new router_service_factories),  // scoped_ptr
     next_event_id_(1) {
   DLOG(INFO) << "manager() ";
   frontend_endpoint_ = "inproc://" + boost::lexical_cast<std::string>(this)
       + ".rpcz.manager.frontend";
 
-  zmq::socket_t* frontend_socket = new zmq::socket_t(context_, ZMQ_ROUTER);
+  // broker frontend socket
+  zmq::socket_t* broker_fe_socket = new zmq::socket_t(context_, ZMQ_ROUTER);
   int linger_ms = 0;
-  frontend_socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
-  frontend_socket->bind(frontend_endpoint_.c_str());
+  broker_fe_socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
+  broker_fe_socket->bind(frontend_endpoint_.c_str());
   int nthreads = application_options::get_worker_threads();
   assert(nthreads > 0);
   workers_.reset(new scoped_worker[nthreads]);
@@ -65,7 +65,7 @@ manager::manager()
   sync_event event;
   broker_thread_ = boost::thread(&broker_thread::run,
                                  boost::ref(context_), nthreads, &event,
-                                 frontend_socket);
+                                 broker_fe_socket);
   event.wait();
 }
 
@@ -84,13 +84,13 @@ bool manager::is_destroyed() {
 
 // used by get_frontend_socket()
 zmq::socket_t& manager::new_frontend_socket() {
-  assert(NULL == socket_.get());
+  BOOST_ASSERT(NULL == tss_fe_socket_.get());
   zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_DEALER);
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->connect(frontend_endpoint_.c_str());
-  assert(NULL == socket_.get());
-  socket_.reset(socket);  // set thread specific socket
+  BOOST_ASSERT(NULL == tss_fe_socket_.get());
+  tss_fe_socket_.reset(socket);  // set thread specific frontend socket
   return *socket;
 }
 
@@ -129,21 +129,26 @@ void manager::add(closure* closure) {
 }
 
 void manager::run() {
-  is_terminating_->wait();
+  terminated_->wait();  // wait until terminated
 }
 
 void manager::terminate() {
-  is_terminating_->signal();
+  terminated_->signal();
 }
 
-manager::~manager() {
-  DLOG(INFO) << "~manager()";
+void manager::join_threads() {
+  DLOG(INFO) << "join_threads()...";
   zmq::socket_t& socket = get_frontend_socket();
   send_empty_message(&socket, ZMQ_SNDMORE);
   send_char(&socket, c2b::kQuit, 0);
   broker_thread_.join();
   worker_threads_.join_all();
   DLOG(INFO) << "All threads joined.";
+}
+
+manager::~manager() {
+  DLOG(INFO) << "~manager()";
+  join_threads();
 }
 
 }  // namespace rpcz

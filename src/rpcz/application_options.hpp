@@ -1,5 +1,8 @@
-#ifndef RPCZ_APPLICATION_OPTIONS_H
-#define RPCZ_APPLICATION_OPTIONS_H
+// Licensed under the Apache License, Version 2.0.
+// Author: Jin Qing (http://blog.csdn.net/jq0123)
+
+#ifndef RPCZ_APPLICATION_OPTIONS_HPP
+#define RPCZ_APPLICATION_OPTIONS_HPP
 
 #include <boost/thread.hpp>
 
@@ -31,5 +34,4 @@ public:
 };  // class application_options
 
 }  // namespace rpcz
-
-#endif  // RPCZ_APPLICATION_OPTIONS_H
+#endif  // RPCZ_APPLICATION_OPTIONS_HPP
