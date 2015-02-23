@@ -232,7 +232,6 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
 void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
-  if (!iter.has_more()) return;
   std::string sender(message_to_string(iter.next()));
   if (!iter.has_more()) return;
   if (iter.next().size() != 0) return;
@@ -247,7 +246,6 @@ void broker_thread::handle_router_socket(uint64 router_index) {
 void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
   message_iterator iter(*dealer_sockets_[dealer_index]);
-  if (!iter.has_more()) return;
   if (iter.next().size() != 0) return;
   if (!iter.has_more()) return;
 

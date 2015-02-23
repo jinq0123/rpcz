@@ -21,7 +21,6 @@
 #include <string>
 
 #include <boost/lexical_cast.hpp>
-#include <boost/thread/tss.hpp>
 
 #include <zmq.hpp>
 #include <google/protobuf/stubs/common.h>

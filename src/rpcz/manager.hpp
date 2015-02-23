@@ -20,7 +20,6 @@
 
 #include <string>
 #include <boost/atomic/atomic.hpp>  // for atomic_uint64_t
-#include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_array.hpp>
 #include <boost/thread.hpp>
