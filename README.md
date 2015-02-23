@@ -41,11 +41,11 @@ See example_server.cc
 
     class SearchServiceImpl : public SearchService {
       virtual void Search(const SearchRequest& request,
-                          rpcz::replier replier_copy) {
+                          const rpcz::replier& rep) {
         SearchResponse response;
         response.add_results("result1 for " + request.query());
         response.add_results("this is result2");
-        replier_copy.send(response);
+        rep.reply(response);
       }
     };
     
