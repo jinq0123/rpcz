@@ -34,8 +34,8 @@ set(RPCZ_SOURCES
     sync_call_handler.cc
     sync_event.cc
     sync_requester.cc
-    worker.cc
-    worker_thread_group.cc
+    worker/worker.cc
+    worker/worker_thread_group.cc
     zmq_utils.cc
     ${PROTO_SOURCES})
 
