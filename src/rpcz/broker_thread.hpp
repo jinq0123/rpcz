@@ -25,7 +25,7 @@
 #include <rpcz/reactor.hpp>
 
 namespace rpcz {
-
+class closure;
 class message_iterator;
 class rpc_controller;
 class sync_event;

@@ -37,15 +37,5 @@ const char kWorkerReady     = 0x21;  // Always the first message sent.
 const char kWorkerDone      = 0x22;  // Sent just before the worker quits.
 }  // namespace c2b
 
-// Messages sent from the broker to a worker thread:
-namespace b2w {
-const char kRunClosure      = 0x11;  // Run a closure.
-const char kStartRpc        = 0x12;  // Start an rpc. Map event_id to rpc_controller.
-const char kHandleData      = 0x13;  // Handle router/dealer socket data.
-const char kHandleTimeout   = 0x14;  // Handle request timeout.
-const char kRegisterSvc     = 0x15;  // Register service.
-const char kWorkerQuit      = 0x1f;  // Ask the worker to quit.
-}  // namespace b2w
-
 }  // namespace rpcz
 #endif  // RPCZ_INTERNAL_COMMANDS_HPP

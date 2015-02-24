@@ -35,6 +35,9 @@ class worker {
  public:
   void operator()();
 
+ public:
+  worker_cmd_queue_ptr get_cmd_queue() const;
+
  private:
   void start_rpc(message_iterator& iter);
   void handle_data(message_iterator& iter);
@@ -54,6 +57,9 @@ class worker {
   const size_t worker_index_;
   const std::string frontend_endpoint_;
   zmq::context_t& context_;
+
+ private:
+  worker_cmd_queue_ptr cmd_queue_;
 
  private:
   typedef boost::unordered_map<uint64/*event_id*/, rpc_controller*>

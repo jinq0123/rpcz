@@ -2,8 +2,8 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Worker thread group. Thread-safe.
 
-#ifndef RPCZ_WORDER_THREAD_GROUP_HPP
-#define RPCZ_WORDER_THREAD_GROUP_HPP
+#ifndef RPCZ_WORKER_THREAD_GROUP_HPP
+#define RPCZ_WORKER_THREAD_GROUP_HPP
 
 #include <boost/noncopyable.hpp>
 #include <boost/scoped_array.hpp>
@@ -16,6 +16,7 @@ class context_t;
 
 namespace rpcz {
 class worker;
+class workers_commander;
 
 class worker_thread_group : boost::noncopyable {
  public:
@@ -33,11 +34,12 @@ class worker_thread_group : boost::noncopyable {
   void join_all();  // blocking
 
  private:
-  int threads_;  // number of threads, >= 1
+  const int threads_;  // number of threads, >= 1
   boost::thread_group thread_group_;
   typedef scoped_ptr<worker> scoped_worker;
   boost::scoped_array<scoped_worker> workers_;
+  workers_commander_ptr workers_commander_;
 };
 
 }  // namespace rpcz
-#endif  // RPCZ_WORDER_THREAD_GROUP_HPP
+#endif  // RPCZ_WORKER_THREAD_GROUP_HPP

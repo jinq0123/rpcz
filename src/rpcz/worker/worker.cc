@@ -85,6 +85,10 @@ void worker::operator()() {
   send_char(&socket, c2b::kWorkerDone);
 }
 
+worker_cmd_queue_ptr worker::get_cmd_queue() const {
+  return cmd_queue_;
+}
+
 void worker::start_rpc(message_iterator& iter) {
   BOOST_ASSERT(iter.has_more());
   rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
