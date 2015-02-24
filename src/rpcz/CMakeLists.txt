@@ -8,6 +8,7 @@ add_subdirectory(plugin)
 protobuf_generate_cpp(RPCZ_PB_SRCS RPCZ_PB_HDRS proto/rpcz.proto)
 set(PROTO_SOURCES ${RPCZ_PB_SRCS} ${RPCZ_PB_HDRS})
 
+include_directories(${TBB_INCLUDE_DIRS})
 include_directories(${Rpcz_BINARY_DIR}/src)
 include_directories(${Rpcz_SOURCE_DIR}/src)
 
@@ -48,6 +49,8 @@ add_library(rpcz SHARED ${RPCZ_SOURCES} ${RPCZ_HEADERS} ${RPCZ_PUBLIC_HEADERS})
 target_link_libraries(rpcz ${RPCZ_LIB_DEPS})
 target_link_libraries(rpcz optimized ${PROTOBUF_LIBRARY})
 target_link_libraries(rpcz debug ${PROTOBUF_LIBRARY_DEBUG})
+target_link_libraries(rpcz optimized ${TBB_tbb_LIBRARY_RELEASE})
+target_link_libraries(rpcz debug ${TBB_tbb_LIBRARY_DEBUG})
 
 set(RPCZ_TARGET_LIBS rpcz)
 
@@ -55,6 +58,9 @@ add_library(rpcz_static STATIC ${RPCZ_SOURCES})
 target_link_libraries(rpcz_static ${RPCZ_LIB_DEPS})
 target_link_libraries(rpcz_static optimized ${PROTOBUF_LIBRARY})
 target_link_libraries(rpcz_static debug ${PROTOBUF_LIBRARY_DEBUG})
+target_link_libraries(rpcz_static optimized ${TBB_tbb_LIBRARY_RELEASE})
+target_link_libraries(rpcz_static debug ${TBB_tbb_LIBRARY_DEBUG})
+
 set_target_properties(rpcz_static PROPERTIES COMPILE_DEFINITIONS "RPCZ_STATIC")
 list(APPEND RPCZ_TARGET_LIBS rpcz_static)
 

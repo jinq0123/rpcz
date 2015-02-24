@@ -23,6 +23,7 @@ option(rpcz_build_examples "Build rpcz's examples." OFF)
 find_package(ProtobufPlugin REQUIRED)
 find_package(Boost REQUIRED COMPONENTS thread program_options chrono date_time system)
 find_package(ZeroMQ REQUIRED)
+find_package(TBB REQUIRED)
 
 find_path(CPPZMQ_DIR
   NAMES zmq.hpp
