@@ -50,6 +50,8 @@ manager::manager()
 
   // broker frontend socket
   zmq::socket_t* broker_fe_socket = new zmq::socket_t(context_, ZMQ_ROUTER);
+  int send_hwm = 10 * 1000 * 1000;
+  broker_fe_socket->setsockopt(ZMQ_SNDHWM, &send_hwm, sizeof(send_hwm));
   int linger_ms = 0;
   broker_fe_socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   broker_fe_socket->bind(frontend_endpoint_.c_str());

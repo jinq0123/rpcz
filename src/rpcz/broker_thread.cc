@@ -176,6 +176,8 @@ void broker_thread::handle_bind_command(
     const std::string& sender,
     const std::string& endpoint) {
   zmq::socket_t* socket = new zmq::socket_t(context_, ZMQ_ROUTER);  // delete in reactor
+  int send_hwm = 1000 * 1000;
+  socket->setsockopt(ZMQ_SNDHWM, &send_hwm, sizeof(send_hwm));
   int linger_ms = 0;
   socket->setsockopt(ZMQ_LINGER, &linger_ms, sizeof(linger_ms));
   socket->bind(endpoint.c_str());  // TODO: catch exception
