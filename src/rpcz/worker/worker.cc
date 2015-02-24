@@ -18,7 +18,7 @@
 
 // Worker thread function.
 
-#include <rpcz/worker.hpp>
+#include <rpcz/worker/worker.hpp>
 
 #include <zmq.hpp>
 

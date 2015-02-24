@@ -31,7 +31,7 @@
 #include <rpcz/logging.hpp>
 #include <rpcz/router_service_factories.hpp>
 #include <rpcz/sync_event.hpp>
-#include <rpcz/worker_thread_group.hpp>
+#include <rpcz/worker/worker_thread_group.hpp>
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message
 
 namespace rpcz {

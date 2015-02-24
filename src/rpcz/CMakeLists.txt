@@ -40,13 +40,14 @@ set(RPCZ_SOURCES
     ${PROTO_SOURCES})
 
 file(GLOB RPCZ_HEADERS *.hpp)
+file(GLOB RPCZ_WORKER_HEADERS worker/*.hpp)
 set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${Boost_CHRONO_LIBRARIES}
                   ${Boost_DATE_TIME_LIBRARIES}
                   ${Boost_SYSTEM_LIBRARIES}
                   ${Boost_THREAD_LIBRARIES})
 
-add_library(rpcz SHARED ${RPCZ_SOURCES} ${RPCZ_HEADERS} ${RPCZ_PUBLIC_HEADERS})
+add_library(rpcz SHARED ${RPCZ_SOURCES} ${RPCZ_HEADERS} ${RPCZ_WORKER_HEADERS} ${RPCZ_PUBLIC_HEADERS})
 target_link_libraries(rpcz ${RPCZ_LIB_DEPS})
 target_link_libraries(rpcz optimized ${PROTOBUF_LIBRARY})
 target_link_libraries(rpcz debug ${PROTOBUF_LIBRARY_DEBUG})

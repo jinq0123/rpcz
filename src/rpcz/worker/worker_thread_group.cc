@@ -2,9 +2,9 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Worker thread group. Thread-safe.
 
-#include <rpcz/worker_thread_group.hpp>
+#include <rpcz/worker/worker_thread_group.hpp>
 
-#include <rpcz/worker.hpp>  // for worker
+#include <rpcz/worker/worker.hpp>  // for worker
 
 namespace rpcz {
 
