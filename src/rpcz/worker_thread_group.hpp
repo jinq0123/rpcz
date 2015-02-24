@@ -33,6 +33,7 @@ class worker_thread_group : boost::noncopyable {
   void join_all();  // blocking
 
  private:
+  int threads_;  // number of threads, >= 1
   boost::thread_group thread_group_;
   typedef scoped_ptr<worker> scoped_worker;
   boost::scoped_array<scoped_worker> workers_;

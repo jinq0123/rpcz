@@ -11,7 +11,8 @@ namespace rpcz {
 worker_thread_group::worker_thread_group(
     int threads,
     const std::string& frontend_endpoint,
-    zmq::context_t& context) {
+    zmq::context_t& context)
+    : threads_(threads) {
   BOOST_ASSERT(threads > 0);
   workers_.reset(new scoped_worker[threads]);
   for (int i = 0; i < threads; ++i) {
