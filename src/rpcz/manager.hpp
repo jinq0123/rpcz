@@ -1,4 +1,5 @@
 // Copyright 2011 Google Inc. All Rights Reserved.
+// Copyright 2015 Jin Qing.
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,27 +16,30 @@
 // Author: nadavs@google.com <Nadav Samet>
 //         Jin Qing (http://blog.csdn.net/jq0123)
 
-#ifndef RPCZ_CONNECTION_MANAGER_H
-#define RPCZ_CONNECTION_MANAGER_H
+#ifndef RPCZ_CONNECTION_MANAGER_HPP
+#define RPCZ_CONNECTION_MANAGER_HPP
 
 #include <string>
 #include <boost/atomic/atomic.hpp>  // for atomic_uint64_t
 #include <boost/noncopyable.hpp>
-#include <boost/scoped_array.hpp>
 #include <boost/thread.hpp>
 #include <boost/weak_ptr.hpp>
-#include <zmq.hpp>
 
 #include <rpcz/common.hpp>
 #include <rpcz/manager_ptr.hpp>
 #include <rpcz/service_factory_map_ptr.hpp>
+
+namespace zmq {
+class context_t;
+class socket_t;
+}  // namespace zmq
 
 namespace rpcz {
 
 class closure;
 class router_service_factories;
 class sync_event;
-class worker;
+class worker_thread_group;
 
 // A manager is a multi-threaded asynchronous system for communication over ZeroMQ sockets.
 // manager is thread-safe.
@@ -89,16 +93,14 @@ class manager : boost::noncopyable {
   static boost::mutex this_weak_ptr_mutex_;
 
  private:
-  zmq::context_t context_;
+  scoped_ptr<zmq::context_t> context_;
   // thread specific frontend socket
   boost::thread_specific_ptr<zmq::socket_t> tss_fe_socket_;
   std::string frontend_endpoint_;
 
  private:
   boost::thread broker_thread_;
-  boost::thread_group worker_threads_;
-  typedef scoped_ptr<worker> scoped_worker;
-  boost::scoped_array<scoped_worker> workers_;
+  scoped_ptr<worker_thread_group> worker_thread_group_;
 
  private:
   scoped_ptr<sync_event> terminated_;
@@ -122,5 +124,4 @@ zmq::socket_t& manager::get_frontend_socket() {
 }
 
 }  // namespace rpcz
-
-#endif
+#endif  // RPCZ_CONNECTION_MANAGER_HPP
