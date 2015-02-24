@@ -6,33 +6,6 @@ namespace rpcz {
 
 namespace b2w {
 
-class closure;
-struct param_run_closure {
-  closure* clsr;
-};
-
-class rpc_controller;
-struct param_start_rpc {
-  rpc_controller* ctrl;
-};
-
-struct param_handle_data {
-  connection_info info;
-  // XXX data to receive
-};
-
-struct param_handle_timeout {
-  uint64 event_id;
-};
-
-struct param_register_svc {
-  connection_info info;
-  // XXX other data...
-};
-
-struct param_quit {
-};
-
 worker_cmd_ptr make_handle_timeout_cmd(uint64 event_id) {
   worker_cmd_ptr p = boost::make_shared<worker_cmd>();
   p->cmd = kHandleTimeout;
