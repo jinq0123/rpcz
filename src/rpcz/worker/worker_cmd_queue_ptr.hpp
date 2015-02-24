@@ -7,7 +7,7 @@
 
 #include <boost/shared_ptr.hpp>
 #include <tbb/tbb.h>  // for concurrent_bounded_queue
-#include <rcpz/worker/worker_cmd_ptr.hpp>
+#include <rpcz/worker/worker_cmd_ptr.hpp>
 
 namespace rpcz {
 typedef tbb::concurrent_bounded_queue<worker_cmd_ptr> worker_cmd_queue;

@@ -4,14 +4,21 @@
 #ifndef RPCZ_WORKERS_COMMANDER_HPP
 #define RPCZ_WORKERS_COMMANDER_HPP
 
+#include <rpcz/worker/worker_cmd_queue_ptr.hpp>
+#include <rpcz/worker/worker_cmd_maker.hpp>  // for make_start_rpc_cmd()
+
 namespace rpcz {
 
-// Workers' commander. Dispactch commands to workers.
-// Thread-safe.
+// Workers' commander.
+// Send commands to workers.
 // Push commands to worker's commands queue.
+// Thread-safe.
 class workers_commander {
  public:
   explicit workers_commander(int workers);
+
+ public:
+     int get_workers() const { return workers; }
 
  public:
   // Non-thread-safe.
@@ -30,7 +37,7 @@ class workers_commander {
   bool is_worker_index_legal(unsigned int worker_index) const;
 
  private:
-  const int workers;  // number of workers, >= 1
+  const int workers_;  // number of workers, >= 1
   boost::scoped_ptr<worker_cmd_queue_ptr> worker_cmd_queues_;
 };
 

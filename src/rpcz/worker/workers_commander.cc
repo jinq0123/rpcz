@@ -37,7 +37,7 @@ void workers_commander::register_svc(
 void workers_commander::quit_worker(
     unsigned int worker_index) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues_[worker_index] = b2w::make_quit_cmd();
+  worker_cmd_queues_[worker_index] = b2w::make_quit_worker_cmd();
 }
 
 bool workers_commander::is_worker_index_legal(

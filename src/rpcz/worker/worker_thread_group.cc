@@ -29,6 +29,10 @@ worker_thread_group::~worker_thread_group() {
   thread_group_.join_all();
 }
 
+workers_commander_ptr worker_thread_group::get_workers_commander() const {
+  return workers_commander_;
+}
+
 void worker_thread_group::join_all() {  // blocking
   thread_group_.join_all();
 }

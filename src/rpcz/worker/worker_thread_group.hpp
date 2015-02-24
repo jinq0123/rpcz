@@ -9,6 +9,7 @@
 #include <boost/scoped_array.hpp>
 #include <boost/thread.hpp>  // for thread_group
 #include <rpcz/common.hpp>  // for scoped_ptr
+#include <rpcz/worker/workers_commander_ptr.hpp>
 
 namespace zmq {
 class context_t;
@@ -27,8 +28,7 @@ class worker_thread_group : boost::noncopyable {
   virtual ~worker_thread_group();
 
  public:
-  // Executes the closure on one of the worker threads.
-  // XXX void add(closure* closure);
+  workers_commander_ptr get_workers_commander() const;
 
  public:
   void join_all();  // blocking

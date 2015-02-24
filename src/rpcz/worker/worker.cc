@@ -30,6 +30,7 @@
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/rpcz.pb.h>
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message()
+#include <rpcz/worker/worker_cmd.hpp>  // for kRunClosure
 
 namespace rpcz {
 
@@ -45,20 +46,18 @@ worker::~worker() {
 }
 
 void worker::operator()() {
-  zmq::socket_t socket(context_, ZMQ_DEALER);
-  socket.connect(frontend_endpoint_.c_str());
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, c2b::kWorkerReady, ZMQ_SNDMORE);
-  send_uint64(&socket, worker_index_);
+  worker_cmd_queue& cmd_queue = *cmd_queue_;
+  worker_cmd_ptr cmd;
+    // XXXX
+  //send_char(&socket, c2b::kWorkerReady, ZMQ_SNDMORE);
+  //send_uint64(&socket, worker_index_);
   bool should_continue = true;
   do {
-    message_iterator iter(socket);
-    CHECK_EQ(0, iter.next().size());
-    BOOST_ASSERT(iter.has_more());
-    char command(interpret_message<char>(iter.next()));
+    cmd_queue.pop(cmd);  // blocking
+    BOOST_ASSERT(cmd);
     using namespace b2w;  // broker to worker command
-    switch (command) {
-      case kWorkerQuit:
+    switch (cmd->cmd) {
+      case kQuitWorker:
         should_continue = false;
         break;
       case kRunClosure:

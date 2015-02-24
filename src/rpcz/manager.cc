@@ -60,9 +60,14 @@ manager::manager()
   worker_thread_group_.reset(new worker_thread_group(threads,
       frontend_endpoint_, *context_));
   sync_event event;
+  workers_commander_ptr worker_commander
+      = worker_thread_group_->get_workers_commander();
+  BOOST_ASSERT(worker_commander->get_workers() == threads);
   broker_thread_ = boost::thread(&broker_thread::run,
-                                 boost::ref(*context_), threads, &event,
-                                 broker_fe_socket);
+                                 boost::ref(*context_),
+                                 &event,
+                                 broker_fe_socket,
+                                 worker_commander);
   event.wait();
 }
 

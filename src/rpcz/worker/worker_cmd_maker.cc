@@ -2,6 +2,8 @@
 // Author: Jin Qing (http://blog.csdn.net/jq0123)
 // Worker command.
 
+#include <rpcz/worker/worker_cmd_maker.hpp>
+
 namespace rpcz {
 
 namespace b2w {
@@ -31,4 +33,3 @@ worker_cmd_ptr make_quit_worker_cmd() {
 
 }  // namespace b2w
 }  // namespace rpcz
-#endif  // RPCZ_WORKER_CMD_HPP

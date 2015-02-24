@@ -23,6 +23,7 @@
 #include <vector>
 
 #include <rpcz/reactor.hpp>
+#include <rpcz/worker/workers_commander_ptr.hpp>
 
 namespace rpcz {
 class closure;
@@ -36,18 +37,18 @@ class broker_thread {
  public:
   broker_thread(
       zmq::context_t& context,
-      int nthreads,
       sync_event* ready_event,
-      zmq::socket_t* frontend_socket);
+      zmq::socket_t* frontend_socket,
+      const workers_commander_ptr& wkrs_cmdr);
 
  public:
   static void run(zmq::context_t& context,
-                  int nthreads,
                   sync_event* ready_event,
-                  zmq::socket_t* frontend_socket);
+                  zmq::socket_t* frontend_socket,
+                  const workers_commander_ptr& wkrs_cmdr);
 
  private:
-  void wait_for_workers_ready_reply(int nthreads);
+  void wait_for_workers_ready_reply();
   void handle_frontend_socket(zmq::socket_t* frontend_socket);
   inline void begin_worker_command(
       const connection_info& conn_info, char command);
@@ -99,14 +100,15 @@ class broker_thread {
       message_iterator& iter);
 
  private:
+  zmq::context_t& context_;
+  int workers_;  // number of workers, >= 0
   reactor reactor_;
   std::vector<zmq::socket_t*> dealer_sockets_;  // of client.
   std::vector<zmq::socket_t*> router_sockets_;  // of server.
   typedef std::map<std::string, zmq::socket_t*> endpoint_to_socket;
   endpoint_to_socket bind_map_;  // for unbind
-  zmq::context_t& context_;
   zmq::socket_t* frontend_socket_;
-  std::vector<std::string> workers_;
+  workers_commander_ptr workers_commander_;
 };
 
 }  // namespace rpcz

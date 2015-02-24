@@ -26,36 +26,41 @@
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/sync_event.hpp>
 #include <rpcz/utc_ms.hpp>
+#include <rpcz/worker/workers_commander.hpp>
 #include <rpcz/zmq_utils.hpp>
 
 namespace rpcz {
 
 broker_thread::broker_thread(
     zmq::context_t& context,
-    int nthreads,
     sync_event* ready_event,
-    zmq::socket_t* frontend_socket)
+    zmq::socket_t* frontend_socket,
+    const workers_commander_ptr& wkrs_cmdr)
     : context_(context),
-    frontend_socket_(frontend_socket) {
-  BOOST_ASSERT(nthreads > 0);
+      workers_(wkrs_cmdr->get_workers()),
+      frontend_socket_(frontend_socket),
+      workers_commander_(wkrs_cmdr) {
+  BOOST_ASSERT(workers_ > 0);
+  BOOST_ASSERT(wkrs_cmdr);
   // Index 0 is reserved for debug check.
   dealer_sockets_.push_back(NULL);
   BOOST_ASSERT(1 == dealer_sockets_.size());
   router_sockets_.push_back(NULL);
   BOOST_ASSERT(1 == router_sockets_.size());
 
-  wait_for_workers_ready_reply(nthreads);
+  wait_for_workers_ready_reply();
   ready_event->signal();
   reactor_.add_socket(frontend_socket, new_permanent_callback(
       this, &broker_thread::handle_frontend_socket,
       frontend_socket));
 }
 
-void broker_thread::wait_for_workers_ready_reply(int nthreads) {
-  BOOST_ASSERT(nthreads > 0);
+// XXX DEL?
+void broker_thread::wait_for_workers_ready_reply() {
+  BOOST_ASSERT(workers_ > 0);
   BOOST_ASSERT(workers_.empty());
-  workers_.resize(nthreads);
-  for (int i = 0; i < nthreads; ++i) {
+  workers_.resize(workers_);
+  for (int i = 0; i < workers_; ++i) {
     message_iterator iter(*frontend_socket_);
     std::string sender = message_to_string(iter.next());
     BOOST_ASSERT(!sender.empty());  // zmq id
@@ -72,11 +77,14 @@ void broker_thread::wait_for_workers_ready_reply(int nthreads) {
   }
 }
 
-void broker_thread::run(zmq::context_t& context,
-    int nthreads, sync_event* ready_event,
-    zmq::socket_t* frontend_socket) {
-  broker_thread bt(
-      context, nthreads, ready_event, frontend_socket);
+void broker_thread::run(
+    zmq::context_t& context,
+    sync_event* ready_event,
+    zmq::socket_t* frontend_socket,
+    const workers_commander_ptr& workers_commander) {
+  BOOST_ASSERT(workers_commander);
+  broker_thread bt(context, ready_event,
+      frontend_socket, workers_commander);
   bt.reactor_.loop();
 }
 
@@ -145,8 +153,7 @@ inline void broker_thread::begin_worker_command(
 inline void broker_thread::add_closure(closure* closure) {
   BOOST_ASSERT(!workers_.empty());
   size_t worker_index = rand() % workers_.size();
-  begin_worker_command(worker_index, b2w::kRunClosure);
-  send_pointer(frontend_socket_, closure, 0);
+  workers_commander->run_closure(worker_index, closure);
 }
 
 void broker_thread::handle_connect_command(
@@ -218,8 +225,9 @@ void broker_thread::handle_quit_command(message_iterator& iter) {
 
 void broker_thread::handle_worker_done_command(
     const std::string& sender) {
-  workers_.erase(std::remove(workers_.begin(), workers_.end(), sender));
-  if (!workers_.empty())
+        // XXXX
+  //workers_.erase(std::remove(workers_.begin(), workers_.end(), sender));
+  //if (!workers_.empty())
     return;
   // All workers are gone, time to quit.
   reactor_.set_should_quit();

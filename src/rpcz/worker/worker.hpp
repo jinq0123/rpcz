@@ -10,6 +10,7 @@
 
 #include <rpcz/common.hpp>  // for uint64
 #include <rpcz/request_handler_map.hpp>
+#include <rpcz/worker/worker_cmd_queue_ptr.hpp>
 
 namespace zmq {
 class context_t;
