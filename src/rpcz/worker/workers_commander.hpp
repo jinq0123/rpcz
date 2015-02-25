@@ -6,6 +6,8 @@
 
 #include <boost/make_shared.hpp>
 #include <boost/scoped_array.hpp>
+#include <boost/shared_ptr.hpp>
+
 #include <rpcz/worker/worker_cmd_queue_ptr.hpp>
 #include <rpcz/worker/worker_cmd.hpp>
 
@@ -30,9 +32,13 @@ class workers_commander {
  public:
   inline void run_closure(unsigned int worker_index, closure* clsr);
   inline void start_rpc(unsigned int worker_index, rpc_controller* ctrl);
-  inline void handle_data(unsigned int worker_index, const handle_data_cmd_ptr& cmd);
+  inline void handle_data(unsigned int worker_index,
+                          const handle_data_cmd_ptr& cmd);
   void handle_timeout(unsigned int worker_index, uint64 event_id);
-  void register_svc(unsigned int worker_index, const connection_info& info);  // XXX
+  void register_svc(unsigned int worker_index,
+                    const connection_info_ptr& info,
+                    const std::string& name,
+                    iservice* svc);
   void quit_worker(unsigned int worker_index);
 
  private:
@@ -58,10 +64,11 @@ inline void workers_commander::start_rpc(
 }
 
 inline void workers_commander::handle_data(
-    unsigned int worker_index, const connection_info& info) {  // XXX
+    unsigned int worker_index, const handle_data_cmd_ptr& cmd) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_ptr cmd(new b2w::handle_data_cmd(info));
-  worker_cmd_queues_[worker_index]->push(cmd);
+  BOOST_ASSERT(cmd);
+  worker_cmd_ptr wkr_cmd = boost::static_pointer_cast<worker_cmd>(cmd);
+  worker_cmd_queues_[worker_index]->push(wkr_cmd);
 }
 
 }  // namespace rpcz

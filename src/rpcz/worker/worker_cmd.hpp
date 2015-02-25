@@ -6,13 +6,11 @@
 #define RPCZ_WORKER_CMD_HPP
 
 #include <boost/assert.hpp>
+#include <zmq.hpp>  // for message_t
+
 #include <rpcz/common.hpp>  // for uint64
 #include <rpcz/connection_info.hpp>  // for connection_info
 #include <rpcz/connection_info_ptr.hpp>
-
-namespace zmq {
-class message_t;
-}  // namespace zmq
 
 namespace rpcz {
 class closure;
@@ -79,13 +77,13 @@ struct handle_timeout_cmd : public worker_cmd {
   handle_timeout_cmd(uint64 ev_id);
 };
 
-// XXXX
 struct register_svc_cmd : public worker_cmd {
   connection_info_ptr info;
   std::string name;
   iservice* svc;
 
-  register_svc_cmd(const connection_info_ptr& conn_info);
+  register_svc_cmd(const connection_info_ptr& conn_info,
+      const std::string& svc_name, iservice* service);
 };
 
 struct quit_worker_cmd : public worker_cmd {

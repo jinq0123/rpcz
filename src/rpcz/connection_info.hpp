@@ -14,6 +14,8 @@ struct connection_info {
   uint64 index;  // router or dealer index
   std::string sender;  // Zmq sender id. Empty for dealer type.
 
+  connection_info()
+      : is_router(false), index(0) {}
   connection_info(uint64 router_index, const std::string& sndr)
       : is_router(true), index(router_index), sender(sndr) {}
   explicit connection_info(uint64 dealer_index)

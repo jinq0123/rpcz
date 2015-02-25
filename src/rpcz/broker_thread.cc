@@ -261,9 +261,9 @@ inline void broker_thread::handle_socket(
   if (!iter.has_more()) return;
   handle_data_cmd_ptr cmd_ptr(new b2w::handle_data_cmd);  // shared_ptr
   b2w::handle_data_cmd& cmd = *cmd_ptr;
-  cmd.header.move(iter.next());
+  cmd.header.move(&iter.next());
   if (iter.has_more())
-    cmd.payload.move(iter.next());
+    cmd.payload.move(&iter.next());
   cmd.info = info;
   workers_commander_->handle_data(get_worker_index(*info), cmd_ptr);
 }
@@ -312,13 +312,17 @@ inline void broker_thread::send_reply(message_iterator& iter) {
 
 void broker_thread::register_service(message_iterator& iter) {
   BOOST_ASSERT(iter.has_more());
-  connection_info info;
-  read_connection_info(iter, &info);
-  BOOST_ASSERT(is_connection_info_legal(info));
-
-  workers_commander_->register_svc(get_worker_index(info), info);
-  // forward to worker thread
-  // XXXXX forward_messages(iter, *frontend_socket_);
+  connection_info_ptr info(new connection_info);
+  read_connection_info(iter, info.get());
+  BOOST_ASSERT(is_connection_info_legal(*info));
+  BOOST_ASSERT(iter.has_more());
+  std::string name = message_to_string(iter.next());
+  BOOST_ASSERT(iter.has_more());
+  iservice* svc = interpret_message<iservice*>(iter.next());
+  BOOST_ASSERT(!iter.has_more());
+  BOOST_ASSERT(svc);
+  workers_commander_->register_svc(get_worker_index(*info),
+                                   info, name, svc);
 }
 
 bool broker_thread::is_dealer_index_legal(uint64 dealer_index) const {

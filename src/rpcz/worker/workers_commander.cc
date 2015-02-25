@@ -25,24 +25,31 @@ void workers_commander::set_cmd_queue(unsigned int worker_index,
 void workers_commander::handle_timeout(
     unsigned int worker_index, uint64 event_id) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues[worker_index] = b2w::make_handle_timeout_cmd(event_id);
+  worker_cmd_ptr cmd(new b2w::handle_timeout_cmd(event_id));  // shared_ptr
+  worker_cmd_queues_[worker_index]->push(cmd);
 }
 
 void workers_commander::register_svc(
-    unsigned int worker_index, const connection_info& info) {  // XXX
+    unsigned int worker_index,
+    const connection_info_ptr& info,
+    const std::string& name,
+    iservice* svc) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues_[worker_index] = b2w::make_register_svc_cmd(info);
+  BOOST_ASSERT(svc);
+  worker_cmd_ptr cmd(new b2w::register_svc_cmd(info, name, svc));  // shared_ptr
+  worker_cmd_queues_[worker_index]->push(cmd);
 }
 
 void workers_commander::quit_worker(
     unsigned int worker_index) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues_[worker_index] = b2w::make_quit_worker_cmd();
+  worker_cmd_ptr cmd(new b2w::quit_worker_cmd);  // shared_ptr
+  worker_cmd_queues_[worker_index]->push(cmd);
 }
 
 bool workers_commander::is_worker_index_legal(
     unsigned int worker_index) const {
-  return worker_index < (unsinged int)workers_
+  return worker_index < (unsigned int)workers_
       && worker_cmd_queues_[worker_index];
 }
 
