@@ -15,7 +15,7 @@ workers_commander::workers_commander(int workers)
 // Non-thread-safe.
 void workers_commander::set_cmd_queue(unsigned int worker_index,
     const worker_cmd_queue_ptr& cmd_queue) {
-  BOOST_ASSERT(worker_index < workers_);
+  BOOST_ASSERT(worker_index < (unsigned int)workers_);
   BOOST_ASSERT(cmd_queue);
   // Should set once only.
   BOOST_ASSERT(!worker_cmd_queues_[worker_index]);
@@ -42,7 +42,7 @@ void workers_commander::quit_worker(
 
 bool workers_commander::is_worker_index_legal(
     unsigned int worker_index) const {
-  return worker_index < workers_
+  return worker_index < (unsinged int)workers_
       && worker_cmd_queues_[worker_index];
 }
 

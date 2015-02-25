@@ -27,7 +27,7 @@ class request_handler {
   ~request_handler();
 
  public:
-  void handle_request(const ::rpcz::rpc_request_header& req_hdr,
+  void handle_request(const rpc_request_header& req_hdr,
                       const void* data, size_t len);
 
  public:

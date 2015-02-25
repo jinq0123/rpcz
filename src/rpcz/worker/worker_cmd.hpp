@@ -8,6 +8,11 @@
 #include <boost/assert.hpp>
 #include <rpcz/common.hpp>  // for uint64
 #include <rpcz/connection_info.hpp>  // for connection_info
+#include <rpcz/connection_info_ptr.hpp>
+
+namespace zmq {
+class message_t;
+}  // namespace zmq
 
 namespace rpcz {
 class closure;
@@ -24,7 +29,7 @@ enum worker_cmd_enum {
   kHandleData,  // Handle router/dealer socket data.
   kHandleTimeout,  // Handle request timeout.
   kRegisterSvc,  // Register service.
-  kQuitworker,  // Ask the worker to quit.
+  kQuitWorker,  // Ask the worker to quit.
 
   kMaxCmd
 };
@@ -59,12 +64,12 @@ struct start_rpc_cmd : public worker_cmd {
 };
 
 struct handle_data_cmd : public worker_cmd {
-  connection_info info;
-  // XXX data to receive
+  connection_info_ptr info;
+  zmq::message_t header;
+  zmq::message_t payload;
 
-  handle_data_cmd(const connection_info& conn_info)
-      : worker_cmd(kHandleData),
-      info(conn_info) {}
+  handle_data_cmd()
+      : worker_cmd(kHandleData) {}
 };
 
 struct handle_timeout_cmd : public worker_cmd {
@@ -80,8 +85,8 @@ struct register_svc_cmd : public worker_cmd {
   register_svc_cmd(const connection_info& conn_info);
 };
 
-struct quit_worker : public worker_cmd {
-  quit_worker();
+struct quit_worker_cmd : public worker_cmd {
+  quit_worker_cmd();
 };
 
 }  // namespace b2w

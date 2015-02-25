@@ -31,6 +31,7 @@
 #include <rpcz/logging.hpp>
 #include <rpcz/router_service_factories.hpp>
 #include <rpcz/sync_event.hpp>
+#include <rpcz/worker/workers_commander.hpp>
 #include <rpcz/worker/worker_thread_group.hpp>
 #include <rpcz/zmq_utils.hpp>  // for send_empty_message
 
@@ -60,14 +61,14 @@ manager::manager()
   worker_thread_group_.reset(new worker_thread_group(threads,
       frontend_endpoint_, *context_));
   sync_event event;
-  workers_commander_ptr worker_commander
+  workers_commander_ptr workers_commander
       = worker_thread_group_->get_workers_commander();
-  BOOST_ASSERT(worker_commander->get_workers() == threads);
+  BOOST_ASSERT(workers_commander->get_workers() == threads);
   broker_thread_ = boost::thread(&broker_thread::run,
                                  boost::ref(*context_),
                                  &event,
                                  broker_fe_socket,
-                                 worker_commander);
+                                 workers_commander);
   event.wait();
 }
 

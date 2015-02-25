@@ -56,13 +56,13 @@ reactor::~reactor() {
 }
 
 void reactor::add_socket(zmq::socket_t* socket, closure* closure) {
-  assert(closure);
+  BOOST_ASSERT(closure);
   sockets_.push_back(std::make_pair(socket, closure));
   is_dirty_ = true;
 }
 
 void reactor::del_socket(zmq::socket_t* socket, closure* callback) {
-  assert(callback);
+  BOOST_ASSERT(callback);
   del_sockets_.insert(std::make_pair(socket, callback));
   is_dirty_ = true;
   // Close and delete socket in loop().
@@ -98,7 +98,7 @@ void reactor::process_del_sockets() {
     delete sockets_[i].second;  // delele callback
     sockets_[i] = sockets_[--nSize];  // fill with the last
     sockets_.pop_back();
-    assert(nSize == sockets_.size());
+    BOOST_ASSERT(nSize == sockets_.size());
 
     for (const_iterator it = r.first; it != r.second; ++it)
       (*it).second->run();

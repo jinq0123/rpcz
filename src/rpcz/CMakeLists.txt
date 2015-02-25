@@ -49,6 +49,8 @@ set(RPCZ_LIB_DEPS ${ZeroMQ_LIBRARIES}
                   ${Boost_SYSTEM_LIBRARIES}
                   ${Boost_THREAD_LIBRARIES})
 
+add_definitions(-DWIN32_LEAN_AND_MEAN)
+
 add_library(rpcz SHARED ${RPCZ_SOURCES} ${RPCZ_HEADERS} ${RPCZ_WORKER_HEADERS} ${RPCZ_PUBLIC_HEADERS})
 target_link_libraries(rpcz ${RPCZ_LIB_DEPS})
 target_link_libraries(rpcz optimized ${PROTOBUF_LIBRARY})

@@ -32,11 +32,11 @@ request_handler::~request_handler() {
   service_map map_copy = service_map_;
   BOOST_FOREACH(const service_map::value_type& v, map_copy)
       unregister_service(v.first);
-  assert(service_map_.empty());
+  BOOST_ASSERT(service_map_.empty());
 }
 
 void request_handler::handle_request(
-    const ::rpcz::rpc_request_header& req_hdr,
+    const rpc_request_header& req_hdr,
     const void* data, size_t len) {
   BOOST_ASSERT(data);
   connection_ptr conn(new connection(conn_info_));  // shared_ptr
@@ -51,7 +51,7 @@ void request_handler::handle_request(
     return;
   }
   iservice* svc = iter->second;
-  assert(svc);
+  BOOST_ASSERT(svc);
   svc->dispatch_request(req_hdr.method(), data, len, rep);
 }  // handle_request()
 
@@ -74,7 +74,7 @@ void request_handler::create_and_register_service(
 void request_handler::unregister_service(const std::string& name) {
   service_map::const_iterator iter = service_map_.find(name);
   if (iter == service_map_.end()) return;
-  assert((*iter).second);
+  BOOST_ASSERT((*iter).second);
   delete (*iter).second;
   service_map_.erase(iter);
 }

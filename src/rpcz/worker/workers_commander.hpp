@@ -30,7 +30,7 @@ class workers_commander {
  public:
   inline void run_closure(unsigned int worker_index, closure* clsr);
   inline void start_rpc(unsigned int worker_index, rpc_controller* ctrl);
-  inline void handle_data(unsigned int worker_index, const connection_info& info);  // XXX
+  inline void handle_data(unsigned int worker_index, const handle_data_cmd_ptr& cmd);
   void handle_timeout(unsigned int worker_index, uint64 event_id);
   void register_svc(unsigned int worker_index, const connection_info& info);  // XXX
   void quit_worker(unsigned int worker_index);

@@ -154,7 +154,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
 inline void broker_thread::add_closure(closure* closure) {
   BOOST_ASSERT(workers_ > 0);
   size_t worker_index = rand() % workers_;
-  workers_commander->run_closure(worker_index, closure);
+  workers_commander_->run_closure(worker_index, closure);
 }
 
 void broker_thread::handle_connect_command(
@@ -207,7 +207,7 @@ void broker_thread::handle_unbind_command(
     const std::string& endpoint) {
   endpoint_to_socket::const_iterator it = bind_map_.find(endpoint);
   if (it == bind_map_.end()) return;
-  assert((*it).second);
+  BOOST_ASSERT((*it).second);
   reactor_.del_socket((*it).second,
       new_callback(this, &broker_thread::handle_socket_deleted, std::string(sender)));
   bind_map_.erase(it);
@@ -217,10 +217,8 @@ void broker_thread::handle_unbind_command(
 
 void broker_thread::handle_quit_command(message_iterator& iter) {
   // Ask the workers to quit. They'll in turn send kWorkerDone.
-  for (size_t i = 0; i < workers_.size(); ++i) {
-    send_string(frontend_socket_, workers_[i], ZMQ_SNDMORE);
-    send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-    send_char(frontend_socket_, b2w::kWorkerQuit, 0);
+  for (int i = 0; i < workers_; ++i) {
+    workers_commander_->quit_worker(i);
   }
 }
 
@@ -240,37 +238,40 @@ void broker_thread::handle_socket_deleted(const std::string sender) {
   send_empty_message(frontend_socket_, 0);  // Only to end zmq message?
 }
 
-void broker_thread::handle_router_socket(uint64 router_index) {
+inline void broker_thread::handle_router_socket(uint64 router_index) {
   BOOST_ASSERT(is_router_index_legal(router_index));
   message_iterator iter(*router_sockets_[router_index]);
   std::string sender(message_to_string(iter.next()));
   if (!iter.has_more()) return;
-  if (iter.next().size() != 0) return;
-  if (!iter.has_more()) return;
-
-  connection_info info = { true, router_index, sender };
-  begin_worker_command(info, b2w::kHandleData);
-  write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
-  forward_messages(iter, *frontend_socket_);
+  connection_info_ptr info(new connection_info(router_index, sender));  // shared_ptr
+  handle_socket(info, iter);
 }
 
-void broker_thread::handle_dealer_socket(uint64 dealer_index) {
+inline void broker_thread::handle_dealer_socket(uint64 dealer_index) {
   BOOST_ASSERT(is_dealer_index_legal(dealer_index));
   message_iterator iter(*dealer_sockets_[dealer_index]);
+  connection_info_ptr info(new connection_info(dealer_index));  // shared_ptr
+  handle_socket(info, iter);
+}
+
+inline void broker_thread::handle_socket(
+    const connection_info_ptr& info, message_iterator& iter) {
+  BOOST_ASSERT(info);
   if (iter.next().size() != 0) return;
   if (!iter.has_more()) return;
-
-  connection_info info = { false, dealer_index, "" };
-  begin_worker_command(info, b2w::kHandleData);
-  write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
-  forward_messages(iter, *frontend_socket_);
+  handle_data_cmd_ptr cmd_ptr(new b2w::handle_data_cmd);  // shared_ptr
+  b2w::handle_data_cmd& cmd = *cmd_ptr;
+  cmd.header.move(iter.next());
+  if (iter.has_more())
+    cmd.payload.move(iter.next());
+  cmd->info = info;
+  workers_commander_->handle_data(get_worker_index(*info), cmd_ptr);
 }
 
 void broker_thread::handle_timeout(uint64 event_id, size_t worker_index) {
-  BOOST_ASSERT(!workers_.empty());
-  worker_index %= workers_.size();
-  begin_worker_command(worker_index, b2w::kHandleTimeout);
-  send_uint64(frontend_socket_, event_id);
+  BOOST_ASSERT(workers_);
+  worker_index %= workers_;
+  workers_commander_->handle_timeout(worker_index, event_id);
 }
 
 inline void broker_thread::send_request(message_iterator& iter) {
@@ -297,9 +298,8 @@ inline void broker_thread::send_request(message_iterator& iter) {
 
 inline void broker_thread::start_rpc(
     const connection_info& info,
-    const rpc_controller* ctrl) {
-  begin_worker_command(info, b2w::kStartRpc);
-  send_pointer(frontend_socket_, ctrl);
+    rpc_controller* ctrl) {
+  workers_commander_->start_rpc(get_worker_index(info), ctrl);
 }
 
 inline void broker_thread::send_reply(message_iterator& iter) {
@@ -316,10 +316,9 @@ void broker_thread::register_service(message_iterator& iter) {
   read_connection_info(iter, &info);
   BOOST_ASSERT(is_connection_info_legal(info));
 
+  workers_commander_->register_svc(get_worker_index(info), info);
   // forward to worker thread
-  begin_worker_command(info, b2w::kRegisterSvc);
-  write_connection_info(frontend_socket_, info, ZMQ_SNDMORE);
-  forward_messages(iter, *frontend_socket_);
+  // XXXXX forward_messages(iter, *frontend_socket_);
 }
 
 bool broker_thread::is_dealer_index_legal(uint64 dealer_index) const {
@@ -359,8 +358,8 @@ inline void broker_thread::forward_to(
 // Map connection to worker thread.
 inline size_t broker_thread::get_worker_index(
     const connection_info& info) const {
-  BOOST_ASSERT(!workers_.empty());
-  return hash_value(info) % workers_.size();
+  BOOST_ASSERT(workers_);
+  return hash_value(info) % workers_;
 }
 
 }  // namespace rpcz

@@ -10,6 +10,7 @@
 
 #include <rpcz/common.hpp>  // for uint64
 #include <rpcz/request_handler_map.hpp>
+#include <rpcz/worker/worker_cmd_ptr.hpp>
 #include <rpcz/worker/worker_cmd_queue_ptr.hpp>
 
 namespace zmq {
@@ -40,19 +41,21 @@ class worker {
   worker_cmd_queue_ptr get_cmd_queue() const;
 
  private:
-  void start_rpc(message_iterator& iter);
-  void handle_data(message_iterator& iter);
-  void handle_timeout(message_iterator& iter);
-  void register_service(message_iterator& iter);
+  inline void run_closure(const worker_cmd_ptr& cmd);
+  inline void start_rpc(const worker_cmd_ptr& cmd);
+  inline void handle_data(const worker_cmd_ptr& cmd);
+  void handle_timeout(const worker_cmd_ptr& cmd);
+  void register_service(const worker_cmd_ptr& cmd);
 
  private:
-  void handle_request(const connection_info& conn_info,
-                      const ::rpcz::rpc_request_header& req_hdr,
-                      message_iterator& iter);
-  void handle_response(const ::rpcz::rpc_response_header& resp_hdr,
-                       message_iterator& iter);
-  void handle_done_resp(uint64 event_id, const zmq::message_t& response);
-  void handle_error_resp(const ::rpcz::rpc_response_header& resp_hdr);
+  inline void handle_request(
+      const rpc_request_header& req_hdr,
+      const b2w::handle_data_cmd& cmd);
+  inline void handle_response(
+      const rpc_response_header& resp_hdr,
+      const b2w::handle_data_cmd& cmd);
+  inline void handle_done_resp(uint64 event_id, const zmq::message_t& response);
+  void handle_error_resp(const rpc_response_header& resp_hdr);
 
  private:
   const size_t worker_index_;

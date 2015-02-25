@@ -22,7 +22,7 @@ void application_options::set_worker_threads(int n) {
 
 int application_options::get_worker_threads() {
   lock_guard lock(mutex_);
-  assert(worker_threads_ > 0);
+  BOOST_ASSERT(worker_threads_ > 0);
   return worker_threads_;
 }
 

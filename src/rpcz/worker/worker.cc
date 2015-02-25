@@ -29,7 +29,7 @@
 #include <rpcz/request_handler.hpp>
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/rpcz.pb.h>
-#include <rpcz/zmq_utils.hpp>  // for send_empty_message()
+// DEL #include <rpcz/zmq_utils.hpp>  // for send_empty_message()
 #include <rpcz/worker/worker_cmd.hpp>  // for kRunClosure
 
 namespace rpcz {
@@ -61,64 +61,68 @@ void worker::operator()() {
         should_continue = false;
         break;
       case kRunClosure:
-        interpret_message<closure*>(iter.next())->run();
+        run_closure(cmd);
         break;
       case kStartRpc:
-        start_rpc(iter);
+        start_rpc(cmd);
         break;
       case kHandleData:
-        handle_data(iter);
+        handle_data(cmd);
         break;
       case kHandleTimeout:
-        handle_timeout(iter);
+        handle_timeout(cmd);
         break;
       case kRegisterSvc:
-        register_service(iter);
+        register_service(cmd);
         break;
       default:
         CHECK(false);
         break;
     }  // switch
   } while (should_continue);
-  send_empty_message(&socket, ZMQ_SNDMORE);
-  send_char(&socket, c2b::kWorkerDone);
+  // XXXX
+  //send_empty_message(&socket, ZMQ_SNDMORE);
+  //send_char(&socket, c2b::kWorkerDone);
 }
 
 worker_cmd_queue_ptr worker::get_cmd_queue() const {
   return cmd_queue_;
 }
 
-void worker::start_rpc(message_iterator& iter) {
-  BOOST_ASSERT(iter.has_more());
-  rpc_controller* ctrl = interpret_message<rpc_controller*>(iter.next());
-  BOOST_ASSERT(!iter.has_more());
+inline void run_closure(const worker_cmd_ptr& cmd) {
+  b2w::run_closure_cmd* run_cmd = static_cast<b2w::run_closure_cmd*>(cmd.get());
+  closure* clsr = run_cmd->clsr;
+  BOOST_ASSERT(clsr);
+  clsr->run();
+}
+
+inline void worker::start_rpc(const worker_cmd_ptr& cmd) {
+  b2w::start_rpc_cmd* start = static_cast<b2w::start_rpc_cmd*>(cmd.get());
+  rpc_controller* ctrl = start->ctrl;
   BOOST_ASSERT(ctrl);
   uint64 event_id = ctrl->get_event_id();
   remote_response_map_[event_id] = ctrl;
 }
 
-void worker::handle_data(message_iterator& iter) {
-  BOOST_ASSERT(iter.has_more());
-  connection_info info;
-  read_connection_info(iter, &info);
-  if (!iter.has_more()) return;
-  const zmq::message_t& msg = iter.next();
+inline void worker::handle_data(const worker_cmd_ptr& cmd) {
+  b2w::handle_data_cmd* hd_cmd = static_cast<b2w::handle_data_cmd*>(cmd.get());
+  const zmq::message_t& header = hd_cmd->header;
   rpc_header rpc_hdr;
-  if (!rpc_hdr.ParseFromArray(msg.data(), msg.size())) {
+  if (!rpc_hdr.ParseFromArray(header.data(), header.size())) {
     DLOG(INFO) << "Received bad header.";
     return;
   }
   if (rpc_hdr.has_req_hdr()) {
-    handle_request(info, rpc_hdr.req_hdr(), iter);
+    handle_request(rpc_hdr.req_hdr(), *hd_cmd);
     return;
   }
   if (rpc_hdr.has_resp_hdr()) {
-    handle_response(rpc_hdr.resp_hdr(), iter);
+    handle_response(rpc_hdr.resp_hdr(), *hd_cmd);
     return;
   }
 }
 
-void worker::handle_timeout(message_iterator& iter) {
+void worker::handle_timeout(const worker_cmd_ptr& cmd) {
   uint64 event_id = interpret_message<uint64>(iter.next());
   BOOST_ASSERT(!iter.has_more());
   remote_response_map::iterator response_iter
@@ -134,7 +138,7 @@ void worker::handle_timeout(message_iterator& iter) {
   remote_response_map_.erase(response_iter);
 }
 
-void worker::register_service(message_iterator& iter) {
+void worker::register_service(const worker_cmd_ptr& cmd) {
   BOOST_ASSERT(iter.has_more());
   connection_info info;
   read_connection_info(iter, &info);
@@ -148,32 +152,30 @@ void worker::register_service(message_iterator& iter) {
   handler.register_service(name, svc);
 }
 
-void worker::handle_request(
-    const connection_info& conn_info,
-    const ::rpcz::rpc_request_header& req_hdr,
-    message_iterator& iter) {
-  if (!iter.has_more()) return;
-  zmq::message_t& payload = iter.next();
+inline void worker::handle_request(
+    const rpc_request_header& req_hdr,
+    const b2w::handle_data_cmd& cmd) {
+  BOOST_ASSERT(cmd.info);
+  const connection_info& conn_info = *cmd.info,
+  const zmq::message_t& payload = cmd.payload;
   request_handler& handler = request_handler_map_.get_handler(conn_info);
   handler.handle_request(req_hdr, payload.data(), payload.size());
 }
 
 void worker::handle_response(
-    const ::rpcz::rpc_response_header& resp_hdr,
-    message_iterator& iter) {
+    const rpc_response_header& resp_hdr,
+    const b2w::handle_data_cmd& cmd) {
   if (resp_hdr.has_error_code()) {
     handle_error_resp(resp_hdr);
     return;
   }
 
   // normal response
-  if (iter.has_more()) {
-    const zmq::message_t& payload = iter.next();
-    handle_done_resp(resp_hdr.event_id(), payload);
-  }
+  const zmq::message_t& payload = cmd.payload;
+  handle_done_resp(resp_hdr.event_id(), payload);
 }
 
-void worker::handle_done_resp(uint64 event_id,
+inline void worker::handle_done_resp(uint64 event_id,
     const zmq::message_t& response) {
   remote_response_map::iterator response_iter
       = remote_response_map_.find(event_id);
@@ -188,7 +190,7 @@ void worker::handle_done_resp(uint64 event_id,
   remote_response_map_.erase(response_iter);
 }
 
-void worker::handle_error_resp(const ::rpcz::rpc_response_header& resp_hdr) {
+void worker::handle_error_resp(const rpc_response_header& resp_hdr) {
   BOOST_ASSERT(resp_hdr.has_error_code());
   remote_response_map::iterator response_iter
       = remote_response_map_.find(resp_hdr.event_id());

@@ -18,7 +18,6 @@
 
 #include <rpcz/cpp_service.hpp>
 
-#include <assert.h>
 #include <string>
 
 #include <google/protobuf/descriptor.h>  // for FindMethodByName()

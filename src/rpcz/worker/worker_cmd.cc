@@ -21,7 +21,7 @@ register_svc_cmd::register_svc_cmd(const connection_info& conn_info)
 };
 
 quit_worker_cmd::quit_worker_cmd()
-    : worker_cmd(kQuitworker) {
+    : worker_cmd(kQuitWorker) {
 };
 
 }  // namespace b2w

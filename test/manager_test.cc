@@ -195,7 +195,7 @@ const static char* kEndpoint = "inproc://test";
 const static char* kReply = "gotit";
 
 void DoThis(zmq::context_t* context) {
-  assert(context);
+  BOOST_ASSERT(context);
   LOG(INFO)<<"Creating socket. Context="<<context;
   zmq::socket_t socket(*context, ZMQ_PUSH);
   socket.connect(kEndpoint);

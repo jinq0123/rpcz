@@ -13,6 +13,11 @@ struct connection_info {
   bool is_router;  // ZMQ_ROUTER or ZMQ_DEALER
   uint64 index;  // router or dealer index
   std::string sender;  // Zmq sender id. Empty for dealer type.
+
+  connection_info(uint64 router_index, const std::string& sndr)
+      : is_router(true), index(router_index), sender(sndr) {}
+  explicit connection_info(uint64 dealer_index)
+      : is_router(false), index(dealer_index) {}
 };
 
 inline bool operator==(const connection_info& lhs,

@@ -73,15 +73,17 @@ class broker_thread {
  private:
   // Callback on reactor deleted socket.
   void handle_socket_deleted(const std::string sender);
-  void handle_router_socket(uint64 router_index);
-  void handle_dealer_socket(uint64 dealer_index);
+  inline void handle_router_socket(uint64 router_index);
+  inline void handle_dealer_socket(uint64 dealer_index);
+  inline void broker_thread::handle_socket(
+    const connection_info_ptr& info, message_iterator& iter);
   void handle_timeout(uint64 event_id, size_t worker_index);
 
  private:
   inline void add_closure(closure* closure);
   inline void send_request(message_iterator& iter);
   inline void start_rpc(const connection_info& info,
-                        const rpc_controller* ctrl);
+                        rpc_controller* ctrl);
   inline void send_reply(message_iterator& iter);
 
  private:
