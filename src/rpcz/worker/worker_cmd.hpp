@@ -5,6 +5,7 @@
 #ifndef RPCZ_WORKER_CMD_HPP
 #define RPCZ_WORKER_CMD_HPP
 
+#include <boost/assert.hpp>
 #include <rpcz/common.hpp>  // for uint64
 #include <rpcz/connection_info.hpp>  // for connection_info
 
@@ -28,49 +29,59 @@ enum worker_cmd_enum {
   kMaxCmd
 };
 
-struct param_run_closure;
-struct param_start_rpc;
-struct param_handle_data;
-struct param_handle_timeout;
-struct param_register_svc;
-struct param_quit_worker;
-
 struct worker_cmd {
   worker_cmd_enum cmd;
-  // cmd parameter
-  union {
-    param_run_closure    run_closure;
-    param_start_rpc      start_rpc;
-    param_handle_data    handle_data;
-    param_handle_timeout handle_timeout;
-    param_register_svc   register_svc;
-    param_quit_worker    quit_worker;
-  };
+
+  worker_cmd(worker_cmd_enum c) : cmd(c) {
+    BOOST_ASSERT(c > kIllegalCmd);
+    BOOST_ASSERT(c < kMaxCmd);
+  }
 };
 
-struct param_run_closure {
+struct run_closure_cmd : public worker_cmd {
   closure* clsr;
+
+  run_closure_cmd(closure* cl)
+      : worker_cmd(kRunClosure),
+      clsr(cl) {
+    BOOST_ASSERT(cl);
+  }
 };
 
-struct param_start_rpc {
+struct start_rpc_cmd : public worker_cmd {
   rpc_controller* ctrl;
+
+  start_rpc_cmd(rpc_controller* controller)
+      : worker_cmd(kStartRpc),
+        ctrl(controller) {
+    BOOST_ASSERT(ctrl);
+  }
 };
 
-struct param_handle_data {
+struct handle_data_cmd : public worker_cmd {
   connection_info info;
   // XXX data to receive
+
+  handle_data_cmd(const connection_info& conn_info)
+      : worker_cmd(kHandleData),
+      info(conn_info) {}
 };
 
-struct param_handle_timeout {
+struct handle_timeout_cmd : public worker_cmd {
   uint64 event_id;
+
+  handle_timeout_cmd(uint64 ev_id);
 };
 
-struct param_register_svc {
+struct register_svc_cmd : public worker_cmd {
   connection_info info;
   // XXX other data...
+
+  register_svc_cmd(const connection_info& conn_info);
 };
 
-struct param_quit_worker {
+struct quit_worker : public worker_cmd {
+  quit_worker();
 };
 
 }  // namespace b2w

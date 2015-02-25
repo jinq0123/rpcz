@@ -58,23 +58,23 @@ broker_thread::broker_thread(
 // XXX DEL?
 void broker_thread::wait_for_workers_ready_reply() {
   BOOST_ASSERT(workers_ > 0);
-  BOOST_ASSERT(workers_.empty());
-  workers_.resize(workers_);
-  for (int i = 0; i < workers_; ++i) {
-    message_iterator iter(*frontend_socket_);
-    std::string sender = message_to_string(iter.next());
-    BOOST_ASSERT(!sender.empty());  // zmq id
-    CHECK_EQ(0, iter.next().size());
-    char command(interpret_message<char>(iter.next()));
-    CHECK_EQ(c2b::kWorkerReady, command)
-        << "Got unexpected command " << (int)command;
-    BOOST_ASSERT(iter.has_more());
-    uint64 worker_index(interpret_message<uint64>(iter.next()));
-    BOOST_ASSERT(!iter.has_more());
-    BOOST_ASSERT(worker_index < workers_.size());
-    BOOST_ASSERT(workers_[worker_index].empty());
-    workers_[worker_index] = sender;
-  }
+  //BOOST_ASSERT(workers_.empty());
+  //workers_.resize(workers_);
+  //for (int i = 0; i < workers_; ++i) {
+  //  message_iterator iter(*frontend_socket_);
+  //  std::string sender = message_to_string(iter.next());
+  //  BOOST_ASSERT(!sender.empty());  // zmq id
+  //  CHECK_EQ(0, iter.next().size());
+  //  char command(interpret_message<char>(iter.next()));
+  //  CHECK_EQ(c2b::kWorkerReady, command)
+  //      << "Got unexpected command " << (int)command;
+  //  BOOST_ASSERT(iter.has_more());
+  //  uint64 worker_index(interpret_message<uint64>(iter.next()));
+  //  BOOST_ASSERT(!iter.has_more());
+  //  BOOST_ASSERT(worker_index < workers_.size());
+  //  BOOST_ASSERT(workers_[worker_index].empty());
+  //  workers_[worker_index] = sender;
+  //}
 }
 
 void broker_thread::run(
@@ -134,25 +134,26 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   }  // switch
 }
 
-// command must be broker to worker (b2w) command.
-inline void broker_thread::begin_worker_command(
-    const connection_info& conn_info, char command) {
-  begin_worker_command(get_worker_index(conn_info), command);
-}
-
-// command must be broker to worker (b2w) command.
-inline void broker_thread::begin_worker_command(
-    size_t worker_index, char command) {
-  BOOST_ASSERT(worker_index < workers_.size());
-  send_string(frontend_socket_, workers_[worker_index], ZMQ_SNDMORE);
-  send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-  send_char(frontend_socket_, command, ZMQ_SNDMORE);
-}
+// XXXXX DEL
+//// command must be broker to worker (b2w) command.
+//inline void broker_thread::begin_worker_command(
+//    const connection_info& conn_info, char command) {
+//  begin_worker_command(get_worker_index(conn_info), command);
+//}
+//
+//// command must be broker to worker (b2w) command.
+//inline void broker_thread::begin_worker_command(
+//    size_t worker_index, char command) {
+//  BOOST_ASSERT(worker_index < workers_.size());
+//  send_string(frontend_socket_, workers_[worker_index], ZMQ_SNDMORE);
+//  send_empty_message(frontend_socket_, ZMQ_SNDMORE);
+//  send_char(frontend_socket_, command, ZMQ_SNDMORE);
+//}
 
 // Add closure to random worker thread.
 inline void broker_thread::add_closure(closure* closure) {
-  BOOST_ASSERT(!workers_.empty());
-  size_t worker_index = rand() % workers_.size();
+  BOOST_ASSERT(workers_ > 0);
+  size_t worker_index = rand() % workers_;
   workers_commander->run_closure(worker_index, closure);
 }
 

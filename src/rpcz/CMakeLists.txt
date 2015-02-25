@@ -35,7 +35,7 @@ set(RPCZ_SOURCES
     sync_event.cc
     sync_requester.cc
     worker/worker.cc
-    worker/worker_cmd_maker.cc
+    worker/worker_cmd.cc
     worker/worker_thread_group.cc
     worker/workers_commander.cc
     zmq_utils.cc

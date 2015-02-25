@@ -50,10 +50,11 @@ class broker_thread {
  private:
   void wait_for_workers_ready_reply();
   void handle_frontend_socket(zmq::socket_t* frontend_socket);
-  inline void begin_worker_command(
-      const connection_info& conn_info, char command);
-  inline void begin_worker_command(
-      size_t worker_index, char command);
+  // DEL XXXXX
+  //inline void begin_worker_command(
+  //    const connection_info& conn_info, char command);
+  //inline void begin_worker_command(
+  //    size_t worker_index, char command);
   void handle_connect_command(
       const std::string& sender,
       const std::string& endpoint);

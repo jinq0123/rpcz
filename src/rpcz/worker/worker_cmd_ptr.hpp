@@ -8,8 +8,10 @@
 #include <boost/shared_ptr.hpp>
 
 namespace rpcz {
+namespace b2w {
 struct worker_cmd;
-typedef boost::shared_ptr<worker_cmd> worker_cmd_ptr;
+}  // namespace b2w
+typedef boost::shared_ptr<b2w::worker_cmd> worker_cmd_ptr;
 }  // namespace rpcz
 
 #endif  // RPCZ_WORKER_CMD_PTR_HPP

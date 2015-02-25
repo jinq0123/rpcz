@@ -4,8 +4,10 @@
 #ifndef RPCZ_WORKERS_COMMANDER_HPP
 #define RPCZ_WORKERS_COMMANDER_HPP
 
+#include <boost/make_shared.hpp>
+#include <boost/scoped_array.hpp>
 #include <rpcz/worker/worker_cmd_queue_ptr.hpp>
-#include <rpcz/worker/worker_cmd_maker.hpp>  // for make_start_rpc_cmd()
+#include <rpcz/worker/worker_cmd.hpp>
 
 namespace rpcz {
 
@@ -18,7 +20,7 @@ class workers_commander {
   explicit workers_commander(int workers);
 
  public:
-     int get_workers() const { return workers; }
+     int get_workers() const { return workers_; }
 
  public:
   // Non-thread-safe.
@@ -38,25 +40,28 @@ class workers_commander {
 
  private:
   const int workers_;  // number of workers, >= 1
-  boost::scoped_ptr<worker_cmd_queue_ptr> worker_cmd_queues_;
+  boost::scoped_array<worker_cmd_queue_ptr> worker_cmd_queues_;
 };
 
 inline void workers_commander::run_closure(
     unsigned int worker_index, closure* clsr) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues_[worker_index] = b2w::make_run_closure_cmd(clsr);
+  worker_cmd_ptr cmd(new b2w::run_closure_cmd(clsr));  // shared_ptr
+  worker_cmd_queues_[worker_index]->push(cmd);
 }
 
 inline void workers_commander::start_rpc(
     unsigned int worker_index, rpc_controller* ctrl) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues_[worker_index] = b2w::make_start_rpc_cmd(ctrl);
+  worker_cmd_ptr cmd(new b2w::start_rpc_cmd(ctrl));
+  worker_cmd_queues_[worker_index]->push(cmd);
 }
 
 inline void workers_commander::handle_data(
     unsigned int worker_index, const connection_info& info) {  // XXX
   BOOST_ASSERT(is_worker_index_legal(worker_index));
-  worker_cmd_queues_[worker_index] = b2w::make_handle_data_cmd(ctrl);
+  worker_cmd_ptr cmd(new b2w::handle_data_cmd(info));
+  worker_cmd_queues_[worker_index]->push(cmd);
 }
 
 }  // namespace rpcz
