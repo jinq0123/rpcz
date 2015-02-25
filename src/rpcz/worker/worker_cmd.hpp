@@ -17,6 +17,7 @@ class message_t;
 namespace rpcz {
 class closure;
 class rpc_controller;
+class iservice;
 
 // Messages sent from the broker to a worker thread:
 namespace b2w {
@@ -78,11 +79,13 @@ struct handle_timeout_cmd : public worker_cmd {
   handle_timeout_cmd(uint64 ev_id);
 };
 
+// XXXX
 struct register_svc_cmd : public worker_cmd {
-  connection_info info;
-  // XXX other data...
+  connection_info_ptr info;
+  std::string name;
+  iservice* svc;
 
-  register_svc_cmd(const connection_info& conn_info);
+  register_svc_cmd(const connection_info_ptr& conn_info);
 };
 
 struct quit_worker_cmd : public worker_cmd {

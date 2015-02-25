@@ -264,7 +264,7 @@ inline void broker_thread::handle_socket(
   cmd.header.move(iter.next());
   if (iter.has_more())
     cmd.payload.move(iter.next());
-  cmd->info = info;
+  cmd.info = info;
   workers_commander_->handle_data(get_worker_index(*info), cmd_ptr);
 }
 

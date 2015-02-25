@@ -21,6 +21,10 @@ class socket_t;
 
 namespace rpcz {
 
+namespace b2w {
+struct handle_data_cmd;
+}  // namespace b2w
+
 class message_iterator;
 class rpc_controller;
 class rpc_request_header;

@@ -20,7 +20,7 @@
 
 #include <rpcz/worker/worker.hpp>
 
-#include <zmq.hpp>
+#include <zmq.hpp>  // for message_t
 
 #include <rpcz/callback.hpp>  // for closure
 #include <rpcz/connection_info_zmq.hpp>  // for read_connection_info()
@@ -123,8 +123,9 @@ inline void worker::handle_data(const worker_cmd_ptr& cmd) {
 }
 
 void worker::handle_timeout(const worker_cmd_ptr& cmd) {
-  uint64 event_id = interpret_message<uint64>(iter.next());
-  BOOST_ASSERT(!iter.has_more());
+  const b2w::handle_timeout_cmd* timeout_cmd = static_cast<
+      const b2w::handle_timeout_cmd*>(cmd.get());
+  uint64 event_id = timeout_cmd->event_id;
   remote_response_map::iterator response_iter
       = remote_response_map_.find(event_id);
   if (response_iter == remote_response_map_.end())
@@ -139,24 +140,17 @@ void worker::handle_timeout(const worker_cmd_ptr& cmd) {
 }
 
 void worker::register_service(const worker_cmd_ptr& cmd) {
-  BOOST_ASSERT(iter.has_more());
-  connection_info info;
-  read_connection_info(iter, &info);
-  BOOST_ASSERT(iter.has_more());
-  std::string name = message_to_string(iter.next());
-  BOOST_ASSERT(iter.has_more());
-  iservice* svc = interpret_message<iservice*>(iter.next());
-  BOOST_ASSERT(!iter.has_more());
-  BOOST_ASSERT(svc);
-  request_handler& handler = request_handler_map_.get_handler(info);
-  handler.register_service(name, svc);
+  const b2w::register_svc_cmd* reg = static_cast<
+      const b2w::register_svc_cmd*>(cmd.get());
+  request_handler& handler = request_handler_map_.get_handler(*reg->info);
+  handler.register_service(reg->name, reg->svc);
 }
 
 inline void worker::handle_request(
     const rpc_request_header& req_hdr,
     const b2w::handle_data_cmd& cmd) {
   BOOST_ASSERT(cmd.info);
-  const connection_info& conn_info = *cmd.info,
+  const connection_info& conn_info = *cmd.info;
   const zmq::message_t& payload = cmd.payload;
   request_handler& handler = request_handler_map_.get_handler(conn_info);
   handler.handle_request(req_hdr, payload.data(), payload.size());

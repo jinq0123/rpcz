@@ -22,6 +22,7 @@
 #include <map>
 #include <vector>
 
+#include <rpcz/connection_info_ptr.hpp>
 #include <rpcz/reactor.hpp>
 #include <rpcz/worker/workers_commander_ptr.hpp>
 
