@@ -5,6 +5,7 @@
 #include <rpcz/worker/worker_thread_group.hpp>
 
 #include <rpcz/worker/worker.hpp>  // for worker
+#include <rpcz/worker/workers_commander.hpp>
 
 namespace rpcz {
 
@@ -13,7 +14,7 @@ worker_thread_group::worker_thread_group(
     const std::string& frontend_endpoint,
     zmq::context_t& context)
     : threads_(threads),
-      workers_(new scoped_worder[threads]),  // scoped_array
+      workers_(new scoped_worker[threads]),  // scoped_array
       workers_commander_(new workers_commander(threads)) {  // shared_ptr
   BOOST_ASSERT(threads > 0);
   for (int i = 0; i < threads; ++i) {

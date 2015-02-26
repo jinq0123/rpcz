@@ -67,7 +67,7 @@ inline void workers_commander::handle_data(
     unsigned int worker_index, const handle_data_cmd_ptr& cmd) {
   BOOST_ASSERT(is_worker_index_legal(worker_index));
   BOOST_ASSERT(cmd);
-  worker_cmd_ptr wkr_cmd = boost::static_pointer_cast<worker_cmd>(cmd);
+  worker_cmd_ptr wkr_cmd = boost::static_pointer_cast<b2w::worker_cmd>(cmd);
   worker_cmd_queues_[worker_index]->push(wkr_cmd);
 }
 

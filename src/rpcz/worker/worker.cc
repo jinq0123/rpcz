@@ -89,7 +89,7 @@ worker_cmd_queue_ptr worker::get_cmd_queue() const {
   return cmd_queue_;
 }
 
-inline void run_closure(const worker_cmd_ptr& cmd) {
+inline void worker::run_closure(const worker_cmd_ptr& cmd) {
   b2w::run_closure_cmd* run_cmd = static_cast<b2w::run_closure_cmd*>(cmd.get());
   closure* clsr = run_cmd->clsr;
   BOOST_ASSERT(clsr);

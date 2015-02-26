@@ -34,7 +34,7 @@ enum worker_cmd_enum {
 };
 
 struct worker_cmd {
-  worker_cmd_enum cmd;
+  const worker_cmd_enum cmd;
 
   worker_cmd(worker_cmd_enum c) : cmd(c) {
     BOOST_ASSERT(c > kIllegalCmd);
