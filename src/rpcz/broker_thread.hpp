@@ -49,7 +49,6 @@ class broker_thread {
                   const workers_commander_ptr& wkrs_cmdr);
 
  private:
-  void wait_for_workers_ready_reply();
   void handle_frontend_socket(zmq::socket_t* frontend_socket);
   void handle_connect_command(
       const std::string& sender,
