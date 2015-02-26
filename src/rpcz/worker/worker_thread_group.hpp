@@ -21,9 +21,7 @@ class workers_commander;
 
 class worker_thread_group : boost::noncopyable {
  public:
-  explicit worker_thread_group(int threads,
-      const std::string& frontend_endpoint_,
-      zmq::context_t& context_);
+  explicit worker_thread_group(int threads);
   // Blocks until all threads joined.
   virtual ~worker_thread_group();
 

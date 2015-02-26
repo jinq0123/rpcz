@@ -9,18 +9,14 @@
 
 namespace rpcz {
 
-worker_thread_group::worker_thread_group(
-    int threads,
-    const std::string& frontend_endpoint,
-    zmq::context_t& context)
+worker_thread_group::worker_thread_group(int threads)
     : threads_(threads),
       workers_(new scoped_worker[threads]),  // scoped_array
       workers_commander_(new workers_commander(threads)) {  // shared_ptr
   BOOST_ASSERT(threads > 0);
   for (int i = 0; i < threads; ++i) {
-    workers_[i].reset(new worker(i, frontend_endpoint, context));
-    thread_group_.add_thread(new boost::thread(
-        boost::ref(*workers_[i])));
+    workers_[i].reset(new worker(i));
+    thread_group_.add_thread(new boost::thread(boost::ref(*workers_[i])));
     // All commands are send through the worker's cmd queue.
     workers_commander_->set_cmd_queue(i, workers_[i]->get_cmd_queue());
   }

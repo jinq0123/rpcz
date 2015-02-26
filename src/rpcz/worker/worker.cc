@@ -23,9 +23,6 @@
 #include <zmq.hpp>  // for message_t
 
 #include <rpcz/callback.hpp>  // for closure
-#include <rpcz/connection_info_zmq.hpp>  // for read_connection_info()
-#include <rpcz/internal_commands.hpp>  // for kReady
-#include <rpcz/logging.hpp>  // for CHECK_EQ()
 #include <rpcz/request_handler.hpp>
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/rpcz.pb.h>
@@ -33,12 +30,8 @@
 
 namespace rpcz {
 
-worker::worker(size_t worker_index,
-               const std::string& frontend_endpoint,
-               zmq::context_t& context)
+worker::worker(size_t worker_index)
     : worker_index_(worker_index),
-      frontend_endpoint_(frontend_endpoint),
-      context_(context),
       cmd_queue_(new worker_cmd_queue) {
 }
 
@@ -73,7 +66,7 @@ void worker::operator()() {
         register_service(cmd);
         break;
       default:
-        CHECK(false);
+        BOOST_ASSERT(false);
         break;
     }  // switch
   } while (should_continue);
@@ -103,7 +96,7 @@ inline void worker::handle_data(const worker_cmd_ptr& cmd) {
   const zmq::message_t& header = hd_cmd->header;
   rpc_header rpc_hdr;
   if (!rpc_hdr.ParseFromArray(header.data(), header.size())) {
-    DLOG(INFO) << "Received bad header.";
+    // DLOG(INFO) << "Received bad header.";
     return;
   }
   if (rpc_hdr.has_req_hdr()) {

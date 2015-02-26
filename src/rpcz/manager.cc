@@ -58,8 +58,7 @@ manager::manager()
   broker_fe_socket->bind(frontend_endpoint_.c_str());
   int threads = application_options::get_worker_threads();
   BOOST_ASSERT(threads > 0);
-  worker_thread_group_.reset(new worker_thread_group(threads,
-      frontend_endpoint_, *context_));
+  worker_thread_group_.reset(new worker_thread_group(threads));
   sync_event event;
   workers_commander_ptr workers_commander
       = worker_thread_group_->get_workers_commander();

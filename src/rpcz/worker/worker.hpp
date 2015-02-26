@@ -14,9 +14,7 @@
 #include <rpcz/worker/worker_cmd_queue_ptr.hpp>
 
 namespace zmq {
-class context_t;
 class message_t;
-class socket_t;
 }  // namespace zmq
 
 namespace rpcz {
@@ -33,9 +31,7 @@ struct connection_info;
 
 class worker {
  public:
-  worker(size_t worker_index,
-      const std::string& frontend_endpoint,
-      zmq::context_t& context);
+  explicit worker(size_t worker_index);
   ~worker();
 
  public:
@@ -63,8 +59,6 @@ class worker {
 
  private:
   const size_t worker_index_;
-  const std::string frontend_endpoint_;
-  zmq::context_t& context_;
 
  private:
   worker_cmd_queue_ptr cmd_queue_;
