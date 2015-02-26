@@ -29,6 +29,8 @@ void sync_event::wait() {
 }
 
 void sync_event::signal() {
+  boost::unique_lock<boost::mutex> lock(mu_);
+  ready_ = true;
   cond_.notify_all();
 }
 }  // namespace rpcz
