@@ -51,11 +51,6 @@ class broker_thread {
  private:
   void wait_for_workers_ready_reply();
   void handle_frontend_socket(zmq::socket_t* frontend_socket);
-  // DEL XXXXX
-  //inline void begin_worker_command(
-  //    const connection_info& conn_info, char command);
-  //inline void begin_worker_command(
-  //    size_t worker_index, char command);
   void handle_connect_command(
       const std::string& sender,
       const std::string& endpoint);
@@ -68,8 +63,7 @@ class broker_thread {
   void handle_unbind_command(
       const std::string& sender,
       const std::string& endpoint);
-  void handle_quit_command(message_iterator& iter);
-  void handle_worker_done_command(const std::string& sender);
+  void handle_quit_command();
 
  private:
   // Callback on reactor deleted socket.
@@ -116,5 +110,4 @@ class broker_thread {
 };
 
 }  // namespace rpcz
-
 #endif  // RPCZ_BROKER_THREAD_H

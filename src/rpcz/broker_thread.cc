@@ -96,7 +96,7 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
   using namespace c2b;  // command to broker
   switch (command) {
     case kQuit:
-      handle_quit_command(iter);
+      handle_quit_command();
       break;
     case kConnect:
       handle_connect_command(sender, message_to_string(iter.next()));
@@ -120,35 +120,11 @@ void broker_thread::handle_frontend_socket(zmq::socket_t* frontend_socket) {
       register_service(iter);
       break;
 
-    // worker to broker commands
-    case kWorkerReady:
-      CHECK(false);
-      break;
-    case kWorkerDone:
-      handle_worker_done_command(sender);
-      break;
-
     default:
       BOOST_ASSERT(false);
       break;
   }  // switch
 }
-
-// XXXXX DEL
-//// command must be broker to worker (b2w) command.
-//inline void broker_thread::begin_worker_command(
-//    const connection_info& conn_info, char command) {
-//  begin_worker_command(get_worker_index(conn_info), command);
-//}
-//
-//// command must be broker to worker (b2w) command.
-//inline void broker_thread::begin_worker_command(
-//    size_t worker_index, char command) {
-//  BOOST_ASSERT(worker_index < workers_.size());
-//  send_string(frontend_socket_, workers_[worker_index], ZMQ_SNDMORE);
-//  send_empty_message(frontend_socket_, ZMQ_SNDMORE);
-//  send_char(frontend_socket_, command, ZMQ_SNDMORE);
-//}
 
 // Add closure to random worker thread.
 inline void broker_thread::add_closure(closure* closure) {
@@ -215,20 +191,7 @@ void broker_thread::handle_unbind_command(
   // It will callback on deleted before next zmq_poll().
 }
 
-void broker_thread::handle_quit_command(message_iterator& iter) {
-  // Ask the workers to quit. They'll in turn send kWorkerDone.
-  for (int i = 0; i < workers_; ++i) {
-    workers_commander_->quit_worker(i);
-  }
-}
-
-void broker_thread::handle_worker_done_command(
-    const std::string& sender) {
-        // XXXX
-  //workers_.erase(std::remove(workers_.begin(), workers_.end(), sender));
-  //if (!workers_.empty())
-    return;
-  // All workers are gone, time to quit.
+void broker_thread::handle_quit_command() {
   reactor_.set_should_quit();
 }
 

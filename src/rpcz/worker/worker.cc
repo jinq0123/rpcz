@@ -39,7 +39,8 @@ worker::worker(size_t worker_index,
                zmq::context_t& context)
     : worker_index_(worker_index),
       frontend_endpoint_(frontend_endpoint),
-      context_(context) {
+      context_(context),
+      cmd_queue_(new worker_cmd_queue) {
 }
 
 worker::~worker() {
@@ -48,9 +49,6 @@ worker::~worker() {
 void worker::operator()() {
   worker_cmd_queue& cmd_queue = *cmd_queue_;
   worker_cmd_ptr cmd;
-    // XXXX
-  //send_char(&socket, c2b::kWorkerReady, ZMQ_SNDMORE);
-  //send_uint64(&socket, worker_index_);
   bool should_continue = true;
   do {
     cmd_queue.pop(cmd);  // blocking
@@ -80,9 +78,6 @@ void worker::operator()() {
         break;
     }  // switch
   } while (should_continue);
-  // XXXX
-  //send_empty_message(&socket, ZMQ_SNDMORE);
-  //send_char(&socket, c2b::kWorkerDone);
 }
 
 worker_cmd_queue_ptr worker::get_cmd_queue() const {

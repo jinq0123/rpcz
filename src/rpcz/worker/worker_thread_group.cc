@@ -35,6 +35,8 @@ workers_commander_ptr worker_thread_group::get_workers_commander() const {
 }
 
 void worker_thread_group::join_all() {  // blocking
+  for (int i = 0; i < threads_; i++)
+    workers_commander_->quit_worker(i);
   thread_group_.join_all();
 }
 
