@@ -29,7 +29,6 @@
 #include <rpcz/request_handler.hpp>
 #include <rpcz/rpc_controller.hpp>  // for rpc_controller
 #include <rpcz/rpcz.pb.h>
-// DEL #include <rpcz/zmq_utils.hpp>  // for send_empty_message()
 #include <rpcz/worker/worker_cmd.hpp>  // for kRunClosure
 
 namespace rpcz {

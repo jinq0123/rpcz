@@ -32,8 +32,6 @@ const char kReply           = 0x05;  // reply to a request
 const char kRunClosure      = 0x06;  // run a closure
 const char kRegisterSvc     = 0x07;  // register service
 const char kQuit            = 0x0f;  // quit all workers
-// Messages sent from a worker thread to the broker:
-const char kWorkerDone      = 0x22;  // Sent just before the worker quits.
 }  // namespace c2b
 
 }  // namespace rpcz
