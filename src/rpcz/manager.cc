@@ -37,9 +37,6 @@
 
 namespace rpcz {
 
-manager::weak_ptr manager::this_weak_ptr_;
-boost::mutex manager::this_weak_ptr_mutex_;
-
 manager::manager()
   : context_(new zmq::context_t(1)),  // scope_ptr
     terminated_(new sync_event),  // scoped_ptr
@@ -71,17 +68,8 @@ manager::manager()
   event.wait();
 }
 
-manager_ptr manager::get_new() {
-  lock_guard lock(this_weak_ptr_mutex_);
-  manager_ptr p = this_weak_ptr_.lock();
-  if (p) return p;
-  p.reset(new manager);
-  this_weak_ptr_ = p;
-  return p;
-}
-
 bool manager::is_destroyed() {
-  return 0 == this_weak_ptr_.use_count();
+  return dyn_singleton_helper::mgr_wptr.expired();
 }
 
 // used by get_frontend_socket()

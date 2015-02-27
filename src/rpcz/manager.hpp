@@ -23,7 +23,6 @@
 #include <boost/atomic/atomic.hpp>  // for atomic_uint64_t
 #include <boost/noncopyable.hpp>
 #include <boost/thread.hpp>
-#include <boost/weak_ptr.hpp>
 
 #include <rpcz/common.hpp>
 #include <rpcz/manager_ptr.hpp>
@@ -45,18 +44,24 @@ class worker_thread_group;
 // manager is thread-safe.
 // manager is singleton.
 class manager : boost::noncopyable {
- private:
-  manager();
-
  public:
-  // Dynamic singleton. Auto destruct.
+  // Dynamic singleton. Auto destroyed.
+  // See: (A dynamic) Singleton using weak_ptr and shared_ptr
+  // http://boost.2283326.n4.nabble.com/A-dynamic-Singleton-using-weak-ptr-and-shared-ptr-td2581447.html
+  // Constructed on first use, and destroyed if not referenced anymore.
   static inline manager_ptr get();
   static bool is_destroyed();  // for debug
 
- public:
+ private:
+  manager();
   // Blocks the current thread until all connections have completed.
-  ~manager();
+  virtual ~manager();
 
+  struct dyn_singleton_helper;
+  struct dyn_singleton_deleter;
+  friend dyn_singleton_deleter;
+
+ public:
   // Binds a socket to the given endpoint.
   // And binds service factories to this socket.
   void bind(const std::string& endpoint,
@@ -84,15 +89,6 @@ class manager : boost::noncopyable {
   void join_threads();
 
  private:
-  static manager_ptr get_new();  // used by get()
-
- private:
-  typedef boost::weak_ptr<manager> weak_ptr;
-  typedef boost::lock_guard<boost::mutex> lock_guard;
-  static weak_ptr this_weak_ptr_;
-  static boost::mutex this_weak_ptr_mutex_;
-
- private:
   scoped_ptr<zmq::context_t> context_;
   // thread specific frontend socket
   boost::thread_specific_ptr<zmq::socket_t> tss_fe_socket_;
@@ -109,11 +105,14 @@ class manager : boost::noncopyable {
   // Map router index to factories.
   const scoped_ptr<router_service_factories> factories_;  // thread-safe
 };  // class manager
+}  // namespace rpcz
+
+#include <rpcz/manager_dyn_singleton_helper.hpp>
+
+namespace rpcz {
 
 manager_ptr manager::get() {
-  manager_ptr p = this_weak_ptr_.lock();
-  if (p) return p;
-  return get_new();
+  return dyn_singleton_helper::get_manager_ptr();
 }
 
 zmq::socket_t& manager::get_frontend_socket() {

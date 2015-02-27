@@ -20,6 +20,7 @@ set(RPCZ_SOURCES
     connection.cc
     cpp_service.cc
     manager.cc
+    manager_dyn_singleton_helper.cc
     reactor.cc
     request_handler.cc
     request_handler_map.cc
