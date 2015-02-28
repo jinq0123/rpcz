@@ -45,12 +45,8 @@ private:
 };
 
 inline manager_ptr manager::dyn_singleton_helper::get_manager_ptr() {
-  // Syncronise Initialization:
-  boost::recursive_mutex::scoped_lock lock(
-      dyn_singleton_helper::mgr_wptr_mtx);
-
   // Acquire singleton pointer:
-  manager_ptr p = dyn_singleton_helper::mgr_wptr.lock();
+  manager_ptr p = dyn_singleton_helper::mgr_wptr.lock();  // thread-safe
   if (p) return p;
 
   return make_manager_ptr();
