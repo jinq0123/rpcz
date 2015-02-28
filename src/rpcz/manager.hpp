@@ -111,11 +111,11 @@ class manager : boost::noncopyable {
 
 namespace rpcz {
 
-manager_ptr manager::get() {
+inline manager_ptr manager::get() {
   return dyn_singleton_helper::get_manager_ptr();
 }
 
-zmq::socket_t& manager::get_frontend_socket() {
+inline zmq::socket_t& manager::get_frontend_socket() {
   zmq::socket_t* socket = tss_fe_socket_.get();
   if (socket)
       return *socket;

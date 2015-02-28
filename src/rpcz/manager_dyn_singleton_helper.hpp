@@ -36,7 +36,7 @@ struct manager::dyn_singleton_helper : private boost::noncopyable {
   static inline manager_ptr get_manager_ptr();
 
 private:
-  static manager_ptr get_new_manager_ptr();
+  static manager_ptr make_manager_ptr();
 
 private:
   // no constructing
@@ -53,7 +53,7 @@ inline manager_ptr manager::dyn_singleton_helper::get_manager_ptr() {
   manager_ptr p = dyn_singleton_helper::mgr_wptr.lock();
   if (p) return p;
 
-  return get_new_manager_ptr();
+  return make_manager_ptr();
 }
 
 }  // namespace rpcz

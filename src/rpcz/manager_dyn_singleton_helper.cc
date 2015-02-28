@@ -18,6 +18,14 @@ bool manager::dyn_singleton_helper::mgr_exists = false;
 boost::recursive_mutex manager::dyn_singleton_helper::mgr_exists_mtx;
 boost::condition_variable_any manager::dyn_singleton_helper::cond;
 
+struct manager::dyn_singleton_deleter {
+  void operator()(manager* p) {
+    BOOST_ASSERT(p);
+    delete p;
+    manager::dyn_singleton_helper::finish_destruction();
+  }
+};
+
 void manager::dyn_singleton_helper::start_construction()
 {
   boost::recursive_mutex::scoped_lock lock(mgr_exists_mtx);
@@ -34,19 +42,11 @@ void manager::dyn_singleton_helper::finish_destruction()
   cond.notify_one();
 }
 
-manager_ptr manager::dyn_singleton_helper::get_new_manager_ptr() {
+manager_ptr manager::dyn_singleton_helper::make_manager_ptr() {
   start_construction();
-  manager_ptr p(new manager(), dyn_singleton_deleter());  // shared_ptr
+  manager_ptr p(new manager(), manager::dyn_singleton_deleter());  // shared_ptr
   mgr_wptr = p;
   return p;
-}
-
-struct dyn_singleton_deleter {
-  void operator()(manager* p) {
-    BOOST_ASSERT(p);
-    delete p;
-    manager::dyn_singleton_helper::finish_destruction();
-  }
 }
 
 }  // namespace rpcz
