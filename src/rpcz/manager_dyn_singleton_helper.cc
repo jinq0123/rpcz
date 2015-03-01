@@ -22,7 +22,7 @@ struct manager::dyn_singleton_deleter {
   void operator()(manager* p) {
     BOOST_ASSERT(p);
     delete p;
-    manager::dyn_singleton_helper::finish_destruction();
+    dyn_singleton_helper::finish_destruction();
   }
 };
 
@@ -44,10 +44,9 @@ void manager::dyn_singleton_helper::finish_destruction()
 
 manager_ptr manager::dyn_singleton_helper::make_manager_ptr() {
   // Syncronise Initialization:
-  boost::recursive_mutex::scoped_lock lock(
-      dyn_singleton_helper::mgr_wptr_mtx);
+  boost::recursive_mutex::scoped_lock lock(mgr_wptr_mtx);
   // Acquire singleton pointer:
-  manager_ptr p = dyn_singleton_helper::mgr_wptr.lock();
+  manager_ptr p = mgr_wptr.lock();
   if (p) return p;
 
   start_construction();  // blocking until previous object finished destruction.
