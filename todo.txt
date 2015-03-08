@@ -13,3 +13,14 @@
     SearchResponse resp = searchStub.SearchGold();
 
 * Use TBB concurrent queue instead of ZMQ inproc queue.
+
+* Specify the worker thread index. Like:
+  searchStub.SetWorkerIndex(1);  // runs in thread 1
+  searchStub.SetWorkerIndex(rand());  // randomly select a thread
+  
+  Default use the current worker thread. GetCurrentWorkerThreadIndex()?
+  Use thread 1 if not in worker thread. 0 == GetCurrentWorkerThreadIndex()
+  
+  searchStub.SetRandomDispatch();  // Do not specify worker thread.
+                                   // Dispatch to a random thread on each request.
+  Run callback in the requesting worker thread.
